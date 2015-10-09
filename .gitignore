@@ -1,0 +1,8 @@
+# OS specific
+.DS_Store
+
+# Binaries
+bin
+
+# Mergecrap files
+*.orig
