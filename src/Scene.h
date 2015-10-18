@@ -23,7 +23,7 @@ public:
     Scene();
     ~Scene();
 
-    void init();
+    void initialize();
     void draw();
 
     void addGeometry(Geometry *);

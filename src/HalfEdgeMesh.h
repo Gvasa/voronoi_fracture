@@ -28,7 +28,7 @@ public:
     HalfEdgeMesh() { };
     ~HalfEdgeMesh();
 
-    void init();
+    void initialize();
     void draw();
 
     bool addFace();

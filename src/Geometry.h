@@ -14,7 +14,7 @@ public:
     virtual ~Geometry() {};
 
     // A Geometry must have the following:
-    virtual void init() = 0;
+    virtual void initialize() = 0;
     virtual void draw() = 0;
     virtual bool addFace() = 0;
 

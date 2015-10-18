@@ -14,7 +14,9 @@ HalfEdgeMesh::~HalfEdgeMesh() {
 }
 
 // Add init stuff here, right now its just some random shit for the red ugly triangle
-void HalfEdgeMesh::init() {
+void HalfEdgeMesh::initialize() {
+
+    std::cout << "\nInitializing Half-Edge mesh ...\n\n";
 
     glGenVertexArrays(1, &vertexArrayID);
     
@@ -32,6 +34,8 @@ void HalfEdgeMesh::init() {
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+    std::cout << "\nHalf-Edge mesh initialized!\n" << std::endl;
 }
 
 // Add draw stuff here, right now its just some random shit for the red ugly triangle
