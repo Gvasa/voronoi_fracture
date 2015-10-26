@@ -5,7 +5,13 @@ CC = g++-4.9
 CFLAGS = -O3
 
 # Libs and Frameworks:
-FRAMEWORKS = -lglew -lglfw3 -framework Opengl -framework Cocoa -framework IOKit -framework CoreVideo -std=c++11
+ifeq ($(OS), LINUX)
+	FRAMEWORKS = -lglew -lglfw3 -framework Opengl -framework Cocoa -framework IOKit -framework CoreVideo -std=c++11
+else
+	FRAMEWORKS = -lGLEW -lglfw3 -lGL -lX11 -lXi -lXrandr -lXxf86vm -lXinerama -lXcursor -lrt -lm -pthread -ldl -std=c++11
+endif
+
+
 
 # Location for libs:
 LIBFOLD = -L"/usr/local/lib"
