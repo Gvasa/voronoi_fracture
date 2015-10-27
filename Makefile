@@ -6,9 +6,9 @@ CFLAGS = -O3
 
 # Libs and Frameworks:
 ifeq ($(OS), LINUX)
-	FRAMEWORKS = -lglew -lglfw3 -framework Opengl -framework Cocoa -framework IOKit -framework CoreVideo -std=c++11
-else
 	FRAMEWORKS = -lGLEW -lglfw3 -lGL -lX11 -lXi -lXrandr -lXxf86vm -lXinerama -lXcursor -lrt -lm -pthread -ldl -std=c++11
+else
+	FRAMEWORKS = -lglew -lglfw3 -framework Opengl -framework Cocoa -framework IOKit -framework CoreVideo -std=c++11	
 endif
 
 
