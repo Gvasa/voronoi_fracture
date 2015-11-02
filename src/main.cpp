@@ -16,6 +16,8 @@ int initializeOpenGL();
 void initializeScene();
 double calcFPS(double, std::string);
 
+
+
 int main (int argc, char* argv[]) {
 
     scene = new Scene();

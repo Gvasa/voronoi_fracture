@@ -6,6 +6,7 @@
 
 #ifndef SCENE_H
 #define SCENE_H
+#define GLM_FORCE_RADIANS
 
 #include <iostream>
 #include <stdio.h>
@@ -20,6 +21,8 @@
 #include "Geometry.h"
 #include "math/Matrix4x4.h"
 #include "math/Vector3.h"
+
+
 
 
 class Scene{

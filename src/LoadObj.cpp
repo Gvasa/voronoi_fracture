@@ -20,13 +20,13 @@ bool LoadObj::Load(HalfEdgeMesh *mesh, std::istream &is){
 	// Build Mesh
 	const unsigned int numTriangles = loadData.triangles.size();
 	for(unsigned int t = 0; t < numTriangles; t++){
-		Vector3<unsigned int> & triangle = loadData.triangles;
+		Vector3<unsigned int> & triangle = loadData.triangles[t];
 		std::vector<Vector3 <float> > verts;
 		verts.push_back(loadData.verts[triangle[0]]);
 		verts.push_back(loadData.verts[triangle[1]]);
 		verts.push_back(loadData.verts[triangle[2]]);
 
-		mesh->AddFace(verts);
+		mesh->addFace(verts);
 	}
 	return true;
 }
@@ -44,7 +44,7 @@ bool LoadObj::ReadHeader(std::istream &is){
 		return false;
 }
 
-bool ObjIO::ReadData(std::istream & is){
+bool LoadObj::ReadData(std::istream & is){
   std::string lineBuf;
   int c;
   int i=0;
@@ -101,5 +101,15 @@ bool ObjIO::ReadData(std::istream & is){
     i++;
   }
   return true;
+}
+
+Vector3<unsigned int> LoadObj::ReadTri(std::istream &is){
+  //  This is a simplified version of an obj reader that can't read normal and texture indices
+  std::string buf, v;
+  is >> buf;
+  assert(buf == "f" || buf=="F");
+
+  getline(is, v); // read indices
+  return Vector3<unsigned int>(v) - Vector3<unsigned int>(1,1,1); // obj file format is 1-based
 }
 
