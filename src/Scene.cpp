@@ -32,7 +32,7 @@ void Scene::initialize() {
     // Background color
     glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
 
-    for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
+   for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
         (*it)->initialize();
 }
 
@@ -61,11 +61,13 @@ void Scene::draw() {
     // Draw Geometries in scene
     for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
         (*it)->draw(MVP);
+
 }
 
 
 void Scene::addGeometry(Geometry *G) {
     mGeometries.push_back(G);
+    std::cout << mGeometries.size() << std::endl;
 }
 
 Matrix4x4<float> Scene::toMatrix4x4(glm::mat4 m) {

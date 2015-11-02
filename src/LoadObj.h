@@ -10,26 +10,30 @@
 #define LOADOBJ_H
 
 // Libs and headers
-#include <string>
+#include <string.h>
+#include <stdio.h>
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <exception>
+#include <unistd.h>
+
 
 // Classes
 #include "HalfEdgeMesh.h"
 #include "math/Vector3.h"
 
 class LoadObj{
-public: 
+public:
 	LoadObj() {}
 
-	bool Load(Geometry *, std::istream & is); //false return on error
+	bool loadObject(Geometry *, std::string fileName); //false return on error
 
 protected:
-	bool ReadHeader(std::istream &is);
-	bool ReadData(std::istream &is);
+	bool readHeader(std::istream &is);
+	bool readData(std::istream &is);
 
-	Vector3<unsigned int> ReadTri(std::istream &is);
+	Vector3<unsigned int> readTri(std::istream &is);
 
 	struct LoadData{
 		std::vector<Vector3 <float> > verts;

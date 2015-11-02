@@ -79,15 +79,15 @@ void HalfEdgeMesh::draw(Matrix4x4<float> MVP) {
 
 // This is where we add a face to the half-edge structure
 bool HalfEdgeMesh::addFace(std::vector<Vector3 <float> > verts) {
-    // Add verts and edges here
+   std::cout << "addFAce" << std::endl;
 }
 
 // This is where we add an edge to the half-edge structure
 bool HalfEdgeMesh::addEdge() {
-    
+    std::cout << "addEdge" << std::endl;
 }
 
 // This is where we add a vertex to the half-edge structure
 bool HalfEdgeMesh::addVertex() {
-    
+    std::cout << "addVertex" << std::endl;
 }

@@ -14,15 +14,16 @@
 GLFWwindow* window;
 Geometry *mesh;
 Scene *scene;
-LoadObj *obj;
 std::string windowTitle = "Voronoi Fracture";
+LoadObj *objectLoader;
 
 int initializeOpenGL();
 void initializeScene();
 void mouseButton(GLFWwindow* window, int button, int action, int mods);
 void mouseMotion(GLFWwindow* window, double x, double y);
 double calcFPS(double, std::string);
-void initializeIstream();
+
+
 
 
 
@@ -40,7 +41,10 @@ int main (int argc, char* argv[]) {
     
     // Create geometries and add them to the scene
     mesh = new HalfEdgeMesh();
-    initializeIstream();
+
+    objectLoader = new LoadObj();
+    objectLoader->loadObject(mesh, "assets/stanford-bunny.obj");
+
     scene->addGeometry(mesh);
 
     initializeScene();
@@ -210,32 +214,3 @@ double calcFPS(double timeInterval = 1.0, std::string windowTitle = "NONE") {
     return fps;
 }
 
-void initializeIstream(){
-    std::filebuf fb;
-
-
-    try(fb.open("tetrahedron.obj", std::ios::in))
-    {
-        //std::ifstream is (&fb);
-        std::cout << "open" << std::endl;
-        /*if(is){
-            is.seekg(0, is.end);
-            int length = is.tellg();
-            is.seekg(0, is.beg);
-            char * buffer = new char [length];
-
-            is.read(buffer,length);
-
-            delete[] buffer;
-
-        }
-        is.close();*/
-    } catch (exception& e) {
-        std::cout << e.what() << std::endl;
-    }
-
-    fb.close();
-    //obj = new LoadObj();
-    //obj->Load(mesh, is);
-    //is.close();
-}
