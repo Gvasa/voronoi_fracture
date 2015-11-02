@@ -17,7 +17,7 @@
 
 // Classes
 #include "HalfEdgeMesh.h"
-#include "Math/Vector3.h"
+#include "math/Vector3.h"
 
 class LoadObj{
 public: 
@@ -28,6 +28,8 @@ public:
 protected:
 	bool ReadHeader(std::istream &is);
 	bool ReadData(std::istream &is);
+
+	Vector3<unsigned int> ReadTri(std::istream &is);
 
 	struct LoadData{
 		std::vector<Vector3 <float> > verts;

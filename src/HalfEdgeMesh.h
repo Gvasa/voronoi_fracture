@@ -31,7 +31,7 @@ public:
     void initialize();
     void draw(Matrix4x4<float>);
 
-    bool addFace();
+    bool addFace(std::vector<Vector3 <float> >);
     bool addEdge();
     bool addVertex();
 

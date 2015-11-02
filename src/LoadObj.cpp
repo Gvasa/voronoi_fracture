@@ -103,3 +103,13 @@ bool LoadObj::ReadData(std::istream & is){
   return true;
 }
 
+Vector3<unsigned int> LoadObj::ReadTri(std::istream &is){
+  //  This is a simplified version of an obj reader that can't read normal and texture indices
+  std::string buf, v;
+  is >> buf;
+  assert(buf == "f" || buf=="F");
+
+  getline(is, v); // read indices
+  return Vector3<unsigned int>(v) - Vector3<unsigned int>(1,1,1); // obj file format is 1-based
+}
+

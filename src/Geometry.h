@@ -20,9 +20,10 @@ public:
     // A Geometry must have the following:
     virtual void initialize() = 0;
     virtual void draw(Matrix4x4<float>) = 0;
+    virtual bool addFace(std::vector<Vector3 <float> >) = 0;
 
     // A Geometry might have the following:
-    virtual bool addFace() {};
+    // Add functions
 };
 
 #endif // GEOMETRY_H
