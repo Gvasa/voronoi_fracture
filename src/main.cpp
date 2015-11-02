@@ -20,6 +20,8 @@ void mouseButton(GLFWwindow* window, int button, int action, int mods);
 void mouseMotion(GLFWwindow* window, double x, double y);
 double calcFPS(double, std::string);
 
+
+
 int main (int argc, char* argv[]) {
 
     scene = new Scene();
