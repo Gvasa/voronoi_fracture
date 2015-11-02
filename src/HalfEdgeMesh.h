@@ -20,6 +20,8 @@
 // Classes
 #include "Geometry.h"
 #include "tools/shader.hpp"
+#include "math/Vector3.h"
+#include "math/Vector4.h"
 
 class HalfEdgeMesh : public Geometry {
 

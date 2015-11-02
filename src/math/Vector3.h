@@ -12,7 +12,7 @@
 #ifndef _vector3_h
 #define _vector3_h
 
-#include "Math/Vector4.h"
+#include "Vector4.h"
 #include <cmath>
 #include <iostream>
 #include <string>

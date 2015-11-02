@@ -31,9 +31,14 @@ void HalfEdgeMesh::initialize() {
          0.0f,  1.0f, 0.0f,
     };
 
+    std::vector<Vector3<float> > verts;
+    verts.push_back(Vector3<float>(-1.0f, -1.0f, 0.0f));
+    verts.push_back(Vector3<float>(1.0f, -1.0f, 0.0f));
+    verts.push_back(Vector3<float>(0.0f, 1.0f, 0.0f));
+
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(Vector3<float>), &verts[0], GL_STATIC_DRAW);
 
     std::cout << "\nHalf-Edge mesh initialized!\n" << std::endl;
 }
