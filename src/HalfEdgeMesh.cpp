@@ -25,13 +25,14 @@ void HalfEdgeMesh::initialize() {
     // Create and compile our GLSL program from the shaders
     shaderProgram = LoadShaders( "shaders/SimpleVertexShader.vertexshader", "shaders/SimpleFragmentShader.fragmentshader" );
 
+    MVPLoc = glGetUniformLocation(shaderProgram, "MVP");
+
     static const GLfloat g_vertex_buffer_data[] = {
         -1.0f, -1.0f, 0.0f,
          1.0f, -1.0f, 0.0f,
          0.0f,  1.0f, 0.0f,
     };
 
-    std::vector<Vector3<float> > verts;
     verts.push_back(Vector3<float>(-1.0f, -1.0f, 0.0f));
     verts.push_back(Vector3<float>(1.0f, -1.0f, 0.0f));
     verts.push_back(Vector3<float>(0.0f, 1.0f, 0.0f));
@@ -40,18 +41,9 @@ void HalfEdgeMesh::initialize() {
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(Vector3<float>), &verts[0], GL_STATIC_DRAW);
 
-    std::cout << "\nHalf-Edge mesh initialized!\n" << std::endl;
-}
-
-// Add draw stuff here, right now its just some random shit for the red ugly triangle
-void HalfEdgeMesh::draw() {
-
-    // Use our shader
-    glUseProgram(shaderProgram);
-
     // 1rst attribute buffer : vertices
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    //glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glVertexAttribPointer(
         0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
         3,                  // size
@@ -61,9 +53,27 @@ void HalfEdgeMesh::draw() {
         (void*)0            // array buffer offset
     );
 
-    // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0, 3); // 3 indices starting at 0 -> 1 triangle
+    std::cout << "\nHalf-Edge mesh initialized!\n" << std::endl;
+}
 
+// Add draw stuff here, right now its just some random shit for the red ugly triangle
+void HalfEdgeMesh::draw(Matrix4x4<float> MVP) {
+
+    // Use our shader
+    glUseProgram(shaderProgram);
+
+    glUniformMatrix4fv(MVPLoc, 1, GL_FALSE, &MVP(0, 0));
+
+    glBindVertexArray(vertexArrayID);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(Vector3<float>), &verts[0], GL_STATIC_DRAW);
+
+    // Draw the triangle !
+    glDrawArrays(GL_TRIANGLES, 0, verts.size()); // 3 indices starting at 0 -> 1 triangle
+    
+    // Unbind
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDisableVertexAttribArray(0);
 }
 

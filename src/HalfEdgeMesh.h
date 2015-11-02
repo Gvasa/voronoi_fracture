@@ -20,8 +20,6 @@
 // Classes
 #include "Geometry.h"
 #include "tools/shader.hpp"
-#include "math/Vector3.h"
-#include "math/Vector4.h"
 
 class HalfEdgeMesh : public Geometry {
 
@@ -31,7 +29,7 @@ public:
     ~HalfEdgeMesh();
 
     void initialize();
-    void draw();
+    void draw(Matrix4x4<float>);
 
     bool addFace();
     bool addEdge();
@@ -39,9 +37,17 @@ public:
 
 private:
 
+    // Shader data
     GLuint vertexArrayID;
     GLuint vertexBuffer;
     GLuint shaderProgram;
+
+    GLint MVPLoc;           // MVP matrix
+
+    // Ugly temporary placeholder, remove asap
+    std::vector<Vector3<float> > verts;
+
+    // Halfedge data
 
     // Denotes a reference to a border, only for face pointers
     const static unsigned int BORDER;

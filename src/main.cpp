@@ -3,8 +3,8 @@
 #include <math.h>
 
 // Headers
-#include "Scene.h"
 #include "HalfEdgeMesh.h"
+#include "Scene.h"
 #include "debug.h"
 
 GLFWwindow* window;
