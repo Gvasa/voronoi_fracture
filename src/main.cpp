@@ -5,7 +5,9 @@
 // Headers
 #include "HalfEdgeMesh.h"
 #include "Scene.h"
-#include "debug.h"
+#include "Controls.h"
+#include "utils/Utils.h"
+
 
 GLFWwindow* window;
 Geometry *mesh;
@@ -14,6 +16,8 @@ std::string windowTitle = "Voronoi Fracture";
 
 int initializeOpenGL();
 void initializeScene();
+void mouseButton(GLFWwindow* window, int button, int action, int mods);
+void mouseMotion(GLFWwindow* window, double x, double y);
 double calcFPS(double, std::string);
 
 int main (int argc, char* argv[]) {
@@ -33,6 +37,10 @@ int main (int argc, char* argv[]) {
     scene->addGeometry(mesh);
 
     initializeScene();
+
+    //Set functions to handle mouse input
+    glfwSetMouseButtonCallback(window, mouseButton);
+    glfwSetCursorPosCallback(window, mouseMotion);
 
     // Draw-loop
     do{
@@ -108,6 +116,29 @@ void initializeScene() {
     scene->initialize();
 }
 
+// Function that handles input from mouse, sends the position to scene 
+void mouseButton(GLFWwindow* window, int button, int action, int mods) {
+    if(button != GLFW_MOUSE_BUTTON_LEFT)
+        return;
+
+    switch(action) {
+        case GLFW_PRESS:
+            double x, y;
+            glfwGetCursorPos(window, &x, &y);
+            scene->mouseButtonClick(x, y);
+            break;
+        case GLFW_RELEASE:
+            scene->mouseButtonRelease();
+            break;
+        default:
+            break;
+    }
+}
+
+// handles mouse movement, send updated positions to the scene
+void mouseMotion(GLFWwindow* window, double x, double y) {
+    scene->updateCameraPosition(x, y);
+}
     
 double calcFPS(double timeInterval = 1.0, std::string windowTitle = "NONE") {
 
@@ -164,8 +195,8 @@ double calcFPS(double timeInterval = 1.0, std::string windowTitle = "NONE") {
         }
  
         // Reset the frame count to zero and set the initial time to be now
-        frameCount        = 0.0;
-        startTime = glfwGetTime();
+        frameCount  = 0.0;
+        startTime   = glfwGetTime();
     }
  
     // Return the current FPS - doesn't have to be used if you don't want it!

@@ -1,5 +1,16 @@
 #include "Scene.h"
 
+struct cameraHandler {
+    float fov = 45.0f;
+    float aspectRatio = 4.0f / 3.0f;
+    glm::quat orientation;
+
+    glm::mat4 projectionMatrix;
+    glm::mat4 viewMatrix;
+};
+
+cameraHandler camera;
+
 Scene::Scene() {
 
 }
@@ -28,22 +39,24 @@ void Scene::initialize() {
 // Draw all geometries
 void Scene::draw() {
 
-    const glm::mat4 projectionMatrix = glm::perspective(
-        45.0f,          // Field of view
-        4.0f / 3.0f,    // Aspect ratio
-        0.1f,           // Near clipping plane
-        100.0f);        // Far clipping pane
+    camera.projectionMatrix = glm::perspective(
+        camera.fov,          // field of view, 45.0
+        camera.aspectRatio,  // 4/3 atm
+        0.1f,                // Near clipping plane
+        100.0f);             // far clipping plane
 
-    const glm::mat4 viewMatrix = glm::lookAt(
-        glm::vec3(0, 0, 3),     // Camera / eye position
-        glm::vec3(0, 0, 0),     // Target, what do we look at
-        glm::vec3(0, 1, 0));    // Up-vector
+    camera.viewMatrix = glm::lookAt(
+        glm::vec3(0.0f, 0.0f, 3.0f),            // Camera / eye position
+        glm::vec3(0.0f, 0.0f, 0.0f),            // Target, what to look at
+        glm::vec3(0.0f, 1.0f, 0.0f)) *          // Up-vector                            
+        glm::mat4_cast(camera.orientation);     // multiplies the veiw matrix with current rotation
+
 
     // The scene modelmatrix is nothing atm, the geometries will have their own model transforms
     glm::mat4 modelMatrix = glm::mat4(1.0f);
 
     // Construct MVP matrix
-    Matrix4x4<float> MVP = toMatrix4x4(projectionMatrix * viewMatrix * modelMatrix);
+    Matrix4x4<float> MVP = toMatrix4x4(camera.projectionMatrix * camera.viewMatrix * modelMatrix);
 
     // Draw Geometries in scene
     for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
@@ -55,7 +68,6 @@ void Scene::addGeometry(Geometry *G) {
     mGeometries.push_back(G);
 }
 
-
 Matrix4x4<float> Scene::toMatrix4x4(glm::mat4 m) {
     float M[4][4] = {
         {m[0][0], m[0][1], m[0][2], m[0][3]},
@@ -64,4 +76,12 @@ Matrix4x4<float> Scene::toMatrix4x4(glm::mat4 m) {
         {m[3][0], m[3][1], m[3][2], m[3][3]}
     };
     return Matrix4x4<float>(M);
+}
+
+void Scene::updateCameraPosition(double x, double y) {
+    if(! control.dragged())
+        return;
+
+    control.rotate(camera.orientation, x, y);
+    control.dragUpdate(x, y);
 }
