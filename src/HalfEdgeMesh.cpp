@@ -41,7 +41,7 @@ void HalfEdgeMesh::initialize() {
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(Vector3<float>), &verts[0], GL_STATIC_DRAW);
 
-    // 1rst attribute buffer : vertices
+    // 1st attribute buffer : vertices
     glEnableVertexAttribArray(0);
     //glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glVertexAttribPointer(
@@ -59,7 +59,7 @@ void HalfEdgeMesh::initialize() {
 // Add draw stuff here, right now its just some random shit for the red ugly triangle
 void HalfEdgeMesh::draw(Matrix4x4<float> MVP) {
 
-    // Use our shader
+    // Use shader
     glUseProgram(shaderProgram);
 
     glUniformMatrix4fv(MVPLoc, 1, GL_FALSE, &MVP(0, 0));

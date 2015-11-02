@@ -40,6 +40,11 @@ private:
 
     std::vector<Geometry *>mGeometries;
 
+
+    struct LightSource {
+        Vector4<float> color;
+        Vector3<float> position;
+    };
 };
 
 #endif // SCENE_H

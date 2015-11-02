@@ -4,12 +4,14 @@
 
 // Headers
 #include "HalfEdgeMesh.h"
+#include "Rectangle.h"
 #include "Scene.h"
 #include "debug.h"
 
 GLFWwindow* window;
 Geometry *mesh;
 Scene *scene;
+Rectangle *floor_rect;
 std::string windowTitle = "Voronoi Fracture";
 
 int initializeOpenGL();
@@ -29,7 +31,11 @@ int main (int argc, char* argv[]) {
     }
     
     // Create geometries and add them to the scene
+    floor_rect = new Rectangle(2.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
+    floor_rect->rotate(Vector3<float>(1.0, 0.0, 0.0), 90.0f);
     mesh = new HalfEdgeMesh();
+
+    scene->addGeometry(floor_rect);
     scene->addGeometry(mesh);
 
     initializeScene();
@@ -52,6 +58,7 @@ int main (int argc, char* argv[]) {
            glfwWindowShouldClose(window) == 0 );
 
     // Clean-up
+    delete floor_rect;
     delete scene;
 
     // Close OpenGL window and terminate GLFW

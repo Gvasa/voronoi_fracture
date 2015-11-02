@@ -32,10 +32,10 @@ void Scene::draw() {
         45.0f,          // Field of view
         4.0f / 3.0f,    // Aspect ratio
         0.1f,           // Near clipping plane
-        100.0f);        // Far clipping pane
+        100.0f);        // Far clipping plane
 
     const glm::mat4 viewMatrix = glm::lookAt(
-        glm::vec3(0, 0, 3),     // Camera / eye position
+        glm::vec3(2, 2, 4),     // Camera / eye position
         glm::vec3(0, 0, 0),     // Target, what do we look at
         glm::vec3(0, 1, 0));    // Up-vector
 

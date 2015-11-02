@@ -42,6 +42,7 @@ private:
     GLuint vertexBuffer;
     GLuint shaderProgram;
 
+    // Shader indices for Matrices
     GLint MVPLoc;           // MVP matrix
 
     // Ugly temporary placeholder, remove asap
