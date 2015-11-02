@@ -9,7 +9,7 @@
 #include "LoadObj.h"
 #include "HalfEdgeMesh.h"
 
-bool LoadObj::Load(HalfEdgeMesh *mesh, std::istream &is){
+bool LoadObj::Load(Geometry *mesh, std::istream &is){
 	// std::cerr << "Reading obj file.\nOutputting any skipped line(s) for reference.\n";
 	bool success = ReadHeader(is);
 	if(!success) {return false;}
@@ -34,7 +34,9 @@ bool LoadObj::Load(HalfEdgeMesh *mesh, std::istream &is){
 bool LoadObj::ReadHeader(std::istream &is){
 	std::string buf;
 	//read only to the first line starting with "v"
+  std::cout << "1" << std::endl;
 	while(!is.eof() && is.peek() != 'v'){
+    std::cout << is << std::endl;
 		getline(is, buf);
 		//std::cerr << "\"" << buf << "\"\n";
 	}
