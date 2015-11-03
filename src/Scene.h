@@ -42,6 +42,7 @@ public:
 
     void addGeometry(Geometry *);
     void updateCameraPosition(double x, double y);
+    void updateCameraZoom(double x, double y);
     void mouseButtonClick(double x, double y) { control.dragStart(x, y); }
     void mouseButtonRelease() { control.dragEnd(); }
 

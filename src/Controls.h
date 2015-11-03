@@ -20,8 +20,8 @@ class Controls{
 
 public:
 
-    Controls(float radius, float x = 512, float y = 384) 
-            : mRadius(radius), mCenterPosition(glm::vec2(x, y)) {}
+    Controls(float radius, float x = WIDTH, float y = HEIGHT) 
+            : mRadius(radius), mCenterPosition(glm::vec2(x/2.0, y/2.0)) {}
 
     ~Controls();
 

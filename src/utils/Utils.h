@@ -11,6 +11,9 @@
 
 #define debug std::cout << "vid: " << __LINE__ << " " << __FUNCTION__ << std::endl << std::endl;
 
+const int WIDTH = 1024;
+const int HEIGHT = 768;
+
 class Utils {
 
 public:

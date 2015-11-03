@@ -3,6 +3,7 @@
 struct cameraHandler {
     float fov = 45.0f;
     float aspectRatio = 4.0f / 3.0f;
+    float zoom = 0.0f;
     glm::quat orientation;
 
     glm::mat4 projectionMatrix;
@@ -61,7 +62,7 @@ void Scene::render() {
         100.0f);             // far clipping plane
 
     camera.viewMatrix = glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 3.0f),            // Camera / eye position
+        glm::vec3(0.0f, 0.0f, 3.0f+camera.zoom),            // Camera / eye position
         glm::vec3(0.0f, 0.0f, 0.0f),            // Target, what to look at
         glm::vec3(0.0f, 1.0f, 0.0f)) *          // Up-vector                            
         glm::mat4_cast(camera.orientation);     // multiplies the veiw matrix with current rotation
@@ -122,4 +123,8 @@ void Scene::updateCameraPosition(double x, double y) {
 
     control.rotate(camera.orientation, x, y);
     control.dragUpdate(x, y);
+}
+
+void Scene::updateCameraZoom(double x, double y) {
+    camera.zoom -= y / 3.0f;
 }

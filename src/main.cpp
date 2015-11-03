@@ -11,7 +11,6 @@
 #include "utils/Utils.h"
 #include "LoadObj.h"
 
-
 GLFWwindow* window;
 Scene *scene;
 Geometry *mesh;
@@ -26,6 +25,7 @@ int initializeOpenGL();
 void initializeScene();
 void mouseButton(GLFWwindow* window, int button, int action, int mods);
 void mouseMotion(GLFWwindow* window, double x, double y);
+void mouseScroll(GLFWwindow* window, double x, double y);
 double calcFPS(double, std::string);
 
 
@@ -71,6 +71,7 @@ int main (int argc, char* argv[]) {
     //Set functions to handle mouse input
     glfwSetMouseButtonCallback(window, mouseButton);
     glfwSetCursorPosCallback(window, mouseMotion);
+    glfwSetScrollCallback(window, mouseScroll);
 
     // render-loop
     do{
@@ -116,7 +117,7 @@ int initializeOpenGL() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow( 1024, 768, windowTitle.c_str(), NULL, NULL);
+    window = glfwCreateWindow( WIDTH, HEIGHT, windowTitle.c_str(), NULL, NULL);
     if( window == NULL ){
         fprintf( stderr, "Failed to open GLFW window. You might be having an old GPU\n" );
         glfwTerminate();
@@ -169,6 +170,10 @@ void mouseButton(GLFWwindow* window, int button, int action, int mods) {
 // handles mouse movement, send updated positions to the scene
 void mouseMotion(GLFWwindow* window, double x, double y) {
     scene->updateCameraPosition(x, y);
+}
+
+void mouseScroll(GLFWwindow* window, double x, double y) {
+    scene->updateCameraZoom(x, y);
 }
     
 double calcFPS(double timeInterval = 1.0, std::string windowTitle = "NONE") {
