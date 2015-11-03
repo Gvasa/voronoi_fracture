@@ -45,11 +45,13 @@ void Scene::initialize() {
         (*it)->initialize(mPointLight.position);
 }
 
-// Draw all geometries
-void Scene::draw() {
+// render all geometries
+void Scene::render() {
 
     glEnable( GL_CULL_FACE );
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    //glEnable(GL_BLEND);
 
 
     camera.projectionMatrix = glm::perspective(
@@ -79,11 +81,12 @@ void Scene::draw() {
     // Normal Matrix, used for normals in our shading
     mSceneMatrices[I_NM] = toMatrix4x4(glm::inverseTranspose(glm::mat4(camera.viewMatrix * modelMatrix)));
 
-    // Draw Geometries in scene
+    // render Geometries in scene
     for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
-        (*it)->draw(mSceneMatrices);
+        (*it)->render(mSceneMatrices);
 
-    //glDisable(GL_DEPTH_TEST);
+    //glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 }
 

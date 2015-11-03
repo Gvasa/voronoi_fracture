@@ -1,4 +1,4 @@
-#include "rectangle.h"
+#include "Rectangle.h"
 
 Rectangle::Rectangle(float w, float h, Vector3<float> p) 
 : mPosition(p) {
@@ -13,8 +13,6 @@ Rectangle::Rectangle(float w, float h, Vector3<float> p)
     mMaterial.specular      = Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
     mMaterial.specularity   = 50.0f;
     mMaterial.shinyness     = 0.8f;
-
-    std::cout << "ambient: (" << mMaterial.ambient[0] << ", " << mMaterial.ambient[1] << ", " << mMaterial.ambient[2] << ")" << std::endl;
 
     std::cout << "\nPlane created!\n";
 }
@@ -84,7 +82,7 @@ void Rectangle::initialize(Vector3<float> lightPosition) {
 }
 
 
-void Rectangle::draw(std::vector<Matrix4x4<float> > sceneMatrices) {
+void Rectangle::render(std::vector<Matrix4x4<float> > sceneMatrices) {
 
     // Use shader
     glUseProgram(shaderProgram);

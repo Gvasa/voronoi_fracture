@@ -60,7 +60,7 @@ int main (int argc, char* argv[]) {
 
     // Load obj file
     objectLoader = new LoadObj();
-    objectLoader->loadObject(mesh, "assets/cow.obj");
+    objectLoader->loadObject(mesh, "assets/sphere1.0.obj");
 
     scene->addGeometry(floor_rect);
     scene->addGeometry(wall_rect);
@@ -72,14 +72,14 @@ int main (int argc, char* argv[]) {
     glfwSetMouseButtonCallback(window, mouseButton);
     glfwSetCursorPosCallback(window, mouseMotion);
 
-    // Draw-loop
+    // render-loop
     do{
         calcFPS(1.0, windowTitle);
         // Clear the screen
-        glClear( GL_COLOR_BUFFER_BIT );
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Draw all geometries
-        scene->draw();
+        // render all geometries
+        scene->render();
 
         // Swap buffers
         glfwSwapBuffers(window);

@@ -22,7 +22,7 @@ public:
     ~Rectangle();
 
     void initialize(Vector3<float>);
-    void draw(std::vector<Matrix4x4<float> >);
+    void render(std::vector<Matrix4x4<float> >);
 
     void addVertex(Vector3<float> v) { mVerts.push_back(v); };
     void addNormal(Vector3<float> n) { mNormals.push_back(n); };

@@ -21,16 +21,20 @@
 // Classes
 #include "Geometry.h"
 #include "tools/shader.hpp"
+#include "utils/Utils.h"
 
 class HalfEdgeMesh : public Geometry {
 
 public:
 
-    HalfEdgeMesh() { };
+    HalfEdgeMesh();
     ~HalfEdgeMesh();
 
     void initialize(Vector3<float>);
-    void draw(std::vector<Matrix4x4<float> >);
+    void render(std::vector<Matrix4x4<float> >);
+
+    //Adds a triangle (face) to the mesh    
+    bool addFace(std::vector<Vector3 <float> >);
 
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
@@ -69,35 +73,31 @@ public:
 
     EdgeIterator getEdgeIterator(unsigned int i) { return EdgeIterator(this, i); }
     const EdgeIterator getEdgeIterator(unsigned int i) const { return EdgeIterator(this, i); }
-    
-    //Adds a triangle (face) to the mesh    
-    bool addFace(std::vector<Vector3 <float> >);
-
-    //Adds a vertex to the mesh
-    bool addVertex(const Vector3<float> &v, unsigned int &index);
-    
-    //Add a half edge pair, from vertex 1 to vertex2, to the mesh.
-    bool addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsigned int &index1, unsigned int &index2);
-
-    //! Compute and return the normal at face at faceIndex
-    virtual Vector3<float> calculateFaceNormal(unsigned int faceIndex) const;
 
 private:
 
     // Shader data
     GLuint vertexArrayID;
     GLuint vertexBuffer;
+    GLuint normalBuffer;
     GLuint shaderProgram;
 
     // Shader indices for Matrices
     GLint MVPLoc;           // MVP matrix
+    GLint MVLoc;            // MV matrix
+    GLint MVLightLoc;       // MVLight matrix
+    GLint NMLoc;            // NM matrix
+    GLint lightPosLoc;      // Light position
+    GLint colorLoc;         // Color
+    GLint lightAmbLoc;      // Ambient light
+    GLint lightDifLoc;      // Diffuse light
+    GLint lightSpeLoc;      // Specular light
+    GLint specularityLoc;   // Specular constant
+    GLint shinynessLoc;     // How much specularity (magnitude)
 
-    // Ugly temporary placeholder, remove asap
-    std::vector<Vector3<float> > verts;
+    struct Material : public Geometry::Material {   
+    } mMaterial;
 
-    
-    //a list in drawing order
-    std::vector< Vector3<float> > orderedVertexList;
     
     // Halfedge data
 
@@ -164,13 +164,34 @@ private:
     std::vector<Vertex> mVerts;
     // The faces in the mesh
     std::vector<Face> mFaces;
-
-
+    // Vertex list in drawing order
+    std::vector< Vector3<float> > orderedVertexList;
+    // Normal list in drawing order
+    std::vector< Vector3<float> > orderedNormalList;
 
     /*
      * MEMBER FUNCTIONS
      */
-    void buildVertexList();
+
+    //Adds a vertex to the mesh
+    bool addVertex(const Vector3<float> &v, unsigned int &index);
+    
+    //Add a half edge pair, from vertex 1 to vertex2, to the mesh.
+    bool addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsigned int &index1, unsigned int &index2);
+
+    //! Compute and return the normal at a face at faceIndex
+    Vector3<float> calculateFaceNormal(unsigned int faceIndex) const;
+
+    //! Compute and return the normal at a vertex at vertIndex
+    Vector3<float> calculateVertNormal(unsigned int vertIndex) const;
+
+    void buildRenderData();
+
+    void updateRenderData();
+
+    std::vector<unsigned int> findNeighborVertices(unsigned int) const;
+
+    std::vector<unsigned int> findNeighborFaces(unsigned int) const;
 
     /*
      * UTILITY

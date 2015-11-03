@@ -38,7 +38,7 @@ public:
     ~Scene();
 
     void initialize();
-    void draw();
+    void render();
 
     void addGeometry(Geometry *);
     void updateCameraPosition(double x, double y);

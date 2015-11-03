@@ -26,7 +26,7 @@ public:
      * A Geometry must have the following: 
      */
     virtual void initialize(Vector3<float>) = 0;
-    virtual void draw(std::vector<Matrix4x4<float> >) = 0;
+    virtual void render(std::vector<Matrix4x4<float> >) = 0;
 
 
     /* 
