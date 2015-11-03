@@ -11,7 +11,8 @@
 
 bool LoadObj::loadObject(Geometry *mesh, std::string fileName){
 
-    std::cout << "\nLoading obj-file: \n";
+
+    std::cout << "\nLoading obj-file: " << fileName.substr(fileName.find("/")+1) << "...\n";
 
     std::filebuf fb;
     if(fb.open (fileName, std::ios::in)) {
@@ -42,7 +43,7 @@ bool LoadObj::loadObject(Geometry *mesh, std::string fileName){
 		mesh->addFace(verts);
 	}
 
-    std::cout << "\nobj-file loaded\n";
+    std::cout << "\n" << fileName.substr(fileName.find("/")+1) << " successfully loaded!\n";
 
 	return true;
 }
