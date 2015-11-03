@@ -273,7 +273,6 @@ Vector3<float> HalfEdgeMesh::calculateVertNormal(unsigned int vertIndex) const {
     std::vector<unsigned int> faces = findNeighborFaces(vertIndex);
 
     for(unsigned int i = 0; i < faces.size(); i++) {
-        std::cout << getFace(faces[i]).normal << std::endl;
         normal += getFace(faces[i]).normal;
     }
 

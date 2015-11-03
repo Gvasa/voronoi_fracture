@@ -2,6 +2,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#define GLM_FORCE_RADIANS
+
 #include <iostream>
 #include <glm/gtx/string_cast.hpp>
 #include <stdio.h>

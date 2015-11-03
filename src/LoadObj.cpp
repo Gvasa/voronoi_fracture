@@ -10,23 +10,25 @@
 #include "HalfEdgeMesh.h"
 
 bool LoadObj::loadObject(Geometry *mesh, std::string fileName){
-	// std::cerr << "Reading obj file.\nOutputting any skipped line(s) for reference.\n";
 
-  std::filebuf fb;
-  if(fb.open (fileName, std::ios::in)) {
-    std::istream is(&fb);
+    std::cout << "\nLoading obj-file: \n";
+
+    std::filebuf fb;
+    if(fb.open (fileName, std::ios::in)) {
+        std::istream is(&fb);
 
     bool success = readHeader(is);
-    if(!success) { return false; }
+    if(!success)
+        return false;
 
     success = readData(is);
-    if(!success) { return false; } 
+    if(!success) 
+        return false;
 
     fb.close();
 
-  } else {
-    return false;
-  }
+    } else
+        return false;
     
 	// Build Mesh
 	const unsigned int numTriangles = loadData.triangles.size();
@@ -39,6 +41,9 @@ bool LoadObj::loadObject(Geometry *mesh, std::string fileName){
 
 		mesh->addFace(verts);
 	}
+
+    std::cout << "\nobj-file loaded\n";
+
 	return true;
 }
 
@@ -56,71 +61,67 @@ bool LoadObj::readHeader(std::istream &is){
 }
 
 bool LoadObj::readData(std::istream & is){
-  std::string lineBuf;
-  int c;
-  int i=0;
-  while(!is.eof()){
-    c = is.peek();
-    switch (c) {
-    case 'V':
-    case 'v':{
-      std::string startBuf;
-      is >> startBuf; // get the start of the line
-      getline(is, lineBuf); // get the rest of the line
-      if(startBuf == "v"){
-        loadData.verts.push_back(Vector3<float>(lineBuf));
-      }
+    std::string lineBuf;
+    int c;
+    int i=0;
+    while(!is.eof()){
+        c = is.peek();
+        switch (c) {
+        case 'V':
+        case 'v': {
+            std::string startBuf;
+            is >> startBuf; // get the start of the line
+            getline(is, lineBuf); // get the rest of the line
+            if(startBuf == "v")
+                loadData.verts.push_back(Vector3<float>(lineBuf));
+        }
+            break;
+        case 'F':
+        case 'f': {
+            std::stringstream buf;
+            is.get(*buf.rdbuf(), '\n'); // read a line into buf
+            is.get(); // read the not extracted \n
+            buf << "\n"; // and add it to the string stream
+
+            std::string tmp;
+            buf >> tmp; // get the first f or F (+ whitespace)
+
+            // count the number of faces, delimited by whitespace
+            int count = 0;
+            while (buf >> tmp)
+                count++;
+
+            // reset stream
+            buf.clear();
+            buf.seekg(0, std::ios::beg);
+
+            // Determine wheter we have a triangle or a quad
+            if (count == 3)
+                loadData.triangles.push_back(readTri(buf));
+            else {
+              std::cerr << "Encountered polygon with " << count << " faces. i'm giving up.\n";
+              return false;
+            }
+        }
+            break;
+        default:
+            // otherwise just skip the row
+            getline(is, lineBuf);
+
+            break;
+        }
+        i++;
     }
-      break;
-    case 'F':
-    case 'f':
-      {
-        std::stringstream buf;
-        is.get(*buf.rdbuf(), '\n'); // read a line into buf
-        is.get(); // read the not extracted \n
-        buf << "\n"; // and add it to the string stream
-
-        std::string tmp;
-        buf >> tmp; // get the first f or F (+ whitespace)
-
-        // count the number of faces, delimited by whitespace
-        int count = 0;
-        while (buf >> tmp){
-          count++;
-        }
-        // reset stream
-        buf.clear();
-        buf.seekg(0, std::ios::beg);
-
-        // Determine wheter we have a triangle or a quad
-        if (count == 3){
-          loadData.triangles.push_back(readTri(buf));
-        }
-        else {
-          std::cerr << "Encountered polygon with " << count << " faces. i'm giving up.\n";
-          return false;
-        }
-      }
-      break;
-    default:
-      // otherwise just skip the row
-      getline(is, lineBuf);
-      // output it so we see what we miss :)
-      // std::cerr << "\"" << lineBuf << "\"\n";
-      break;
-    }
-    i++;
-  }
-  return true;
+    return true;
 }
 
 Vector3<unsigned int> LoadObj::readTri(std::istream &is){
-  //  This is a simplified version of an obj reader that can't read normal and texture indices
-  std::string buf, v;
-  is >> buf;
-  assert(buf == "f" || buf=="F");
+    //  This is a simplified version of an obj reader that can't read normal and texture indices
+    std::string buf, v;
+    is >> buf;
+    assert(buf == "f" || buf=="F");
 
-  getline(is, v); // read indices
-  return Vector3<unsigned int>(v) - Vector3<unsigned int>(1,1,1); // obj file format is 1-based
+    getline(is, v); // read indices
+    return Vector3<unsigned int>(v) - Vector3<unsigned int>(1,1,1); // obj file format is 1-based
 }
 
