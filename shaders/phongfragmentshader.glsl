@@ -1,6 +1,7 @@
 #version 330 core
 
 uniform mat4 NM;
+uniform vec4 color;
 uniform vec4 ambientColor;
 uniform vec4 diffuseColor;
 uniform vec4 specularColor;
@@ -11,7 +12,7 @@ in vec3 normal;
 in vec3 v;
 in vec3 light_direction;
 
-out vec4 color;
+out vec4 frag_color;
 
 vec4 calcShading( vec3 N, vec3 L ) {
     //Ambient contribution
@@ -45,9 +46,9 @@ void main() {
     v;
     light_direction;
 
-    color = vec4(0.3, 0.3, 0.8, 1.0);
-    //color = diffuseColor;
-    color.rgb *= calcShading(normalize(vec3(NM * vec4(normal, 1.0))), light_direction).rgb * 1.0;
-    color.rgb += calcSpecularShading(normalize(vec3(NM * vec4(normal, 1.0))), light_direction).rgb * shinyness;
+    frag_color = color;
+
+    frag_color.rgb *= calcShading(normalize(vec3(NM * vec4(normal, 1.0))), light_direction).rgb * 1.0;
+    frag_color.rgb += calcSpecularShading(normalize(vec3(NM * vec4(normal, 1.0))), light_direction).rgb * shinyness;
 
 }

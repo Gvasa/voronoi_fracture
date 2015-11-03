@@ -51,19 +51,14 @@ private:
     GLint MVLightLoc;       // MVLight matrix
     GLint NMLoc;            // NM matrix
     GLint lightPosLoc;      // Light position
+    GLint colorLoc;         // Color
     GLint lightAmbLoc;      // Ambient light
     GLint lightDifLoc;      // Diffuse light
     GLint lightSpeLoc;      // Specular light
     GLint specularityLoc;   // Specular constant
     GLint shinynessLoc;     // How much specularity (magnitude)
 
-
-    struct Material {
-        Vector4<float> ambient;
-        Vector4<float> diffuse;
-        Vector4<float> specular;
-        float specularity;
-        float shinyness;
+    struct Material : public Geometry::Material {   
     } mMaterial;
 };
 

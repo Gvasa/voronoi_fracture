@@ -28,6 +28,7 @@ public:
     virtual void initialize(Vector3<float>) = 0;
     virtual void draw(std::vector<Matrix4x4<float> >) = 0;
 
+
     /* 
      * A Geometry might have the following: 
      */
@@ -42,6 +43,52 @@ public:
     };
     virtual void scale(Vector3<float>) {
         std::cout << "\nGeometry does not have scaling implemented!\n";
+    };
+
+protected:
+
+    //! Compute and return the normal at face at faceIndex
+    virtual Vector3<float> calculateFaceNormal(unsigned int faceIndex) const {
+        std::cout << "\nGeometry does not have the function 'calculateFaceNormal' implemented\n";
+    };
+
+public:
+
+    //! Minimal requirements for all meshes, inherited
+    struct Face{
+        Face(const Vector3<float> & n = Vector3<float>(0,0,0),
+            const Vector3<float> & c = Vector3<float>(0.5,0.1,0.7),
+            float u = 0) 
+            : normal(n), 
+            color(c), 
+            curvature(u) {}
+        Vector3<float> normal;
+        Vector3<float> color;
+        float curvature;
+    };
+    //! Minimal requirements for all meshes, inherited
+    struct Vertex{
+        Vertex(const Vector3<float> & p = Vector3<float>(0,0,0),
+            const Vector3<float> & n = Vector3<float>(0,0,0),
+            const Vector3<float> & c = Vector3<float>(0.5,0.1,0.7),
+            float u = 0)
+            : pos(p),
+            normal(n),
+            color(c),
+            curvature(u) {}
+        Vector3<float> pos;
+        Vector3<float> normal;
+        Vector3<float> color;
+        float curvature;
+  };
+
+  struct Material {
+        Vector4<float> color;
+        Vector4<float> ambient;
+        Vector4<float> diffuse;
+        Vector4<float> specular;
+        float specularity;
+        float shinyness;
     };
 };
 

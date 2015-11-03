@@ -9,14 +9,25 @@
 #include "LoadObj.h"
 #include "HalfEdgeMesh.h"
 
-bool LoadObj::Load(HalfEdgeMesh *mesh, std::istream &is){
+bool LoadObj::loadObject(Geometry *mesh, std::string fileName){
 	// std::cerr << "Reading obj file.\nOutputting any skipped line(s) for reference.\n";
-	bool success = ReadHeader(is);
-	if(!success) {return false;}
 
-	success = ReadData(is);
-	if(!success) {return false;}
+  std::filebuf fb;
+  if(fb.open (fileName, std::ios::in)) {
+    std::istream is(&fb);
 
+    bool success = readHeader(is);
+    if(!success) { return false; }
+
+    success = readData(is);
+    if(!success) { return false; } 
+
+    fb.close();
+
+  } else {
+    return false;
+  }
+    
 	// Build Mesh
 	const unsigned int numTriangles = loadData.triangles.size();
 	for(unsigned int t = 0; t < numTriangles; t++){
@@ -31,7 +42,7 @@ bool LoadObj::Load(HalfEdgeMesh *mesh, std::istream &is){
 	return true;
 }
 
-bool LoadObj::ReadHeader(std::istream &is){
+bool LoadObj::readHeader(std::istream &is){
 	std::string buf;
 	//read only to the first line starting with "v"
 	while(!is.eof() && is.peek() != 'v'){
@@ -44,7 +55,7 @@ bool LoadObj::ReadHeader(std::istream &is){
 		return false;
 }
 
-bool LoadObj::ReadData(std::istream & is){
+bool LoadObj::readData(std::istream & is){
   std::string lineBuf;
   int c;
   int i=0;
@@ -83,7 +94,7 @@ bool LoadObj::ReadData(std::istream & is){
 
         // Determine wheter we have a triangle or a quad
         if (count == 3){
-          loadData.triangles.push_back(ReadTri(buf));
+          loadData.triangles.push_back(readTri(buf));
         }
         else {
           std::cerr << "Encountered polygon with " << count << " faces. i'm giving up.\n";
@@ -103,7 +114,7 @@ bool LoadObj::ReadData(std::istream & is){
   return true;
 }
 
-Vector3<unsigned int> LoadObj::ReadTri(std::istream &is){
+Vector3<unsigned int> LoadObj::readTri(std::istream &is){
   //  This is a simplified version of an obj reader that can't read normal and texture indices
   std::string buf, v;
   is >> buf;

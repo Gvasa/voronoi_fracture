@@ -1,5 +1,6 @@
 // Libs
 #include <sstream>
+#include <istream>
 #include <math.h>
 
 // Headers
@@ -8,14 +9,18 @@
 #include "Scene.h"
 #include "Controls.h"
 #include "utils/Utils.h"
+#include "LoadObj.h"
 
 
 GLFWwindow* window;
-Geometry *mesh;
 Scene *scene;
+Geometry *mesh;
 Geometry *floor_rect;
 Geometry *wall_rect;
+LoadObj *objectLoader;
+
 std::string windowTitle = "Voronoi Fracture";
+
 
 int initializeOpenGL();
 void initializeScene();
@@ -52,6 +57,10 @@ int main (int argc, char* argv[]) {
 
     // HalfEdge mesh
     mesh = new HalfEdgeMesh();
+
+    // Load obj file
+    objectLoader = new LoadObj();
+    objectLoader->loadObject(mesh, "assets/cow.obj");
 
     scene->addGeometry(floor_rect);
     scene->addGeometry(wall_rect);

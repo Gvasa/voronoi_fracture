@@ -34,7 +34,7 @@ void Scene::initialize() {
     mPointLight.color = Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
 
     // Background color
-    glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
+    glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
 
     mSceneMatrices.push_back(Matrix4x4<float>());
     mSceneMatrices.push_back(Matrix4x4<float>());
@@ -86,7 +86,6 @@ void Scene::draw() {
     //glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 }
-
 
 void Scene::addGeometry(Geometry *G) {
     mGeometries.push_back(G);

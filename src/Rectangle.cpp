@@ -7,11 +7,12 @@ Rectangle::Rectangle(float w, float h, Vector3<float> p)
 
     createVertices(w, h);
 
-    mMaterial.ambient = Vector4<float>(0.3f, 0.3f, 0.3f, 1.0f);
-    mMaterial.diffuse = Vector4<float>(0.8f, 0.8f, 0.8f, 1.0f);
-    mMaterial.specular = Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
-    mMaterial.specularity = 50.0f;
-    mMaterial.shinyness = 0.8f;
+    mMaterial.color         = Vector4<float>(0.5f, 0.5f, 0.5f, 1.0f);
+    mMaterial.ambient       = Vector4<float>(0.3f, 0.3f, 0.3f, 1.0f);
+    mMaterial.diffuse       = Vector4<float>(0.8f, 0.8f, 0.8f, 1.0f);
+    mMaterial.specular      = Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
+    mMaterial.specularity   = 50.0f;
+    mMaterial.shinyness     = 0.8f;
 
     std::cout << "ambient: (" << mMaterial.ambient[0] << ", " << mMaterial.ambient[1] << ", " << mMaterial.ambient[2] << ")" << std::endl;
 
@@ -41,6 +42,7 @@ void Rectangle::initialize(Vector3<float> lightPosition) {
     MVLightLoc      = glGetUniformLocation(shaderProgram, "MV_light");
     NMLoc           = glGetUniformLocation(shaderProgram, "NM");
     lightPosLoc     = glGetUniformLocation(shaderProgram, "lightPos");
+    colorLoc        = glGetUniformLocation(shaderProgram, "color");
     lightAmbLoc     = glGetUniformLocation(shaderProgram, "ambientColor");
     lightDifLoc     = glGetUniformLocation(shaderProgram, "diffuseColor");
     lightSpeLoc     = glGetUniformLocation(shaderProgram, "specularColor");
@@ -92,6 +94,7 @@ void Rectangle::draw(std::vector<Matrix4x4<float> > sceneMatrices) {
     glUniformMatrix4fv(MVLoc, 1, GL_FALSE, &sceneMatrices[I_MV](0, 0));
     glUniformMatrix4fv(MVLightLoc, 1, GL_FALSE, &sceneMatrices[I_MV_LIGHT](0, 0));
     glUniformMatrix4fv(NMLoc, 1, GL_FALSE, &sceneMatrices[I_NM](0, 0));
+    glUniform4f(colorLoc, mMaterial.color[0], mMaterial.color[1], mMaterial.color[2], mMaterial.color[3]);
     glUniform4f(lightAmbLoc, mMaterial.ambient[0], mMaterial.ambient[1], mMaterial.ambient[2], mMaterial.ambient[3]);
     glUniform4f(lightDifLoc, mMaterial.diffuse[0], mMaterial.diffuse[1], mMaterial.diffuse[2], mMaterial.diffuse[3]);
     glUniform4f(lightSpeLoc, mMaterial.specular[0], mMaterial.specular[1], mMaterial.specular[2], mMaterial.specular[3]);
