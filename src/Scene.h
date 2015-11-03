@@ -8,6 +8,8 @@
 #define SCENE_H
 #define GLM_FORCE_RADIANS
 
+#define GLM_FORCE_RADIANS
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,11 +20,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "glm/gtc/matrix_inverse.hpp"
+#include <glm/gtc/quaternion.hpp>
 
 #include "Geometry.h"
 #include "math/Matrix4x4.h"
 #include "math/Vector3.h"
-
+#include "Controls.h"
+#include "utils/Utils.h"
 
 
 
@@ -37,6 +41,9 @@ public:
     void draw();
 
     void addGeometry(Geometry *);
+    void updateCameraPosition(double x, double y);
+    void mouseButtonClick(double x, double y) { control.dragStart(x, y); }
+    void mouseButtonRelease() { control.dragEnd(); }
 
 private:
 
@@ -50,6 +57,7 @@ private:
         Vector4<float> color;
         Vector3<float> position;
     } mPointLight;
+    Controls control = Controls(300.f);
 };
 
 #endif // SCENE_H
