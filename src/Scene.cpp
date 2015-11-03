@@ -48,6 +48,10 @@ void Scene::initialize() {
 // Draw all geometries
 void Scene::draw() {
 
+    glEnable( GL_CULL_FACE );
+    //glEnable(GL_DEPTH_TEST);
+
+
     camera.projectionMatrix = glm::perspective(
         camera.fov,          // field of view, 45.0
         camera.aspectRatio,  // 4/3 atm
@@ -78,6 +82,9 @@ void Scene::draw() {
     // Draw Geometries in scene
     for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
         (*it)->draw(mSceneMatrices);
+
+    //glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
 }
 
 
