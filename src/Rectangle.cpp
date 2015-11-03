@@ -1,4 +1,4 @@
-#include "rectangle.h"
+#include "Rectangle.h"
 
 Rectangle::Rectangle(float w, float h, Vector3<float> p) 
 : mPosition(p) {
