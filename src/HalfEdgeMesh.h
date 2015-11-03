@@ -29,14 +29,12 @@ public:
     HalfEdgeMesh() { };
     ~HalfEdgeMesh();
 
- //   virtual void update();
-    virtual void initialize();
-
-    void draw(Matrix4x4<float>);
+    void initialize(Vector3<float>);
+    void draw(std::vector<Matrix4x4<float> >);
 
     /*
-    /*      CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
-    */ 
+     * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
+     */ 
     class EdgeIterator {
         friend class HalfEdgeMesh; 
 
@@ -80,7 +78,6 @@ public:
     
     //Add a half edge pair, from vertex 1 to vertex2, to the mesh.
     bool addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsigned int &index1, unsigned int &index2);
-    bool addEdge();
 
     //! Compute and return the normal at face at faceIndex
     virtual Vector3<float> calculateFaceNormal(unsigned int faceIndex) const;
@@ -92,6 +89,7 @@ private:
     GLuint vertexBuffer;
     GLuint shaderProgram;
 
+    // Shader indices for Matrices
     GLint MVPLoc;           // MVP matrix
 
     // Ugly temporary placeholder, remove asap
@@ -110,8 +108,8 @@ private:
 
 
     /*
-    /*              STRUCTS
-    */
+     * STRUCTS
+     */
 
     // A HalfEdge has a vertex, a face and 3 halfedges for mesh traversal
     struct HalfEdge {
@@ -157,8 +155,8 @@ private:
 
 
     /*
-    /*      MEMBER VARIABLES
-    */
+     * MEMBER VARIABLES
+     */
 
     // The edges of the mesh
     std::vector<HalfEdge> mEdges;
@@ -170,13 +168,13 @@ private:
 
 
     /*
-    /*         MEMBER FUNCTIONS
-    */
+     * MEMBER FUNCTIONS
+     */
     void buildVertexList();
 
     /*
-    /*              UTILITY
-    */
+     * UTILITY
+     */
 
     // Unique vertices, this might not be needed, idk
     std::map<Vector3<float>, unsigned int> mUniqueVerts;

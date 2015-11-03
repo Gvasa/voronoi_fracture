@@ -1,29 +1,32 @@
 // Libs
 #include <sstream>
+#include <istream>
 #include <math.h>
 
 // Headers
 #include "HalfEdgeMesh.h"
+#include "Rectangle.h"
 #include "Scene.h"
 #include "Controls.h"
 #include "utils/Utils.h"
 #include "LoadObj.h"
-#include "istream"
 
 
 GLFWwindow* window;
-Geometry *mesh1, *mesh2;
 Scene *scene;
-std::string windowTitle = "Voronoi Fracture";
+Geometry *mesh;
+Geometry *floor_rect;
+Geometry *wall_rect;
 LoadObj *objectLoader;
+
+std::string windowTitle = "Voronoi Fracture";
+
 
 int initializeOpenGL();
 void initializeScene();
 void mouseButton(GLFWwindow* window, int button, int action, int mods);
 void mouseMotion(GLFWwindow* window, double x, double y);
 double calcFPS(double, std::string);
-
-
 
 
 
@@ -40,16 +43,28 @@ int main (int argc, char* argv[]) {
     }
     
     // Create geometries and add them to the scene
-    objectLoader = new LoadObj();
 
-    mesh1 = new HalfEdgeMesh();
-    mesh2 = new HalfEdgeMesh();
-    
-    objectLoader->loadObject(mesh1, "assets/cow.obj");
-    //objectLoader->loadObject(mesh2, "assets/stanford-bunny.obj");
-    
-    scene->addGeometry(mesh1);
-    //scene->addGeometry(mesh2);
+    // Floor
+    floor_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
+    floor_rect->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), 90.0f);
+    floor_rect->translate(Vector3<float>(0.0f, -1.0f, 0.0f));
+    floor_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
+
+    // Wall
+    wall_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
+    wall_rect->translate(Vector3<float>(0.0f, 0.0f, -1.0f));
+    wall_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
+
+    // HalfEdge mesh
+    mesh = new HalfEdgeMesh();
+
+    // Load obj file
+    objectLoader = new LoadObj();
+    objectLoader->loadObject(mesh, "assets/cow.obj");
+
+    scene->addGeometry(floor_rect);
+    scene->addGeometry(wall_rect);
+    scene->addGeometry(mesh);
 
     initializeScene();
 
@@ -75,6 +90,7 @@ int main (int argc, char* argv[]) {
            glfwWindowShouldClose(window) == 0 );
 
     // Clean-up
+    //delete floor_rect;
     delete scene;
 
     // Close OpenGL window and terminate GLFW
@@ -217,4 +233,3 @@ double calcFPS(double timeInterval = 1.0, std::string windowTitle = "NONE") {
     // Return the current FPS - doesn't have to be used if you don't want it!
     return fps;
 }
-

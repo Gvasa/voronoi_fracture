@@ -19,8 +19,8 @@
 #include <math.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "glm/gtc/matrix_inverse.hpp"
 #include <glm/gtc/quaternion.hpp>
-
 
 #include "Geometry.h"
 #include "math/Matrix4x4.h"
@@ -48,8 +48,15 @@ public:
 private:
 
     Matrix4x4<float> toMatrix4x4(glm::mat4);
+    Matrix4x4<float> toMatrix4x4(glm::mat3);
 
     std::vector<Geometry *>mGeometries;
+    std::vector<Matrix4x4<float> >mSceneMatrices;
+
+    struct LightSource {
+        Vector4<float> color;
+        Vector3<float> position;
+    } mPointLight;
     Controls control = Controls(300.f);
 };
 
