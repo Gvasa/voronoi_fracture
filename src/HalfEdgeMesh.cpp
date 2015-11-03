@@ -27,19 +27,11 @@ void HalfEdgeMesh::initialize() {
 
     MVPLoc = glGetUniformLocation(shaderProgram, "MVP");
 
-    static const GLfloat g_vertex_buffer_data[] = {
-        -1.0f, -1.0f, 0.0f,
-         1.0f, -1.0f, 0.0f,
-         0.0f,  1.0f, 0.0f,
-    };
-
-    verts.push_back(Vector3<float>(-1.0f, -1.0f, 0.0f));
-    verts.push_back(Vector3<float>(1.0f, -1.0f, 0.0f));
-    verts.push_back(Vector3<float>(0.0f, 1.0f, 0.0f));
+    buildVertexList();
 
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(Vector3<float>), &verts[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, orderedVertexList.size() * sizeof(Vector3<float>), &orderedVertexList[0], GL_STATIC_DRAW);
 
     // 1rst attribute buffer : vertices
     glEnableVertexAttribArray(0);
@@ -66,10 +58,10 @@ void HalfEdgeMesh::draw(Matrix4x4<float> MVP) {
 
     glBindVertexArray(vertexArrayID);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(Vector3<float>), &verts[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, orderedVertexList.size() * sizeof(Vector3<float>), &orderedVertexList[0], GL_STATIC_DRAW);
 
     // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0, verts.size()); // 3 indices starting at 0 -> 1 triangle
+    glDrawArrays(GL_TRIANGLES, 0, orderedVertexList.size()); // 3 indices starting at 0 -> 1 triangle
     
     // Unbind
     glBindVertexArray(0);
@@ -78,16 +70,163 @@ void HalfEdgeMesh::draw(Matrix4x4<float> MVP) {
 }
 
 // This is where we add a face to the half-edge structure
-bool HalfEdgeMesh::addFace(std::vector<Vector3 <float> > verts) {
-   std::cout << "addFAce" << std::endl;
-}
+bool HalfEdgeMesh::addFace(const std::vector<Vector3 <float> > verts) {
+    // std::cout << "addFAce" << std::endl;
 
-// This is where we add an edge to the half-edge structure
-bool HalfEdgeMesh::addEdge() {
-    std::cout << "addEdge" << std::endl;
+    //std::cerr <<  "ADD TRIANGLE NOT IMPLEMENTED";
+
+    //add the vertices of the face triangle
+    unsigned int vertIndex1, vertIndex2, vertIndex3;
+
+    addVertex(verts.at(0), vertIndex1);
+    addVertex(verts.at(1), vertIndex2);
+    addVertex(verts.at(2), vertIndex3);
+
+   // add all half-edge pairs
+   unsigned int innerHalfEdgeIndex1 = 0,
+                innerHalfEdgeIndex2 = 0,
+                innerHalfEdgeIndex3 = 0,
+                outerHalfEdgeIndex1 = 0,
+                outerHalfEdgeIndex2 = 0,
+                outerHalfEdgeIndex3 = 0;
+
+    //std::cout << "Indices before assing: " << innerHalfEdgeIndex1 << " " << innerHalfEdgeIndex2 << " " << innerHalfEdgeIndex3 << std::endl;
+    //add half edge pairs
+    addHalfEdgePair(vertIndex1, vertIndex2, innerHalfEdgeIndex1, outerHalfEdgeIndex1);
+    addHalfEdgePair(vertIndex2, vertIndex3, innerHalfEdgeIndex2, outerHalfEdgeIndex2);
+    addHalfEdgePair(vertIndex3, vertIndex1, innerHalfEdgeIndex3, outerHalfEdgeIndex3);
+
+    //connect the inner ring
+    getEdge(innerHalfEdgeIndex1).next = innerHalfEdgeIndex2;
+    getEdge(outerHalfEdgeIndex1).prev = innerHalfEdgeIndex3;
+
+    getEdge(innerHalfEdgeIndex2).next = innerHalfEdgeIndex3;
+    getEdge(outerHalfEdgeIndex2).prev = innerHalfEdgeIndex1;
+
+    getEdge(innerHalfEdgeIndex3).next = innerHalfEdgeIndex1;
+    getEdge(outerHalfEdgeIndex3).prev = innerHalfEdgeIndex2;
+
+    // Create the face, don't forget to set the normal! (which should be normalized ofcourse)
+    Face face;
+    mFaces.push_back(face);
+    mFaces.back().edge = innerHalfEdgeIndex1;
+    mFaces.back().normal = calculateFaceNormal(mFaces.size() - 1);
+
+    // all half-edges share the same left face (previously added)
+    getEdge(innerHalfEdgeIndex1).face = mFaces.size() - 1;
+    getEdge(innerHalfEdgeIndex2).face = mFaces.size() - 1;
+    getEdge(innerHalfEdgeIndex3).face = mFaces.size() - 1;
+
+    return true;
 }
 
 // This is where we add a vertex to the half-edge structure
-bool HalfEdgeMesh::addVertex() {
-    std::cout << "addVertex" << std::endl;
+bool HalfEdgeMesh::addVertex(const Vector3<float> &v, unsigned int &index) {
+    //std::cout << "addVertex" << std::endl;
+
+    //search through uniqueVerts and see if the vertice already is in our list
+    std::map<Vector3<float>, unsigned int>::iterator it = mUniqueVerts.find(v);
+
+    //if we find an existing vertices, set our index to that value (hence the map above)
+    if(it != mUniqueVerts.end()) {
+        index = (*it).second;
+        return false;
+    }
+
+    //The vertices does not exist! add it
+    mUniqueVerts[v] = index = getNumVerts(); //get the size of the existing list, give the last pos at index to the vertices being added
+    Vertex vert;
+    vert.pos = v;
+    mVerts.push_back(vert); //add it to the list
+
+    return true;
+}
+
+//inserts a half edge pair between halfedgemesh point to by vert1 and vert2 
+// the first HalfEdgeMesh::HalfEdge (vert1 -> vert2) is the inner one
+// the second (vert2->vert1) is the outer one
+bool HalfEdgeMesh::addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsigned int &index1, unsigned int &index2) {
+    //std::cout << "addHalfEdgePair" << std::endl;
+    //check if the pair to be added already exists
+    std::map<OrderedPair, unsigned int>::iterator it = mUniqueEdgePairs.find(OrderedPair(vert1, vert2));
+
+    //it it exists
+    if(it != mUniqueEdgePairs.end()) {
+        index1 = it->second;                //assign the first index to the place where its found in mUniqueEdgePairs
+        index2 = getEdge(it->second).pair;  //assign the pair of the first edge to the second index
+        //std::cout << "pair " << index1 << " " << index2 << std::endl;
+        if(vert1 != getEdge(index1).vert ) {    // check that both index got assigned correctly
+            std::swap(index1, index2);          // otherwise swap
+        }
+        //std::cout << "---- slut på addhalfedgepair not unique -----" << std::endl << std::endl;
+        return false;
+    }
+
+    //if not found, calculate the indices 
+    index1 = mEdges.size();
+    index2 = index1+1;
+
+    // Create edges and set pair index
+    HalfEdge edge1, edge2;
+    edge1.pair = index2;
+    edge2.pair = index1;
+
+    // connect the edges to the verst
+    edge1.vert = vert1;
+    edge2.vert = vert2;
+
+    // connect the verts to the edges
+    getVert(vert1).edge = index1;
+    getVert(vert2).edge = index2;
+
+    // store the edges in mEdges
+    mEdges.push_back(edge1);
+    mEdges.push_back(edge2);
+
+    OrderedPair op(vert1, vert2);
+    mUniqueEdgePairs[op] = index1; // [ ] constructs a new entry in the map, ordering not important
+
+    return true;
+}   
+
+// This is where we add an edge to the half-edge structure
+bool HalfEdgeMesh::addEdge() {
+    //std::cout << "addEdge" << std::endl;
+}
+
+//! Compute and return the normal at face at faceIndex
+Vector3<float> HalfEdgeMesh::calculateFaceNormal(unsigned int faceIndex) const {
+
+    unsigned int index = getFace(faceIndex).edge;
+    const EdgeIterator it = getEdgeIterator(index);
+
+    const Vector3<float> &point1 = getVert(it.getEdgeVertexIndex()).pos;
+    const Vector3<float> &point2 = getVert(it.next().getEdgeVertexIndex()).pos;
+    const Vector3<float> &point3 = getVert(it.next().next().getEdgeVertexIndex()).pos;
+
+    const Vector3<float> edge1 = point2 - point1;
+    const Vector3<float> edge2 = point3 - point1;
+
+    return Cross(edge1, edge2).Normalize();
+}
+
+void HalfEdgeMesh::buildVertexList() {
+
+    for(int i = 0; i < mFaces.size(); i++ ){
+        Face &face = getFace(i);
+
+        HalfEdge* edge = &getEdge(face.edge);
+
+        Vertex &v1 = getVert(edge->vert);
+        edge = &getEdge(edge->next);
+
+        Vertex &v2 = getVert(edge->vert);
+        edge = &getEdge(edge->next);
+
+        Vertex &v3 = getVert(edge->vert);
+        
+        orderedVertexList.push_back(v1.pos);    
+        orderedVertexList.push_back(v2.pos);
+        orderedVertexList.push_back(v3.pos);
+    }   
 }

@@ -46,7 +46,7 @@ void Scene::draw() {
         100.0f);             // far clipping plane
 
     camera.viewMatrix = glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 3.0f),            // Camera / eye position
+        glm::vec3(2.0f, 2.0f, 4.0f),            // Camera / eye position
         glm::vec3(0.0f, 0.0f, 0.0f),            // Target, what to look at
         glm::vec3(0.0f, 1.0f, 0.0f)) *          // Up-vector                            
         glm::mat4_cast(camera.orientation);     // multiplies the veiw matrix with current rotation
@@ -61,9 +61,7 @@ void Scene::draw() {
     // Draw Geometries in scene
     for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
         (*it)->draw(MVP);
-
 }
-
 
 void Scene::addGeometry(Geometry *G) {
     mGeometries.push_back(G);

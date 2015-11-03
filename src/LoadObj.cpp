@@ -11,11 +11,6 @@
 
 bool LoadObj::loadObject(Geometry *mesh, std::string fileName){
 	// std::cerr << "Reading obj file.\nOutputting any skipped line(s) for reference.\n";
-  //bool success = ReadHeader(is);
-	//if(!success) {return false;}
-
-	//success = ReadData(is);
-	//if(!success) {return false;}
 
   std::filebuf fb;
   if(fb.open (fileName, std::ios::in)) {
@@ -33,7 +28,6 @@ bool LoadObj::loadObject(Geometry *mesh, std::string fileName){
     return false;
   }
     
-
 	// Build Mesh
 	const unsigned int numTriangles = loadData.triangles.size();
 	for(unsigned int t = 0; t < numTriangles; t++){

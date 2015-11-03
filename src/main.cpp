@@ -12,7 +12,7 @@
 
 
 GLFWwindow* window;
-Geometry *mesh;
+Geometry *mesh1, *mesh2;
 Scene *scene;
 std::string windowTitle = "Voronoi Fracture";
 LoadObj *objectLoader;
@@ -40,12 +40,16 @@ int main (int argc, char* argv[]) {
     }
     
     // Create geometries and add them to the scene
-    mesh = new HalfEdgeMesh();
-
     objectLoader = new LoadObj();
-    objectLoader->loadObject(mesh, "assets/stanford-bunny.obj");
 
-    scene->addGeometry(mesh);
+    mesh1 = new HalfEdgeMesh();
+    mesh2 = new HalfEdgeMesh();
+    
+    objectLoader->loadObject(mesh1, "assets/cow.obj");
+    //objectLoader->loadObject(mesh2, "assets/stanford-bunny.obj");
+    
+    scene->addGeometry(mesh1);
+    //scene->addGeometry(mesh2);
 
     initializeScene();
 
