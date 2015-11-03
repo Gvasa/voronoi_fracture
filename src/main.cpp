@@ -11,7 +11,8 @@
 GLFWwindow* window;
 Geometry *mesh;
 Scene *scene;
-Rectangle *floor_rect;
+Geometry *floor_rect;
+Geometry *wall_rect;
 std::string windowTitle = "Voronoi Fracture";
 
 int initializeOpenGL();
@@ -33,11 +34,23 @@ int main (int argc, char* argv[]) {
     }
     
     // Create geometries and add them to the scene
-    floor_rect = new Rectangle(2.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
-    floor_rect->rotate(Vector3<float>(1.0, 0.0, 0.0), 90.0f);
+
+    // Floor
+    floor_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
+    floor_rect->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), 90.0f);
+    floor_rect->translate(Vector3<float>(0.0f, -1.0f, 0.0f));
+    floor_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
+
+    // Wall
+    wall_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
+    wall_rect->translate(Vector3<float>(0.0f, 0.0f, -1.0f));
+    wall_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
+
+    // HalfEdge mesh
     mesh = new HalfEdgeMesh();
 
     scene->addGeometry(floor_rect);
+    scene->addGeometry(wall_rect);
     scene->addGeometry(mesh);
 
     initializeScene();
@@ -60,7 +73,7 @@ int main (int argc, char* argv[]) {
            glfwWindowShouldClose(window) == 0 );
 
     // Clean-up
-    delete floor_rect;
+    //delete floor_rect;
     delete scene;
 
     // Close OpenGL window and terminate GLFW

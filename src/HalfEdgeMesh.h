@@ -28,8 +28,8 @@ public:
     HalfEdgeMesh() { };
     ~HalfEdgeMesh();
 
-    void initialize();
-    void draw(Matrix4x4<float>);
+    void initialize(Vector3<float>);
+    void draw(std::vector<Matrix4x4<float> >);
 
     bool addFace(std::vector<Vector3 <float> >);
     bool addEdge();

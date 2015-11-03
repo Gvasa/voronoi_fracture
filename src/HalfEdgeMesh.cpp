@@ -14,7 +14,7 @@ HalfEdgeMesh::~HalfEdgeMesh() {
 }
 
 // Add init stuff here, right now its just some random shit for the red ugly triangle
-void HalfEdgeMesh::initialize() {
+void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     std::cout << "\nInitializing Half-Edge mesh ...\n\n";
 
@@ -57,12 +57,12 @@ void HalfEdgeMesh::initialize() {
 }
 
 // Add draw stuff here, right now its just some random shit for the red ugly triangle
-void HalfEdgeMesh::draw(Matrix4x4<float> MVP) {
+void HalfEdgeMesh::draw(std::vector<Matrix4x4<float> > sceneMatrices) {
 
     // Use shader
     glUseProgram(shaderProgram);
-
-    glUniformMatrix4fv(MVPLoc, 1, GL_FALSE, &MVP(0, 0));
+    
+    glUniformMatrix4fv(MVPLoc, 1, GL_FALSE, &sceneMatrices[I_MVP](0, 0));
 
     glBindVertexArray(vertexArrayID);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
