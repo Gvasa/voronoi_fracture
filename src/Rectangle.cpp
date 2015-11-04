@@ -27,7 +27,7 @@ Rectangle::~Rectangle() {
 
 void Rectangle::initialize(Vector3<float> lightPosition) {
     
-    std::cout << "\nInitializing Rectangle ...\n\n";
+    std::cout << "\nInitializing Rectangle ...\n";
 
     glGenVertexArrays(1, &vertexArrayID);
     glBindVertexArray(vertexArrayID);
