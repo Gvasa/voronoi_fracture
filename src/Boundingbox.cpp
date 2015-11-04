@@ -20,7 +20,7 @@ void Boundingbox::initialize() {
     glGenVertexArrays(1, &vertexArrayID);
     glBindVertexArray(vertexArrayID);
 
-    shaderProgram = LoadShaders( "shaders/SimpleVertexShader.vertexshader", "shaders/SimpleFragmentShader.fragmenshader" );
+    shaderProgram = LoadShaders( "shaders/SimpleVertexShader.vertexshader", "shaders/SimpleFragmentShader.fragmentshader" );
 
     // Set names for our uniforms, same as in shaders
     MVPLoc = glGetUniformLocation(shaderProgram, "MVP");
