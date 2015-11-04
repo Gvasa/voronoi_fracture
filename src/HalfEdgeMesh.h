@@ -13,7 +13,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-#include <map>
 #include <limits>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -22,6 +21,7 @@
 #include "Geometry.h"
 #include "tools/shader.hpp"
 #include "utils/Utils.h"
+#include "Boundingbox.h"
 
 class HalfEdgeMesh : public Geometry {
 
@@ -158,6 +158,8 @@ private:
      * MEMBER VARIABLES
      */
 
+    Boundingbox *mBoundingbox;
+
     // The edges of the mesh
     std::vector<HalfEdge> mEdges;
     // The vertices in the mesh
@@ -184,6 +186,8 @@ private:
 
     //! Compute and return the normal at a vertex at vertIndex
     Vector3<float> calculateVertNormal(unsigned int vertIndex) const;
+
+    std::vector<Vector3<float> > buildVertexData();
 
     void buildRenderData();
 

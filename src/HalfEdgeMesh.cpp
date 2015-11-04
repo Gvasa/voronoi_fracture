@@ -29,6 +29,9 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     std::cout << "\nInitializing Half-Edge mesh ...\n\n";
 
+    mBoundingbox = new Boundingbox(buildVertexData());
+    mBoundingbox->initialize();
+
     buildRenderData();
 
     // Update face normals
@@ -130,6 +133,8 @@ void HalfEdgeMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDisableVertexAttribArray(0);
+
+    mBoundingbox->render(sceneMatrices[I_MVP]);
 }
 
 // This is where we add a face to the half-edge structure
@@ -276,6 +281,18 @@ Vector3<float> HalfEdgeMesh::calculateVertNormal(unsigned int vertIndex) const {
     }
 
     return normal.Normalize();
+}
+
+
+std::vector<Vector3<float> > HalfEdgeMesh::buildVertexData() {
+
+    std::vector<Vector3<float> > vertexData;
+
+    for(unsigned int i = 0; i < mVerts.size(); i++) {
+        vertexData.push_back(mVerts[i].pos);
+    }
+
+    return vertexData;
 }
 
 
