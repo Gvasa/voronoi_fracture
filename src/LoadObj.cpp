@@ -12,7 +12,7 @@
 bool LoadObj::loadObject(Geometry *mesh, std::string fileName){
 
 
-    std::cout << "\nLoading obj-file: " << fileName.substr(fileName.find("/")+1) << "...\n";
+    std::cout << "\nLoading obj-file: " << fileName.substr(fileName.find("/")+1) <<  " ...\n";
 
     std::filebuf fb;
     if(fb.open (fileName, std::ios::in)) {

@@ -125,6 +125,8 @@ void Scene::updateCameraPosition(double x, double y) {
     control.dragUpdate(x, y);
 }
 
-void Scene::updateCameraZoom(double x, double y) {
-    camera.zoom -= y / 3.0f;
+void Scene::updateCameraZoom(double x, double y) { 
+    
+    if((3.0 + (camera.zoom - y / 5.0f)) > 0.1f)  
+        camera.zoom -= y / 5.0f;
 }
