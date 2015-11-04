@@ -29,6 +29,9 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     std::cout << "\nInitializing Half-Edge mesh ...\n\n";
 
+    mBoundingbox = new Boundingbox(mVerts);
+    mBoundingbox->initialize(lightPosition);
+
     buildRenderData();
 
     // Update face normals
