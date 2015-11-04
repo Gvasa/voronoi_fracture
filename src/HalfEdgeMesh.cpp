@@ -29,7 +29,7 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     std::cout << "\nInitializing Half-Edge mesh ...\n\n";
 
-    mBoundingbox = new Boundingbox(mVerts);
+    mBoundingbox = new Boundingbox(buildVertexData());
     mBoundingbox->initialize(lightPosition);
 
     buildRenderData();
@@ -279,6 +279,18 @@ Vector3<float> HalfEdgeMesh::calculateVertNormal(unsigned int vertIndex) const {
     }
 
     return normal.Normalize();
+}
+
+
+std::vector<Vector3<float> > HalfEdgeMesh::buildVertexData() {
+
+    std::vector<Vector3<float> > vertexData;
+
+    for(unsigned int i = 0; i < mVerts.size(); i++) {
+        vertexData.push_back(mVerts[i].pos);
+    }
+
+    return vertexData;
 }
 
 

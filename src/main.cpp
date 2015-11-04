@@ -60,7 +60,7 @@ int main (int argc, char* argv[]) {
 
     // Load obj file
     objectLoader = new LoadObj();
-    objectLoader->loadObject(mesh, "assets/sphere1.0.obj");
+    objectLoader->loadObject(mesh, "assets/cow.obj");
 
     scene->addGeometry(floor_rect);
     scene->addGeometry(wall_rect);

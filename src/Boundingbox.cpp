@@ -25,9 +25,7 @@ void Boundingbox::render(std::vector<Matrix4x4<float> > sceneMatrices) {
 void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts) {
 
 
-    std::map<float, unsigned int> boundingValues;
-
-
+    std::map<std::string, unsigned int> boundingValues;
 
     for(unsigned int i = 0; i < uniqueVerts.size(); i++) {
 
