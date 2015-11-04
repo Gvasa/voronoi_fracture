@@ -46,7 +46,12 @@ void Boundingbox::initialize() {
 
 void Boundingbox::render(Matrix4x4<float> MVP) {
 
+    //borde inte sättas här, de borde tas in i render function med en kosntant typ RENDER_WITH_WIREFRAME
+    drawWireframe = true;
+
     glDisable( GL_CULL_FACE );
+    glEnable( GL_BLEND );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
      // Use shader
     glUseProgram(shaderProgram);
@@ -60,13 +65,20 @@ void Boundingbox::render(Matrix4x4<float> MVP) {
     glBufferData(GL_ARRAY_BUFFER, mVerts.size() * sizeof(Vector3<float>), &mVerts[0], GL_STATIC_DRAW);
 
     // Draw geometry
-    glDrawArrays(GL_LINES, 0, mVerts.size()); // 3 indices starting at 0 -> 1 triangle
+
+    
+    if(drawWireframe)   //Draw Wireframe
+        glDrawArrays(GL_LINES, 0, mVerts.size()); // 3 indices starting at 0 -> 1 triangle
+    else                //draw triangles
+        glDrawArrays(GL_TRIANGLES, 0, mVerts.size());
+
     
     // Unbind
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDisableVertexAttribArray(0);
 
+    glDisable( GL_BLEND );
     glEnable( GL_CULL_FACE );
 }
 

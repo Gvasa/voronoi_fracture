@@ -1,12 +1,12 @@
 #version 330 core
 
 // Ouput data
-out vec3 color;
+out vec4 color;
 
 void main()
 {
 
 	// Output color = red 
-	color = vec3(1,1,1);
+	color = vec4(1,1,1, 0.5f);
 
 }

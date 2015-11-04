@@ -34,6 +34,8 @@ private:
     void calculateBoundingbox(std::vector<Vector3<float> >);
 
     std::vector<Vector3<float> > mVerts;
+
+    bool drawWireframe = true;
 };
 
 #endif // BOUNDINGBOX_H
