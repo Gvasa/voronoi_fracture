@@ -70,7 +70,6 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(0);
-    //glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glVertexAttribPointer(
         0,                          // attribute 0. I.e. layout 0 in shader
         3,                          // size

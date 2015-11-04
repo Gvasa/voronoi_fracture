@@ -48,7 +48,12 @@ void main() {
 
     frag_color = color;
 
-    frag_color.rgb *= calcShading(normalize(vec3(NM * vec4(normal, 1.0))), light_direction).rgb * 1.0;
-    frag_color.rgb += calcSpecularShading(normalize(vec3(NM * vec4(normal, 1.0))), light_direction).rgb * shinyness;
+    frag_color.rgb *= calcShading(
+        normalize(vec3(NM * vec4(normal, 1.0))),
+        light_direction).rgb * 1.0;
+    
+    frag_color.rgb += calcSpecularShading(
+        normalize(vec3(NM * vec4(normal, 1.0))),
+        light_direction).rgb * shinyness;
 
 }
