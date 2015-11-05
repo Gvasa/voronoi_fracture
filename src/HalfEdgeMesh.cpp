@@ -184,6 +184,60 @@ bool HalfEdgeMesh::addFace(const std::vector<Vector3 <float> > verts) {
     return true;
 }
 
+// Rotate the mesh
+void HalfEdgeMesh::rotate(Vector3<float> axis, float angle){
+    
+    //Compute the rotational matrix
+    std::cout << std::endl << "Rotating..." << std::endl;
+
+    Matrix4x4<float>  rotationMatrix = Matrix4x4<float>::RotationXYZ(
+        axis[0] * (angle * M_PI / 180.0f),
+        axis[1] * (angle * M_PI / 180.0f),
+        axis[2] * (angle * M_PI / 180.0f)  
+    );
+
+    for(unsigned int i = 0; i < mVerts.size(); i++){
+        // Apply the rotation to the vertices
+        Vector4<float> v = Vector4<float>(mVerts[i].pos[0], mVerts[i].pos[1], mVerts[i].pos[2], 1.0f);
+        v = rotationMatrix * v;
+        mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
+
+        //Apply the rotation to the normals
+        Vector4<float> n = Vector4<float>(mVerts[i].normal[0], mVerts[i].normal[1], mVerts[i].normal[2], 1.0f);
+        n = rotationMatrix * n;
+        mVerts[i].normal = Vector3<float>(n[0], n[1], n[2]).Normalize();
+    }
+
+}
+
+// Translate the Mesh
+void HalfEdgeMesh::translate(Vector3<float> p){
+    
+    // Compute the translation matrix
+    Matrix4x4<float> translationMatrix = Matrix4x4<float>::Translation(p[0], p[1], p[2]);
+
+    for(unsigned int i = 0; i < mVerts.size(); i++) {
+        // Apply the rotation to the vertices
+        Vector4<float> v = Vector4<float>(mVerts[i].pos[0], mVerts[i].pos[1], mVerts[i].pos[2], 1.0f);
+        v = translationMatrix * v;
+        mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
+    }
+}
+
+// Scale the Mesh 
+void HalfEdgeMesh::scale(Vector3<float> s){
+
+    // Compute the scaling matrix
+    Matrix4x4<float> scalingMatrix = Matrix4x4<float>::Scale(s[0], s[1], s[2]);
+
+    for(unsigned int i = 0; i < mVerts.size(); i++) {
+        // Apply the scaling matrix
+        Vector4<float> v = Vector4<float>(mVerts[i].pos[0], mVerts[i].pos[1], mVerts[i].pos[2], 1.0f);
+        v = scalingMatrix * v;
+        mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
+    }
+}
+
 // This is where we add a vertex to the half-edge structure
 bool HalfEdgeMesh::addVertex(const Vector3<float> &v, unsigned int &index) {
 
@@ -251,7 +305,7 @@ bool HalfEdgeMesh::addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsig
     mUniqueEdgePairs[op] = index1; // [ ] constructs a new entry in the map, ordering not important
 
     return true;
-}   
+}
 
 //! Compute and return the normal at face at faceIndex
 Vector3<float> HalfEdgeMesh::calculateFaceNormal(unsigned int faceIndex) const {

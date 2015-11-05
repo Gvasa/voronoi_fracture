@@ -36,6 +36,10 @@ public:
     //Adds a triangle (face) to the mesh    
     bool addFace(std::vector<Vector3 <float> >);
 
+    void rotate(Vector3<float>, float);
+    void translate(Vector3<float>);
+    void scale(Vector3<float>);
+
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
      */ 
@@ -55,6 +59,7 @@ public:
             mIndex = index;
         }
     public:
+
         EdgeIterator& next() { mIndex = mHem->getEdge(mIndex).next; return *this; }
         EdgeIterator& prev() { mIndex = mHem->getEdge(mIndex).prev; return *this; }
         EdgeIterator& pair() { mIndex = mHem->getEdge(mIndex).pair; return *this; }
@@ -69,6 +74,7 @@ public:
 
         const bool operator == (const EdgeIterator &eIt) { return this->mIndex == eIt.mIndex; }
         const bool operator != (const EdgeIterator &eIt) { return this->mIndex != eIt.mIndex; }
+
     };
 
     EdgeIterator getEdgeIterator(unsigned int i) { return EdgeIterator(this, i); }
