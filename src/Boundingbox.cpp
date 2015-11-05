@@ -168,11 +168,24 @@ void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts)
 
      //Point 1
     std::vector<Vector3<float> > points;
-
+    /*
     points.push_back(Vector3<float>(0.7, 0.3, -0.5));
     points.push_back(Vector3<float>(-0.3, -0.4, 0.6));
+*/  
 
 
+    Vector3<float> A(0.5f, 0.5f, 0.5f);
+    Vector3<float> B(-0.25f, -0.25f, -0.25f);
+    
+    Vector3<float> mittPunk = A + (B - A) / 2.0f;
+
+    Vector3<flaot> normal = (B - A).Normalize();
+    
+    
+
+
+
+    /*
     mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
     mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
     mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
@@ -181,6 +194,7 @@ void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts)
     mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
     mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
 
+*/
 
 
 
@@ -188,8 +202,7 @@ void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts)
 
 
 
-
-    calculateConvexHull(points);
+   // calculateConvexHull(points);
 
 }
 
