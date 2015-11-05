@@ -20,6 +20,7 @@ public:
 
     void initialize();
     void render(Matrix4x4<float>);
+    void setWireFrame(bool w) { mWireframe = w; };
 
 private:
 
@@ -32,10 +33,11 @@ private:
 
 
     void calculateBoundingbox(std::vector<Vector3<float> >);
+    void calculateConvexHull(std::vector<Vector3<float> >);
 
     std::vector<Vector3<float> > mVerts;
 
-    bool drawWireframe = true;
+    bool mWireframe = false;
 };
 
 #endif // BOUNDINGBOX_H
