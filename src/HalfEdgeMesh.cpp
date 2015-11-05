@@ -31,6 +31,7 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     mBoundingbox = new Boundingbox(buildVertexData());
     mBoundingbox->initialize();
+    mBoundingbox->setWireFrame(true);
 
     buildRenderData();
 

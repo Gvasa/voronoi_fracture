@@ -3,7 +3,6 @@
 Boundingbox::Boundingbox(std::vector<Vector3<float> > uniqueVerts) {
 
     calculateBoundingbox(uniqueVerts);
-
 }
 
 
@@ -46,9 +45,6 @@ void Boundingbox::initialize() {
 
 void Boundingbox::render(Matrix4x4<float> MVP) {
 
-    //borde inte sättas här, de borde tas in i render function med en kosntant typ RENDER_WITH_WIREFRAME
-    drawWireframe = true;
-
     glDisable( GL_CULL_FACE );
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
@@ -67,7 +63,7 @@ void Boundingbox::render(Matrix4x4<float> MVP) {
     // Draw geometry
 
     
-    if(drawWireframe)   //Draw Wireframe
+    if(mWireframe)   //Draw Wireframe
         glDrawArrays(GL_LINES, 0, mVerts.size()); // 3 indices starting at 0 -> 1 triangle
     else                //draw triangles
         glDrawArrays(GL_TRIANGLES, 0, mVerts.size());
@@ -109,6 +105,10 @@ void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts)
         if(uniqueVerts.at(i)[2] > uniqueVerts.at(boundingValues["zMax"])[2]){
             boundingValues["zMax"] = i;
         }
+    }  
+
+    for(std::map<std::string, unsigned int>::iterator it = boundingValues.begin(); it != boundingValues.end(); ++it) {
+        std::cout << (*it).first << "  " << uniqueVerts.at((*it).second) << std::endl;
     }
 
     // xMin Plane
@@ -164,5 +164,38 @@ void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts)
     mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
     mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
     mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+
+
+     //Point 1
+    std::vector<Vector3<float> > points;
+
+    points.push_back(Vector3<float>(0.7, 0.3, -0.5));
+    points.push_back(Vector3<float>(-0.3, -0.4, 0.6));
+
+
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+
+
+
+
+
+
+
+
+
+    calculateConvexHull(points);
+
+}
+
+void Boundingbox::calculateConvexHull(std::vector<Vector3<float> > points) {
+
+
+
 
 }
