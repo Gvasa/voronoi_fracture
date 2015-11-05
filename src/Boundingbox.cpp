@@ -177,11 +177,65 @@ void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts)
     Vector3<float> A(0.5f, 0.5f, 0.5f);
     Vector3<float> B(-0.25f, -0.25f, -0.25f);
     
-    Vector3<float> mittPunk = A + (B - A) / 2.0f;
+    Vector3<float> mittPunkt = A + (B - A) / 2.0f;
 
-    Vector3<flaot> normal = (B - A).Normalize();
+    Vector3<float> normal = (B - A).Normalize();
+
+
+    float x1 = (normal[0]*mittPunkt[1] - normal[1]*uniqueVerts.at(boundingValues["yMin"])[1] + normal[1]*mittPunkt[1] - normal[2]*uniqueVerts.at(boundingValues["zMin"])[2] + normal[2]*mittPunkt[2]) / normal[0];
+    float x2 = (normal[0]*mittPunkt[1] - normal[1]*uniqueVerts.at(boundingValues["yMin"])[1] + normal[1]*mittPunkt[1] - normal[2]*uniqueVerts.at(boundingValues["zMax"])[2] + normal[2]*mittPunkt[2]) / normal[0];
+    float x3 = (normal[0]*mittPunkt[1] - normal[1]*uniqueVerts.at(boundingValues["yMax"])[1] + normal[1]*mittPunkt[1] - normal[2]*uniqueVerts.at(boundingValues["zMin"])[2] + normal[2]*mittPunkt[2]) / normal[0];
+    float x4 = (normal[0]*mittPunkt[1] - normal[1]*uniqueVerts.at(boundingValues["yMax"])[1] + normal[1]*mittPunkt[1] - normal[2]*uniqueVerts.at(boundingValues["zMax"])[2] + normal[2]*mittPunkt[2]) / normal[0];   
+
+    std::cout << "X: " << x1 << " " << x2 << " " << x3 << " " << x4 << std::endl;
+
+    Vector3<float> p1(x2, uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]);
+    Vector3<float> p2(x2, uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMin"])[2]);
+
+    float y1 = (-normal[0]*uniqueVerts.at(boundingValues["xMin"])[0] + normal[0]*mittPunkt[0] + normal[1]*mittPunkt[1] - normal[2]*uniqueVerts.at(boundingValues["zMin"])[2] + normal[2]*mittPunkt[2]) / normal[1];
+    float y2 = (-normal[0]*uniqueVerts.at(boundingValues["xMin"])[0] + normal[0]*mittPunkt[0] + normal[1]*mittPunkt[1] - normal[2]*uniqueVerts.at(boundingValues["zMax"])[2] + normal[2]*mittPunkt[2]) / normal[1];
+    float y3 = (-normal[0]*uniqueVerts.at(boundingValues["xMax"])[0] + normal[0]*mittPunkt[0] + normal[1]*mittPunkt[1] - normal[2]*uniqueVerts.at(boundingValues["zMin"])[2] + normal[2]*mittPunkt[2]) / normal[1];
+    float y4 = (-normal[0]*uniqueVerts.at(boundingValues["xMax"])[0] + normal[0]*mittPunkt[0] + normal[1]*mittPunkt[1] - normal[2]*uniqueVerts.at(boundingValues["zMax"])[2] + normal[2]*mittPunkt[2]) / normal[1];  
+
+    std::cout << "y: " << y1 << " " << y2 << " " << y3 << " " << y4 << std::endl;
+
+    Vector3<float> p3(uniqueVerts.at(boundingValues["xMin"])[0], y2, uniqueVerts.at(boundingValues["zMax"])[2]);
+    Vector3<float> p4(uniqueVerts.at(boundingValues["xMax"])[0], y3, uniqueVerts.at(boundingValues["zMin"])[2]);
+
+    float z1 = (-normal[0]*uniqueVerts.at(boundingValues["xMin"])[0] + normal[0]*mittPunkt[0] - normal[1]*uniqueVerts.at(boundingValues["yMin"])[1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2];
+    float z2 = (-normal[0]*uniqueVerts.at(boundingValues["xMin"])[0] + normal[0]*mittPunkt[0] - normal[1]*uniqueVerts.at(boundingValues["yMax"])[1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2];
+    float z3 = (-normal[0]*uniqueVerts.at(boundingValues["xMax"])[0] + normal[0]*mittPunkt[0] - normal[1]*uniqueVerts.at(boundingValues["yMin"])[1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2];
+    float z4 = (-normal[0]*uniqueVerts.at(boundingValues["xMax"])[0] + normal[0]*mittPunkt[0] - normal[1]*uniqueVerts.at(boundingValues["yMax"])[1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2];
+
+    std::cout << "z: " << z1 << " " << z2 << " " << z3 << " " << z4 << std::endl;
+
+    Vector3<float> p5(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMax"])[1], z2);
+    Vector3<float> p6(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMin"])[1], z3);
+/*
+    std::cout << xyminzmax << std::endl;
+    std::cout << xymaxzmin << std::endl;
+
+    std::cout << xminyzmax << std::endl;
+    std::cout << xmaxyzmin << std::endl;
     
-    
+    std::cout << xminymaxz << std::endl;
+    std::cout << xmaxyminz << std::endl;*/
+
+    mVerts.push_back(p1);
+    mVerts.push_back(p6);
+    mVerts.push_back(p3);
+
+    mVerts.push_back(p6);
+    mVerts.push_back(p5);
+    mVerts.push_back(p3);
+
+    mVerts.push_back(p6);
+    mVerts.push_back(p4);
+    mVerts.push_back(p5);
+
+    mVerts.push_back(p4);
+    mVerts.push_back(p2);
+    mVerts.push_back(p5);
 
 
 
@@ -198,6 +252,10 @@ void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts)
 
 
 
+    // ------------------------------------
+    //  SE TILL ATT INGEN DEL AV NORMALEN ÄR 0 , IFSATS!!)
+    //  
+    // --------------------------------
 
 
 
