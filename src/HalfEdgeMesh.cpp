@@ -33,6 +33,15 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
     mBoundingbox->initialize();
     mBoundingbox->setWireFrame(true);
 
+    Vector3<float> A(0.5f, 0.5f, 0.5f);
+    Vector3<float> B(-0.25f, -0.25f, -0.25f);
+    std::vector<Vector3<float> > voronoiPoints;
+    voronoiPoints.push_back(A);
+    voronoiPoints.push_back(B);
+    mCompound = new Compound(mBoundingbox, voronoiPoints);
+    mCompound->initialize();
+
+
     buildRenderData();
 
     // Update face normals
@@ -136,6 +145,7 @@ void HalfEdgeMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     glDisableVertexAttribArray(0);
 
     mBoundingbox->render(sceneMatrices[I_MVP]);
+    mCompound->render(sceneMatrices[I_MVP]);
 }
 
 // This is where we add a face to the half-edge structure

@@ -22,6 +22,7 @@
 #include "tools/shader.hpp"
 #include "utils/Utils.h"
 #include "Boundingbox.h"
+#include "Compound.h"
 
 class HalfEdgeMesh : public Geometry {
 
@@ -160,6 +161,8 @@ private:
 
     Boundingbox *mBoundingbox;
 
+    Compound *mCompound;
+    
     // The edges of the mesh
     std::vector<HalfEdge> mEdges;
     // The vertices in the mesh
