@@ -129,6 +129,9 @@ void Compound::calculateConvexHull(Boundingbox* boundingBox, std::vector<Vector3
 
     switch(okPoints.size()) {
         case 3:
+            mVerts.push_back(okPoints[0]);
+            mVerts.push_back(okPoints[1]);
+            mVerts.push_back(okPoints[2]);
         case 4:
             mVerts.push_back(okPoints[0]);
             mVerts.push_back(okPoints[1]);
@@ -139,6 +142,18 @@ void Compound::calculateConvexHull(Boundingbox* boundingBox, std::vector<Vector3
             mVerts.push_back(okPoints[3]);
             break;
         case 5:
+            mVerts.push_back(okPoints[0]);
+            mVerts.push_back(okPoints[1]);
+            mVerts.push_back(okPoints[2]);
+
+            mVerts.push_back(okPoints[0]);
+            mVerts.push_back(okPoints[2]);
+            mVerts.push_back(okPoints[3]);
+
+            mVerts.push_back(okPoints[0]);
+            mVerts.push_back(okPoints[3]);
+            mVerts.push_back(okPoints[4]);
+
         case 6:
             mVerts.push_back(okPoints[0]);
             mVerts.push_back(okPoints[2]);
