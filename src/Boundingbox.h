@@ -34,6 +34,8 @@ private:
     GLuint shaderProgram;
 
     GLint MVPLoc; // MVP Matrix
+    GLint ColorLoc;
+    Vector4<float> mColor;
 
 
     void calculateBoundingbox(std::vector<Vector3<float> >);

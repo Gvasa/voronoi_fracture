@@ -40,6 +40,8 @@ private:
     GLuint shaderProgram;
 
     GLint MVPLoc; // MVP Matrix
+    GLint ColorLoc;
+    Vector4<float> mColor;
 
     void calculateVoronoiPattern(Boundingbox *, std::vector<Vector3<float> >);
     void calculateSplittingPlane(Boundingbox *, std::vector<Vector3<float> >);
