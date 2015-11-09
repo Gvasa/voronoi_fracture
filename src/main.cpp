@@ -58,9 +58,9 @@ int main (int argc, char* argv[]) {
 
     // HalfEdge mesh
     mesh = new HalfEdgeMesh();
-    point1 = new Debugpoint();
-    point2 = new Debugpoint();
-    point3 = new Debugpoint();
+    point1 = new Debugpoint(Vector3<float>(0.5f, 0.5f, 0.5f));
+    point2 = new Debugpoint(Vector3<float>(-0.25f, -0.25f, -0.25f));
+    point3 = new Debugpoint(Vector3<float>(0.5f, 0.8f, 0.5f));
 
     // Load obj file
     objectLoader = new LoadObj();
@@ -70,20 +70,6 @@ int main (int argc, char* argv[]) {
     mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.5f, 0.5f));
     mesh->addVoronoiPoint(Vector3<float>(-0.25f, -0.25f, -0.25f));
     mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.8f, 0.5f));
-
-    objectLoader->loadObject(point1, "assets/sphere1.0.obj");
-    objectLoader->loadObject(point2, "assets/sphere1.0.obj");
-    objectLoader->loadObject(point3, "assets/sphere1.0.obj");
-
-
-    point1->scale(Vector3<float>(0.02f, 0.02f, 0.02f));
-    point2->scale(Vector3<float>(0.02f, 0.02f, 0.02f));
-    point3->scale(Vector3<float>(0.02f, 0.02f, 0.02f));
-
-    point1->translate(Vector3<float>(0.5f, 0.5f, 0.5f));
-    point2->translate(Vector3<float>(-0.25f, -0.25f, -0.25f));
-    point3->translate(Vector3<float>(0.5f, 0.8f, 0.5f));
-
 
     scene->addGeometry(floor_rect);
     scene->addGeometry(wall_rect);

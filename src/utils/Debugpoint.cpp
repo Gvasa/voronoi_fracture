@@ -5,7 +5,16 @@ const unsigned int Debugpoint::BORDER = (std::numeric_limits<unsigned int>::max)
 const unsigned int Debugpoint::UNINITIALIZED = (std::numeric_limits<unsigned int>::max)()-1;
 
 
-Debugpoint::Debugpoint() {
+Debugpoint::Debugpoint(Vector3<float> position) {
+
+    objLoader = new LoadObj();
+    objLoader->loadObject(this, "assets/sphere1.0.obj");
+
+
+    scale(Vector3<float>(0.02f, 0.02f, 0.02f));
+
+    translate(position);
+
     mColor = Vector4<float>(0.0f, 1.0f, 1.0f, 1.0f);
 }
 

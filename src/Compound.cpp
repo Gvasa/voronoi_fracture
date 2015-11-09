@@ -132,10 +132,10 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
         if(xPoints[i][0] > boundingValues[XMIN][0] && xPoints[i][0] < boundingValues[XMAX][0])
             okPoints.push_back(xPoints[i]);
 
-        if(yPoints[i][1] > boundingValues[YMIN][0] && yPoints[i][1] < boundingValues[YMAX][1])
+        if(yPoints[i][1] > boundingValues[YMIN][1] && yPoints[i][1] < boundingValues[YMAX][1])
             okPoints.push_back(yPoints[i]);
 
-        if(zPoints[i][2] > boundingValues[ZMIN][0] && zPoints[i][2] < boundingValues[ZMAX][2])
+        if(zPoints[i][2] > boundingValues[ZMIN][2] && zPoints[i][2] < boundingValues[ZMAX][2])
             okPoints.push_back(zPoints[i]);
     }
 

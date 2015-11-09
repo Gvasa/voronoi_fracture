@@ -22,13 +22,14 @@
 // Classes
 #include "../Geometry.h"
 #include "../tools/shader.hpp"
+#include "../LoadObj.h"
 #include "Utils.h"
 
 class Debugpoint : public Geometry {
 
 public:
 
-    Debugpoint();
+    Debugpoint(Vector3<float>);
     ~Debugpoint();
 
     void initialize(Vector3<float>);
@@ -94,6 +95,8 @@ private:
     GLint MVPLoc;           // MVP matrix
     GLint ColorLoc;
     Vector4<float> mColor;
+
+    LoadObj *objLoader;
 
     // Denotes a reference to a border, only for face pointers
     const static unsigned int BORDER;
