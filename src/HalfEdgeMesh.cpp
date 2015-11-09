@@ -35,6 +35,8 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     mCompound = new Compound(mBoundingbox, mVoronoiPoints);
     mCompound->initialize();
+    
+
 
     buildRenderData();
 
