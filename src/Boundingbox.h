@@ -22,6 +22,9 @@ public:
     void render(Matrix4x4<float>);
     void setWireFrame(bool w) { mWireframe = w; };
 
+    std::map<std::string, unsigned int> getBoundingValuesIndex() { return mBoundingValuesIndex; }
+    std::vector<Vector3<float> > getBoundingValues() { return mBoundingValues; }
+
 private:
 
     // Shader data
@@ -36,8 +39,12 @@ private:
     void calculateConvexHull(std::vector<Vector3<float> >);
 
     std::vector<Vector3<float> > mVerts;
+    std::vector<Vector3<float> > mBoundingValues;
+    std::map<std::string, unsigned int> mBoundingValuesIndex;
 
     bool mWireframe = false;
+
+
 };
 
 #endif // BOUNDINGBOX_H
