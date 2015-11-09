@@ -44,6 +44,9 @@ public:
     virtual void scale(Vector3<float>) {
         std::cout << "\nGeometry does not have scaling implemented!\n";
     };
+    virtual float volume() const {
+        std::cout << "\nGeometry does not have volume implemented!\n";
+    };
 
 protected:
 

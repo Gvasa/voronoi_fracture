@@ -61,7 +61,7 @@ int main (int argc, char* argv[]) {
     // Load obj file
     objectLoader = new LoadObj();
     objectLoader->loadObject(mesh, "assets/sphere1.0.obj");
-    mesh->scale(Vector3<float>(0.02f, 0.02f, 0.02f));
+    //mesh->scale(Vector3<float>(0.02f, 0.02f, 0.02f));
     
 
     scene->addGeometry(floor_rect);

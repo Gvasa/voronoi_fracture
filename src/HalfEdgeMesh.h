@@ -38,8 +38,12 @@ public:
     bool addFace(std::vector<Vector3 <float> >);
 
     void rotate(Vector3<float>, float);
+    
     void translate(Vector3<float>);
+    
     void scale(Vector3<float>);
+
+    float volume() const;
 
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!

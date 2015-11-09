@@ -41,6 +41,7 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
     mCompound = new Compound(mBoundingbox, voronoiPoints);
     mCompound->initialize();
 
+    std::cout << "Volume: " << volume() << std::endl << std::endl;
 
     buildRenderData();
 
@@ -249,6 +250,31 @@ void HalfEdgeMesh::scale(Vector3<float> s){
     }
 }
 
+
+float HalfEdgeMesh::volume() const {
+
+    float volume = 0.0f;
+    float area = 0.0f;
+    Vector3<float> normal;
+    Vector3<float> v1, v2, v3;
+    unsigned int edgeIndex;
+
+    for(unsigned int i = 0; i < mFaces.size(); i++) {
+        
+        edgeIndex = getFace(i).edge;
+        v1 = getVert(getEdge(edgeIndex).vert).pos;
+        v2 = getVert(getEdge(getEdge(edgeIndex).next).vert).pos;
+        v3 = getVert(getEdge(getEdge(edgeIndex).prev).vert).pos;
+
+        area = (Cross(v2 - v1, v3 - v1).Length()) / 2.0f;
+
+        normal = getFace(i).normal;
+
+        volume += ((v1 + v2 + v3) / 3.0f) * (normal * area);
+    }
+    return volume / 3.0f;
+}
+
 // This is where we add a vertex to the half-edge structure
 bool HalfEdgeMesh::addVertex(const Vector3<float> &v, unsigned int &index) {
 
@@ -377,7 +403,7 @@ void HalfEdgeMesh::buildRenderData() {
         Vertex &v3 = getVert(edge->vert);
         
         // Add vertices to our drawing list
-        orderedVertexList.push_back(v1.pos);    
+        orderedVertexList.push_back(v1.pos);
         orderedVertexList.push_back(v2.pos);
         orderedVertexList.push_back(v3.pos);
 
@@ -406,7 +432,7 @@ void HalfEdgeMesh::updateRenderData() {
         Vertex &v3 = getVert(edge->vert);
         
         // Add vertices to our drawing list
-        orderedVertexList[vertIndex]     = v1.pos;    
+        orderedVertexList[vertIndex]     = v1.pos;
         orderedVertexList[vertIndex + 1] = v2.pos;
         orderedVertexList[vertIndex + 2] = v3.pos;
 
@@ -416,7 +442,7 @@ void HalfEdgeMesh::updateRenderData() {
         orderedNormalList[vertIndex + 2] = v3.normal;
 
         vertIndex += 3;
-    }   
+    }
 }
 
 
