@@ -1,7 +1,7 @@
 #include "Boundingbox.h"
 
 Boundingbox::Boundingbox(std::vector<Vector3<float> > uniqueVerts) {
-
+    mColor = Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
     calculateBoundingbox(uniqueVerts);
 }
 
@@ -23,6 +23,7 @@ void Boundingbox::initialize() {
 
     // Set names for our uniforms, same as in shaders
     MVPLoc = glGetUniformLocation(shaderProgram, "MVP");
+    ColorLoc = glGetUniformLocation(shaderProgram, "color");
 
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -54,6 +55,7 @@ void Boundingbox::render(Matrix4x4<float> MVP) {
 
     // Pass values of our matrices and materials to the GPU via uniforms
     glUniformMatrix4fv(MVPLoc, 1, GL_FALSE, &MVP(0, 0));
+    glUniform4f(ColorLoc, mColor[0], mColor[1], mColor[2], mColor[3]);
 
     // Rebind the buffer data, vertices are now updated
     glBindVertexArray(vertexArrayID);

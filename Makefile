@@ -22,7 +22,7 @@ LIBFOLD = -L"/usr/local/lib"
 INCFOLD = -I"/usr/local/include"
 
 # Files:
-FILES = $(wildcard src/*.cpp) $(wildcard src/tools/*.cpp)
+FILES = $(wildcard src/*.cpp) $(wildcard src/tools/*.cpp) $(wildcard src/utils/*.cpp)
 
 # Binary folder:
 BINFOLD = bin/

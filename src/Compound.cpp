@@ -2,6 +2,7 @@
 
 Compound::Compound(Boundingbox* boundingBox, std::vector<Vector3 <float> > voronoiPoints) {
 
+    mColor = Vector4<float>(1.0f, 1.0f, 1.0f, 0.5f);
     calculateVoronoiPattern(boundingBox, voronoiPoints);
 }
 
@@ -12,7 +13,7 @@ Compound::~Compound() {
 }
 
 void Compound::initialize() {
-     std::cout << "\nInitializing Compound ...\n";
+    std::cout << "\nInitializing Compound ...\n";
 
     glGenVertexArrays(1, &vertexArrayID);
     glBindVertexArray(vertexArrayID);
@@ -21,6 +22,7 @@ void Compound::initialize() {
 
     // Set names for our uniforms, same as in shaders
     MVPLoc = glGetUniformLocation(shaderProgram, "MVP");
+    ColorLoc = glGetUniformLocation(shaderProgram, "color");
 
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -51,6 +53,7 @@ void Compound::render(Matrix4x4<float> MVP) {
 
     // Pass values of our matrices and materials to the GPU via uniforms
     glUniformMatrix4fv(MVPLoc, 1, GL_FALSE, &MVP(0, 0));
+        glUniform4f(ColorLoc, mColor[0], mColor[1], mColor[2], mColor[3]);
 
     // Rebind the buffer data, vertices are now updated
     glBindVertexArray(vertexArrayID);
@@ -141,8 +144,6 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
         std::cout << "okPoints: " << okPoints[i] << std::endl;
     }
 
-
-
     switch(okPoints.size()) {
         case 3:
             mVerts.push_back(okPoints[0]);
@@ -154,7 +155,7 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
             mVerts.push_back(okPoints[2]);
 
             mVerts.push_back(okPoints[0]);
-            mVerts.push_back(okPoints[2]);
+            mVerts.push_back(okPoints[1]);
             mVerts.push_back(okPoints[3]);
             break;
         case 5:
