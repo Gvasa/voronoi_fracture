@@ -2,7 +2,7 @@
 
 Compound::Compound(Boundingbox* boundingBox, std::vector<Vector3 <float> > voronoiPoints) {
 
-    calculateConvexHull(boundingBox, voronoiPoints);
+    calculateVoronoiPattern(boundingBox, voronoiPoints);
 }
 
 
@@ -73,7 +73,25 @@ void Compound::render(Matrix4x4<float> MVP) {
 
 }
 
-void Compound::calculateConvexHull(Boundingbox* boundingBox, std::vector<Vector3<float> > voronoiPoints) {
+void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vector3<float> > voronoiPoints) {
+
+    for(unsigned int i = 0; i < voronoiPoints.size(); i++) {
+        std::vector<Vector3<float> > twoPoints;
+
+        for (unsigned int j = i+1; j < voronoiPoints.size(); j++) {
+            twoPoints.push_back(voronoiPoints[i]);
+            twoPoints.push_back(voronoiPoints[j]);
+            std::cout << voronoiPoints[i] << std::endl;
+            std::cout << voronoiPoints[j] << std::endl << std::endl;
+            calculateSplittingPlane(boundingBox, twoPoints);
+            twoPoints.clear();
+            twoPoints.shrink_to_fit();
+        }
+
+    }
+}
+
+void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vector3<float> > voronoiPoints) {
         
     std::vector<Vector3<float> > boundingValues = boundingBox->getBoundingValues();
   /*  
@@ -94,8 +112,6 @@ void Compound::calculateConvexHull(Boundingbox* boundingBox, std::vector<Vector3
     xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[1] - normal[1]*boundingValues[YMIN][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMIN][1], boundingValues[ZMAX][2]));
     xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[1] - normal[1]*boundingValues[YMAX][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMAX][1], boundingValues[ZMIN][2]));
     xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[1] - normal[1]*boundingValues[YMAX][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMAX][1], boundingValues[ZMAX][2]));   
-
-    debug
 
     yPoints.push_back(Vector3<float>(boundingValues[XMIN][0], (-normal[0]*boundingValues[XMIN][0] + normal[0]*mittPunkt[0] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[1], boundingValues[ZMIN][2]));
     yPoints.push_back(Vector3<float>(boundingValues[XMIN][0], (-normal[0]*boundingValues[XMIN][0] + normal[0]*mittPunkt[0] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[1], boundingValues[ZMAX][2]));
@@ -137,7 +153,7 @@ void Compound::calculateConvexHull(Boundingbox* boundingBox, std::vector<Vector3
             mVerts.push_back(okPoints[1]);
             mVerts.push_back(okPoints[2]);
 
-            mVerts.push_back(okPoints[1]);
+            mVerts.push_back(okPoints[0]);
             mVerts.push_back(okPoints[2]);
             mVerts.push_back(okPoints[3]);
             break;

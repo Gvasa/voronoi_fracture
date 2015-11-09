@@ -13,7 +13,7 @@
 
 GLFWwindow* window;
 Scene *scene;
-Geometry *mesh;
+Geometry *mesh, *point1, *point2, *point3;
 Geometry *floor_rect;
 Geometry *wall_rect;
 LoadObj *objectLoader;
@@ -57,12 +57,30 @@ int main (int argc, char* argv[]) {
 
     // HalfEdge mesh
     mesh = new HalfEdgeMesh();
+    point1 = new HalfEdgeMesh();
+    point2 = new HalfEdgeMesh();
+    point3 = new HalfEdgeMesh();
 
     // Load obj file
     objectLoader = new LoadObj();
     objectLoader->loadObject(mesh, "assets/sphere1.0.obj");
     mesh->scale(Vector3<float>(0.02f, 0.02f, 0.02f));
     
+    mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.5f, 0.5f));
+    mesh->addVoronoiPoint(Vector3<float>(-0.25f, -0.25f, -0.25f));
+    mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.8f, 0.5f));
+
+    objectLoader->loadObject(point1, "assets/sphere1.0.obj");
+    objectLoader->loadObject(point2, "assets/sphere1.0.obj");
+    objectLoader->loadObject(point3, "assets/sphere1.0.obj");
+
+    point1->translate(Vector3<float>(0.5f, 0.5f, 0.5f));
+    point2->translate(Vector3<float>(-0.25f, -0.25f, -0.25f));
+    point3->translate(Vector3<float>(0.5f, 0.8f, 0.5f));
+
+    point1->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
+    point2->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
+    point3->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
 
     scene->addGeometry(floor_rect);
     scene->addGeometry(wall_rect);

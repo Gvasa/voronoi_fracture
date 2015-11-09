@@ -44,6 +44,9 @@ public:
     virtual void scale(Vector3<float>) {
         std::cout << "\nGeometry does not have scaling implemented!\n";
     };
+    virtual void addVoronoiPoint(Vector3<float>) {
+          std::cout << "\nGeometry does not have addVoronoiPoint implemented!\n";
+    }
 
 protected:
 

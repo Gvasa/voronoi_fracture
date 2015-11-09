@@ -41,8 +41,8 @@ private:
 
     GLint MVPLoc; // MVP Matrix
 
-
-    void calculateConvexHull(Boundingbox *, std::vector<Vector3<float> >);
+    void calculateVoronoiPattern(Boundingbox *, std::vector<Vector3<float> >);
+    void calculateSplittingPlane(Boundingbox *, std::vector<Vector3<float> >);
 
     std::vector<Vector3<float> > mVerts;
 
