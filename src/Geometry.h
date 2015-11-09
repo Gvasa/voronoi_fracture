@@ -47,6 +47,9 @@ public:
     virtual float volume() const {
         std::cout << "\nGeometry does not have volume implemented!\n";
     };
+    virtual void addVoronoiPoint(Vector3<float>) {
+        std::cout << "\nGeometry does not have addVoronoiPoint implemented!\n";
+    }
 
 protected:
 

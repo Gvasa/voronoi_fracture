@@ -36,16 +36,10 @@ public:
 
     //Adds a triangle (face) to the mesh    
     bool addFace(std::vector<Vector3 <float> >);
-    
-    void addVoronoiPoint(Vector3<float> v) { mVoronoiPoints.push_back(v); }
 
     void rotate(Vector3<float>, float);
-    
     void translate(Vector3<float>);
-    
     void scale(Vector3<float>);
-
-    float volume() const;
 
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
@@ -182,11 +176,9 @@ private:
     // The faces in the mesh
     std::vector<Face> mFaces;
     // Vertex list in drawing order
-    std::vector< Vector3<float> > mOrderedVertexList;
+    std::vector< Vector3<float> > orderedVertexList;
     // Normal list in drawing order
-    std::vector< Vector3<float> > mOrderedNormalList;
-
-    std::vector< Vector3<float> > mVoronoiPoints;
+    std::vector< Vector3<float> > orderedNormalList;
 
     /*
      * MEMBER FUNCTIONS

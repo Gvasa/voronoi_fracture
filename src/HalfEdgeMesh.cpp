@@ -33,12 +33,7 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
     mBoundingbox->initialize();
     mBoundingbox->setWireFrame(true);
 
-    Vector3<float> A(0.5f, 0.5f, 0.5f);
-    Vector3<float> B(-0.25f, -0.25f, -0.25f);
-    std::vector<Vector3<float> > voronoiPoints;
-    voronoiPoints.push_back(A);
-    voronoiPoints.push_back(B);
-    mCompound = new Compound(mBoundingbox, voronoiPoints);
+    mCompound = new Compound(mBoundingbox, mVoronoiPoints);
     mCompound->initialize();
 
     std::cout << "Volume: " << volume() << std::endl << std::endl;
@@ -80,7 +75,7 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, orderedVertexList.size() * sizeof(Vector3<float>), &orderedVertexList[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, mOrderedVertexList.size() * sizeof(Vector3<float>), &mOrderedVertexList[0], GL_STATIC_DRAW);
 
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(0);
@@ -96,7 +91,7 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     glGenBuffers(1, &normalBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-    glBufferData(GL_ARRAY_BUFFER, orderedNormalList.size() * sizeof(Vector3<float>), &orderedNormalList[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, mOrderedNormalList.size() * sizeof(Vector3<float>), &mOrderedNormalList[0], GL_STATIC_DRAW);
     // 2nd attribute buffer : normals
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(
@@ -131,14 +126,14 @@ void HalfEdgeMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     // Rebind the buffer data, vertices are now updated
     glBindVertexArray(vertexArrayID);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, orderedVertexList.size() * sizeof(Vector3<float>), &orderedVertexList[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, mOrderedVertexList.size() * sizeof(Vector3<float>), &mOrderedVertexList[0], GL_STATIC_DRAW);
 
     // Rebind the buffer data, normals are now updated
     glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-    glBufferData(GL_ARRAY_BUFFER, orderedNormalList.size() * sizeof(Vector3<float>), &orderedNormalList[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, mOrderedNormalList.size() * sizeof(Vector3<float>), &mOrderedNormalList[0], GL_STATIC_DRAW);
 
     // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0, orderedVertexList.size()); // 3 indices starting at 0 -> 1 triangle
+    glDrawArrays(GL_TRIANGLES, 0, mOrderedVertexList.size()); // 3 indices starting at 0 -> 1 triangle
     
     // Unbind
     glBindVertexArray(0);
@@ -403,14 +398,14 @@ void HalfEdgeMesh::buildRenderData() {
         Vertex &v3 = getVert(edge->vert);
         
         // Add vertices to our drawing list
-        orderedVertexList.push_back(v1.pos);
-        orderedVertexList.push_back(v2.pos);
-        orderedVertexList.push_back(v3.pos);
+        mOrderedVertexList.push_back(v1.pos);    
+        mOrderedVertexList.push_back(v2.pos);
+        mOrderedVertexList.push_back(v3.pos);
 
         // Add normals to our drawing list
-        orderedNormalList.push_back(v1.normal);
-        orderedNormalList.push_back(v2.normal);
-        orderedNormalList.push_back(v3.normal);
+        mOrderedNormalList.push_back(v1.normal);
+        mOrderedNormalList.push_back(v2.normal);
+        mOrderedNormalList.push_back(v3.normal);
     }   
 }
 
@@ -432,14 +427,14 @@ void HalfEdgeMesh::updateRenderData() {
         Vertex &v3 = getVert(edge->vert);
         
         // Add vertices to our drawing list
-        orderedVertexList[vertIndex]     = v1.pos;
-        orderedVertexList[vertIndex + 1] = v2.pos;
-        orderedVertexList[vertIndex + 2] = v3.pos;
+        mOrderedVertexList[vertIndex]     = v1.pos;    
+        mOrderedVertexList[vertIndex + 1] = v2.pos;
+        mOrderedVertexList[vertIndex + 2] = v3.pos;
 
         // Add normals to our drawing list
-        orderedNormalList[vertIndex]     = v1.normal;
-        orderedNormalList[vertIndex + 1] = v2.normal;
-        orderedNormalList[vertIndex + 2] = v3.normal;
+        mOrderedNormalList[vertIndex]     = v1.normal;
+        mOrderedNormalList[vertIndex + 1] = v2.normal;
+        mOrderedNormalList[vertIndex + 2] = v3.normal;
 
         vertIndex += 3;
     }

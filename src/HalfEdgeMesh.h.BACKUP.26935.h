@@ -36,17 +36,15 @@ public:
 
     //Adds a triangle (face) to the mesh    
     bool addFace(std::vector<Vector3 <float> >);
-    
-    void addVoronoiPoint(Vector3<float> v) { mVoronoiPoints.push_back(v); }
 
+<<<<<<< HEAD
     void rotate(Vector3<float>, float);
-    
     void translate(Vector3<float>);
-    
     void scale(Vector3<float>);
 
-    float volume() const;
-
+=======
+    void addVoronoiPoint(Vector3<float> v) { mVoronoiPoints.push_back(v); }
+>>>>>>> ugly hack to show debug spheres at voronoi points
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
      */ 
