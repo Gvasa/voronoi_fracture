@@ -148,12 +148,13 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
             mVerts.push_back(okPoints[0]);
             mVerts.push_back(okPoints[1]);
             mVerts.push_back(okPoints[2]);
+            break;
         case 4:
             mVerts.push_back(okPoints[0]);
             mVerts.push_back(okPoints[1]);
             mVerts.push_back(okPoints[2]);
 
-            mVerts.push_back(okPoints[0]);
+            mVerts.push_back(okPoints[1]);
             mVerts.push_back(okPoints[2]);
             mVerts.push_back(okPoints[3]);
             break;
@@ -169,7 +170,7 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
             mVerts.push_back(okPoints[0]);
             mVerts.push_back(okPoints[3]);
             mVerts.push_back(okPoints[4]);
-
+            break;
         case 6:
             mVerts.push_back(okPoints[0]);
             mVerts.push_back(okPoints[2]);
