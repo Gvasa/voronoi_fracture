@@ -27,13 +27,19 @@ class LoadObj{
 public:
 	LoadObj() {}
 
-	bool loadObject(Geometry *, std::string fileName); //false return on error
+	bool loadObject(std::string fileName); //false return on error
 
+    void loadMesh(Geometry *, std::string objName);
+    
 protected:
+
+    std::map<std::string, std::vector<std::vector<Vector3<float> > > > mObjects;  
+
 	bool readHeader(std::istream &is);
 	bool readData(std::istream &is);
 
 	Vector3<unsigned int> readTri(std::istream &is);
+
 
 	struct LoadData{
 		std::vector<Vector3 <float> > verts;

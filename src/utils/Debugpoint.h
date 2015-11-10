@@ -25,6 +25,8 @@
 #include "../LoadObj.h"
 #include "Utils.h"
 
+class LoadObj;
+
 class Debugpoint : public Geometry {
 
 public:

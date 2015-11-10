@@ -21,8 +21,11 @@
 #include "Geometry.h"
 #include "tools/shader.hpp"
 #include "utils/Utils.h"
+#include "utils/Debugpoint.h"
 #include "Boundingbox.h"
 #include "Compound.h"
+
+class Debugpoint;
 
 class HalfEdgeMesh : public Geometry {
 
@@ -36,9 +39,9 @@ public:
 
     //Adds a triangle (face) to the mesh    
     bool addFace(std::vector<Vector3 <float> >);
-    
-    void addVoronoiPoint(Vector3<float> v) { mVoronoiPoints.push_back(v); }
 
+    void setDebugMode(bool b) { mDebugMode = b; }
+    
     void rotate(Vector3<float>, float);
     
     void translate(Vector3<float>);
@@ -188,6 +191,10 @@ private:
 
     std::vector< Vector3<float> > mVoronoiPoints;
 
+    std::vector<Debugpoint *> mDebugPoints;
+
+    bool mDebugMode = false;
+
     /*
      * MEMBER FUNCTIONS
      */
@@ -197,6 +204,9 @@ private:
     
     //Add a half edge pair, from vertex 1 to vertex2, to the mesh.
     bool addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsigned int &index1, unsigned int &index2);
+
+    //add a voronoiPoint to the mesh, if debugmode = true it will add a debugpoint
+    void addVoronoiPoint(Vector3<float> v);
 
     //! Compute and return the normal at a face at faceIndex
     Vector3<float> calculateFaceNormal(unsigned int faceIndex) const;

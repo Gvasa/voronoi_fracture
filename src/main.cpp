@@ -17,7 +17,7 @@ Scene *scene;
 Geometry *mesh, *point1, *point2, *point3, *point4;
 Geometry *floor_rect;
 Geometry *wall_rect;
-LoadObj *objectLoader;
+static LoadObj *objectLoader;
 
 std::string windowTitle = "Voronoi Fracture";
 
@@ -56,29 +56,34 @@ int main (int argc, char* argv[]) {
     wall_rect->translate(Vector3<float>(0.0f, 0.0f, -1.0f));
     wall_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
 
-    // HalfEdge mesh
+    // HalfEdge loadd
     mesh = new HalfEdgeMesh();
-    point1 = new Debugpoint(Vector3<float>(-0.5f, 0.5f, 0.0f));
+    mesh->setDebugMode(true);
+
+   /* point1 = new Debugpoint(Vector3<float>(-0.5f, 0.5f, 0.0f));
     point2 = new Debugpoint(Vector3<float>(0.5f, 0.5f, 0.0f));
     point3 = new Debugpoint(Vector3<float>(0.0f, -0.707f, 0.0f));
     point4 = new Debugpoint(Vector3<float>(0.0f, 0.0f, 0.0f));
-
+*/
     // Load obj file
     objectLoader = new LoadObj();
-    objectLoader->loadObject(mesh, "assets/sphere1.0.obj");
+    objectLoader->loadObject("assets/sphere1.0.obj");
+    objectLoader->loadObject("assets/sphere0.02.obj");
     //mesh->scale(Vector3<float>(0.02f, 0.02f, 0.02f));
-    
-    mesh->addVoronoiPoint(Vector3<float>(-0.5f, 0.5f, 0.0f));
+   // objectLoader->loadMesh(mesh, "sphere1.0");
+    point1 = new Debugpoint(Vector3<float>(-0.5f, 0.5f, 0.0f));
+
+   /* mesh->addVoronoiPoint(Vector3<float>(-0.5f, 0.5f, 0.0f));
     mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.5f, 0.0f));
     mesh->addVoronoiPoint(Vector3<float>(0.0f, -0.707, 0.0f));
-
+*/
     scene->addGeometry(floor_rect);
     scene->addGeometry(wall_rect);
     scene->addGeometry(point1);
-    scene->addGeometry(point2);
-    scene->addGeometry(point3);
-    scene->addGeometry(point4);
-    scene->addGeometry(mesh);
+   // scene->addGeometry(point2);
+   // scene->addGeometry(point3);
+   // scene->addGeometry(point4);
+//    scene->addGeometry(mesh);
 
     initializeScene();
 

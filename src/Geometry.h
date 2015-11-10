@@ -51,6 +51,10 @@ public:
         std::cout << "\nGeometry does not have addVoronoiPoint implemented!\n";
     }
 
+    virtual void setDebugMode(bool) {
+        std::cout << "\nGeometry does not have setDebugMode implemented!\n";
+    }
+
 protected:
 
     //! Compute and return the normal at face at faceIndex

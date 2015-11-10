@@ -36,6 +36,9 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
     mCompound = new Compound(mBoundingbox, mVoronoiPoints);
     mCompound->initialize();
 
+    for(unsigned int i = 0; i < mDebugPoints.size(); i++)
+        mDebugPoints[i]->initialize(lightPosition);
+
     std::cout << "Volume: " << volume() << std::endl << std::endl;
 
     buildRenderData();
@@ -146,6 +149,11 @@ void HalfEdgeMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
 
     mBoundingbox->render(sceneMatrices[I_MVP]);
     mCompound->render(sceneMatrices[I_MVP]);
+
+    if(mDebugMode) {
+        for(unsigned int i = 0; i < mDebugPoints.size(); i++)
+            mDebugPoints[i]->render(sceneMatrices);
+    }
 
 }
 
@@ -342,6 +350,13 @@ bool HalfEdgeMesh::addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsig
     mUniqueEdgePairs[op] = index1; // [ ] constructs a new entry in the map, ordering not important
 
     return true;
+}
+
+void HalfEdgeMesh::addVoronoiPoint(Vector3<float> v) {
+
+    mDebugPoints.push_back(new Debugpoint(v));
+    mVoronoiPoints.push_back(v); 
+
 }
 
 //! Compute and return the normal at face at faceIndex
