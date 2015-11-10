@@ -7,7 +7,7 @@ const unsigned int HalfEdgeMesh::UNINITIALIZED = (std::numeric_limits<unsigned i
 
 HalfEdgeMesh::HalfEdgeMesh() {
 
-    mMaterial.color         = Vector4<float>(0.2f, 0.6f, 0.2f, 0.5f);
+    mMaterial.color         = Vector4<float>(0.2f, 0.6f, 0.2f, 0.8f);
     mMaterial.ambient       = Vector4<float>(0.3f, 0.3f, 0.3f, 1.0f);
     mMaterial.diffuse       = Vector4<float>(0.8f, 0.8f, 0.8f, 1.0f);
     mMaterial.specular      = Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
@@ -164,7 +164,7 @@ void HalfEdgeMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     glBufferData(GL_ARRAY_BUFFER, mOrderedNormalList.size() * sizeof(Vector3<float>), &mOrderedNormalList[0], GL_STATIC_DRAW);
 
     // Draw the triangle !
-    //glDrawArrays(GL_TRIANGLES, 0, mOrderedVertexList.size()); // 3 indices starting at 0 -> 1 triangle
+    glDrawArrays(GL_TRIANGLES, 0, mOrderedVertexList.size()); // 3 indices starting at 0 -> 1 triangle
     
     // Unbind
     glBindVertexArray(0);

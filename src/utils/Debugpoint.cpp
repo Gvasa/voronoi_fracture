@@ -71,6 +71,7 @@ void Debugpoint::render(std::vector<Matrix4x4<float> > sceneMatrices) {
 
     // Use shader
     glUseProgram(shaderProgram);
+    glDisable( GL_DEPTH_TEST );
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     
@@ -90,6 +91,7 @@ void Debugpoint::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDisableVertexAttribArray(0);
 
+    glEnable( GL_DEPTH_TEST );
     glDisable( GL_BLEND );
 }
 

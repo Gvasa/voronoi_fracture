@@ -50,6 +50,7 @@ void Compound::initialize() {
 void Compound::render(Matrix4x4<float> MVP) {
 
     glDisable( GL_CULL_FACE );
+    glDisable( GL_DEPTH_TEST );
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
@@ -77,6 +78,7 @@ void Compound::render(Matrix4x4<float> MVP) {
     glDisableVertexAttribArray(0);
 
     glDisable( GL_BLEND );
+    glEnable( GL_DEPTH_TEST );
     glEnable( GL_CULL_FACE );
 
 }
@@ -259,10 +261,9 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
 }
 
 
-bool Compound::calculateLineIntersectionPoint(
-    std::pair<Vector3<float>, Vector3<float> > edge1, 
-    std::pair<Vector3<float>, Vector3<float> > edge2, 
-    Vector3<float> &intersectionPoint) {
+bool Compound::calculateLineIntersectionPoint(  std::pair<Vector3<float>, Vector3<float> > edge1, 
+                                                std::pair<Vector3<float>, Vector3<float> > edge2, 
+                                                Vector3<float> &intersectionPoint) {
 
     return true;
 }
