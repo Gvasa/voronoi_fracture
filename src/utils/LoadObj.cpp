@@ -7,14 +7,11 @@
 
 //Classes
 #include "LoadObj.h"
-#include "HalfEdgeMesh.h"
 
-bool LoadObj::loadObject(std::string fileName){
+bool LoadObj::loadObject(std::string objName){
 
-    std::string objName = fileName.substr(fileName.find("/")+1);
-    objName = objName.substr(0, objName.size()-4); 
-
-    //std::cout << "\nLoading obj-file: " << fileName.substr(fileName.find("/")+1) <<  " ...\n";
+    std::string fileName = "assets/" + objName + ".obj";
+    
     std::cout << "\nLoading obj-file: " << fileName <<  " ...\n";
 
     std::filebuf fb;
@@ -131,17 +128,18 @@ Vector3<unsigned int> LoadObj::readTri(std::istream &is){
     return Vector3<unsigned int>(v) - Vector3<unsigned int>(1,1,1); // obj file format is 1-based
 }
 
-void LoadObj::loadMesh(Geometry *g, std::string objName) {
+std::vector<std::vector<Vector3<float> > > LoadObj::getMeshVertexList(std::string objName) {
 
     std::map<std::string, std::vector<std::vector<Vector3<float> > > >::iterator it = mObjects.find(objName);
 
-/*
-    if(it == mObjects.end())
-        return;*/
-    debug
-    std::cout << it->second.size() << std::endl;
+    if(it == mObjects.end()) {
+        if(loadObject(objName))
+            it = mObjects.find(objName);
+        else 
+            return std::vector<std::vector<Vector3<float> > >();
+    }
 
-    for(unsigned int i = 0; i < it->second.size(); i++)
-        g->addFace(it->second[i]);
-    
+    return it->second;
+
 }
+

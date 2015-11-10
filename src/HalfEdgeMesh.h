@@ -26,6 +26,7 @@
 #include "Compound.h"
 
 class Debugpoint;
+class Compound;
 
 class HalfEdgeMesh : public Geometry {
 
@@ -39,6 +40,8 @@ public:
 
     //Adds a triangle (face) to the mesh    
     bool addFace(std::vector<Vector3 <float> >);
+
+    void createMesh(std::string);
 
     void setDebugMode(bool b) { mDebugMode = b; }
     
@@ -173,7 +176,6 @@ private:
     /*
      * MEMBER VARIABLES
      */
-
     Boundingbox *mBoundingbox;
 
     Compound *mCompound;

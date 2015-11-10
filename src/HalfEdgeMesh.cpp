@@ -27,6 +27,8 @@ HalfEdgeMesh::~HalfEdgeMesh() {
 // Add init stuff here, right now its just some random shit for the red ugly triangle
 void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
+
+
     std::cout << "\nInitializing Half-Edge mesh ...\n\n";
 
     mBoundingbox = new Boundingbox(buildVertexData());
@@ -204,8 +206,16 @@ bool HalfEdgeMesh::addFace(const std::vector<Vector3 <float> > verts) {
     return true;
 }
 
+void HalfEdgeMesh::createMesh(std::string objName) {
+
+    std::vector<std::vector<Vector3<float> > > vertexList = Geometry::mObjectLoader->getMeshVertexList(objName);
+
+    for(unsigned int i = 0; i < vertexList.size(); i++) 
+        addFace(vertexList[i]);
+}
+
 // Rotate the mesh
-void HalfEdgeMesh::rotate(Vector3<float> axis, float angle){
+void HalfEdgeMesh::rotate(Vector3<float> axis, float angle) {
     
     //Compute the rotational matrix
     std::cout << std::endl << "Rotating..." << std::endl;
@@ -397,7 +407,7 @@ std::vector<Vector3<float> > HalfEdgeMesh::buildVertexData() {
     for(unsigned int i = 0; i < mVerts.size(); i++) {
         vertexData.push_back(mVerts[i].pos);
     }
-
+    std::cout << "vertexdata: " << vertexData.size() << std::endl;
     return vertexData;
 }
 

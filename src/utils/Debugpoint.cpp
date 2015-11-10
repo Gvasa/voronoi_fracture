@@ -9,14 +9,14 @@ Debugpoint::Debugpoint(Vector3<float> position) {
 
     std::cout << "skapa ny" << std::endl;
 
-       //objLoader = new LoadObj();
-        objLoader->loadMesh(this, "sphere1.0");
+    createMesh("sphere1.0");
+    scale(Vector3<float>(0.02f, 0.02f, 0.02f));
 
-        // scale(Vector3<float>(0.02f, 0.02f, 0.02f));
+    // scale(Vector3<float>(0.02f, 0.02f, 0.02f));
 
-        translate(position);
+    translate(position);
 
-        mColor = Vector4<float>(0.0f, 1.0f, 1.0f, 1.0f);
+    mColor = Vector4<float>(0.0f, 1.0f, 1.0f, 1.0f);
 
         //initialize()
 }
@@ -138,6 +138,14 @@ bool Debugpoint::addFace(const std::vector<Vector3 <float> > verts) {
     getEdge(innerHalfEdgeIndex3).face = mFaces.size() - 1;
 
     return true;
+}
+void Debugpoint::createMesh(std::string objName) {
+
+    std::vector<std::vector<Vector3<float> > > vertexList = Geometry::mObjectLoader->getMeshVertexList(objName);
+
+    for(unsigned int i = 0; i < vertexList.size(); i++) 
+        addFace(vertexList[i]);
+
 }
 
 // Rotate the mesh

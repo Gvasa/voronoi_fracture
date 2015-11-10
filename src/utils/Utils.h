@@ -8,18 +8,20 @@
 #include <glm/gtx/string_cast.hpp>
 #include <stdio.h>
 #include <stdlib.h>
-#include <LoadObj.h>
 
 #define debug std::cout << "vid: " << __LINE__ << " " << __FUNCTION__ << std::endl << std::endl;
 
 const int WIDTH = 1024;
 const int HEIGHT = 768;
 
+//class LoadObj;
+
+
 class Utils {
 
 public:
 
-
+    static void hello() { std::cout << "hello" << std::endl; }
 
 static void printQuat(glm::quat q) {
     std::cout << glm::to_string(glm::eulerAngles(q)) << std::endl;
@@ -27,6 +29,8 @@ static void printQuat(glm::quat q) {
 
 
 private:
+
+    
 
 };
 

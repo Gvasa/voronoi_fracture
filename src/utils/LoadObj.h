@@ -17,11 +17,12 @@
 #include <algorithm>
 #include <exception>
 #include <unistd.h>
+#include <map>
 
 
 // Classes
-#include "HalfEdgeMesh.h"
-#include "math/Vector3.h"
+#include "../math/Vector3.h"
+
 
 class LoadObj{
 public:
@@ -29,8 +30,8 @@ public:
 
 	bool loadObject(std::string fileName); //false return on error
 
-    void loadMesh(Geometry *, std::string objName);
-    
+    std::vector<std::vector<Vector3<float> > > getMeshVertexList(std::string objName);
+
 protected:
 
     std::map<std::string, std::vector<std::vector<Vector3<float> > > > mObjects;  
