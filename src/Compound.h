@@ -45,8 +45,10 @@ private:
 
     void calculateVoronoiPattern(Boundingbox *, std::vector<Vector3<float> >);
     void calculateSplittingPlane(Boundingbox *, std::vector<Vector3<float> >);
+    bool calculateLineIntersectionPoint(std::pair<Vector3<float>, Vector3<float> >, std::pair<Vector3<float>, Vector3<float> >, Vector3<float> &);
 
     std::vector<Vector3<float> > mVerts;
+    std::vector<std::vector<Vector3<float> > > mSplittingPlanes;
 
     bool mWireframe = false;
 };

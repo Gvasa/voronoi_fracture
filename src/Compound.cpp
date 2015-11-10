@@ -121,18 +121,18 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
 
     xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMIN][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMIN][1], boundingValues[ZMIN][2]));
     xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMIN][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMIN][1], boundingValues[ZMAX][2]));
-    xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMAX][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMAX][1], boundingValues[ZMIN][2]));
-    xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMAX][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMAX][1], boundingValues[ZMAX][2]));   
+    xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMAX][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMAX][1], boundingValues[ZMAX][2]));
+    xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMAX][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMAX][1], boundingValues[ZMIN][2]));   
 
     yPoints.push_back(Vector3<float>(boundingValues[XMIN][0], (-normal[0]*boundingValues[XMIN][0] + normal[0]*mittPunkt[0] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[1], boundingValues[ZMIN][2]));
     yPoints.push_back(Vector3<float>(boundingValues[XMIN][0], (-normal[0]*boundingValues[XMIN][0] + normal[0]*mittPunkt[0] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[1], boundingValues[ZMAX][2]));
-    yPoints.push_back(Vector3<float>(boundingValues[XMAX][0], (-normal[0]*boundingValues[XMAX][0] + normal[0]*mittPunkt[0] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[1], boundingValues[ZMIN][2]));
-    yPoints.push_back(Vector3<float>(boundingValues[XMAX][0], (-normal[0]*boundingValues[XMAX][0] + normal[0]*mittPunkt[0] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[1], boundingValues[ZMAX][2])); 
+    yPoints.push_back(Vector3<float>(boundingValues[XMAX][0], (-normal[0]*boundingValues[XMAX][0] + normal[0]*mittPunkt[0] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[1], boundingValues[ZMAX][2]));
+    yPoints.push_back(Vector3<float>(boundingValues[XMAX][0], (-normal[0]*boundingValues[XMAX][0] + normal[0]*mittPunkt[0] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[1], boundingValues[ZMIN][2])); 
 
     zPoints.push_back(Vector3<float>(boundingValues[XMIN][0], boundingValues[YMIN][1], (-normal[0]*boundingValues[XMIN][0] + normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMIN][1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2]));
     zPoints.push_back(Vector3<float>(boundingValues[XMIN][0], boundingValues[YMAX][1], (-normal[0]*boundingValues[XMIN][0] + normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMAX][1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2]));
-    zPoints.push_back(Vector3<float>(boundingValues[XMAX][0], boundingValues[YMIN][1], (-normal[0]*boundingValues[XMAX][0] + normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMIN][1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2]));
     zPoints.push_back(Vector3<float>(boundingValues[XMAX][0], boundingValues[YMAX][1], (-normal[0]*boundingValues[XMAX][0] + normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMAX][1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2]));
+    zPoints.push_back(Vector3<float>(boundingValues[XMAX][0], boundingValues[YMIN][1], (-normal[0]*boundingValues[XMAX][0] + normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMIN][1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2]));
 
 
   //  xPoints.push_back(Vector3<float>( normal[0]*mi ));
@@ -155,11 +155,28 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
         std::cout << "okPoints: " << okPoints[i] << std::endl;
     }
 
+    std::vector<Vector3<float> > points;
+
     switch(okPoints.size()) {
         case 3:
             mVerts.push_back(okPoints[0]);
             mVerts.push_back(okPoints[1]);
             mVerts.push_back(okPoints[2]);
+
+            
+            points.push_back(okPoints[0]);
+            points.push_back(okPoints[1]);
+            points.push_back(okPoints[2]);
+
+            mSplittingPlanes.push_back(points);
+
+            points.clear();
+            points.shrink_to_fit();
+
+            for(unsigned int i = 0; i < mSplittingPlanes[0].size(); i++) {
+                std::cout << "asdjhgasj,dkhasdjkhasdkjhaskdj: " << mSplittingPlanes[0][i] << std::endl;
+            }
+
             break;
         case 4:
             mVerts.push_back(okPoints[0]);
@@ -169,6 +186,17 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
             mVerts.push_back(okPoints[0]);
             mVerts.push_back(okPoints[2]);
             mVerts.push_back(okPoints[3]);
+
+            points.push_back(okPoints[0]);
+            points.push_back(okPoints[1]);
+            points.push_back(okPoints[2]);
+            points.push_back(okPoints[3]);
+
+            mSplittingPlanes.push_back(points);
+
+            points.clear();
+            points.shrink_to_fit();
+
             break;
         case 5:
             mVerts.push_back(okPoints[0]);
@@ -182,6 +210,18 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
             mVerts.push_back(okPoints[0]);
             mVerts.push_back(okPoints[3]);
             mVerts.push_back(okPoints[4]);
+
+            points.push_back(okPoints[0]);
+            points.push_back(okPoints[1]);
+            points.push_back(okPoints[2]);
+            points.push_back(okPoints[3]);
+            points.push_back(okPoints[4]);
+
+            mSplittingPlanes.push_back(points);
+
+            points.clear();
+            points.shrink_to_fit();
+
             break;
         case 6:
             mVerts.push_back(okPoints[0]);
@@ -199,34 +239,35 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
             mVerts.push_back(okPoints[5]);
             mVerts.push_back(okPoints[4]);
             mVerts.push_back(okPoints[3]);
+
+            points.push_back(okPoints[0]);
+            points.push_back(okPoints[1]);
+            points.push_back(okPoints[2]);
+            points.push_back(okPoints[3]);
+            points.push_back(okPoints[4]);
+            points.push_back(okPoints[5]);
+
+            mSplittingPlanes.push_back(points);
+
+            points.clear();
+            points.shrink_to_fit();
+
             break;
         default:
             break;
     }
-    /*
-    mVerts.push_back(okPoints[0]);
-    mVerts.push_back(okPoints[1]);
-    mVerts.push_back(okPoints[2]);
-
-    mVerts.push_back(okPoints[1]);
-    mVerts.push_back(okPoints[2]);
-    mVerts.push_back(okPoints[3]);*/
-
-/*
-    mVerts.push_back(okPoints.at(0));
-    mVerts.push_back(okPoints.at(2));
-    mVerts.push_back(okPoints.at(1));
-
-    mVerts.push_back(okPoints.at(0));
-    mVerts.push_back(okPoints.at(5));
-    mVerts.push_back(okPoints.at(2));
-
-    mVerts.push_back(okPoints.at(5));
-    mVerts.push_back(okPoints.at(3));
-    mVerts.push_back(okPoints.at(2));
-
-    mVerts.push_back(okPoints.at(5));
-    mVerts.push_back(okPoints.at(4));
-    mVerts.push_back(okPoints.at(3));*/
-
 }
+
+
+bool Compound::calculateLineIntersectionPoint(
+    std::pair<Vector3<float>, Vector3<float> > edge1, 
+    std::pair<Vector3<float>, Vector3<float> > edge2, 
+    Vector3<float> &intersectionPoint) {
+
+    return true;
+}
+
+
+
+
+

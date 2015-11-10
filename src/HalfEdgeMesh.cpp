@@ -159,7 +159,7 @@ void HalfEdgeMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     glBufferData(GL_ARRAY_BUFFER, mOrderedNormalList.size() * sizeof(Vector3<float>), &mOrderedNormalList[0], GL_STATIC_DRAW);
 
     // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0, mOrderedVertexList.size()); // 3 indices starting at 0 -> 1 triangle
+    //glDrawArrays(GL_TRIANGLES, 0, mOrderedVertexList.size()); // 3 indices starting at 0 -> 1 triangle
     
     // Unbind
     glBindVertexArray(0);
