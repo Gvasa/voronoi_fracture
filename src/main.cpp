@@ -103,7 +103,6 @@ int main (int argc, char* argv[]) {
            glfwWindowShouldClose(window) == 0 );
 
     // Clean-up
-    //delete floor_rect;
     delete scene;
 
     // Close OpenGL window and terminate GLFW

@@ -22,6 +22,9 @@ Rectangle::~Rectangle() {
 
     mVerts.clear();             // Clear content
     mVerts.shrink_to_fit();     // Free memory
+
+    mNormals.clear();
+    mNormals.shrink_to_fit();
 }
 
 

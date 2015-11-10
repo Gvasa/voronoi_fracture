@@ -7,8 +7,18 @@ Boundingbox::Boundingbox(std::vector<Vector3<float> > uniqueVerts) {
 
 
 Boundingbox::~Boundingbox() {
+    
+    glDeleteBuffers(1, &vertexBuffer);
+    glDeleteVertexArrays(1, &vertexArrayID);
+    glDeleteProgram(shaderProgram);
+
     mVerts.clear();
-    //mVerts.shrink_to_fit();
+    mVerts.shrink_to_fit();
+
+    mBoundingValues.clear();
+    mBoundingValues.shrink_to_fit();
+
+    mBoundingValuesIndex.clear();
 }
 
 

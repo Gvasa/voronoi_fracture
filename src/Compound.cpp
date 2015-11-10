@@ -8,8 +8,13 @@ Compound::Compound(Boundingbox* boundingBox, std::vector<Vector3 <float> > voron
 
 
 Compound::~Compound() {
+
+    glDeleteBuffers(1, &vertexBuffer);
+    glDeleteVertexArrays(1, &vertexArrayID);
+    glDeleteProgram(shaderProgram);
+
     mVerts.clear();
-    //mVerts.shrink_to_fit();
+    mVerts.shrink_to_fit();
 }
 
 void Compound::initialize() {

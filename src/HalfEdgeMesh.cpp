@@ -22,6 +22,30 @@ HalfEdgeMesh::~HalfEdgeMesh() {
     glDeleteBuffers(1, &vertexBuffer);
     glDeleteVertexArrays(1, &vertexArrayID);
     glDeleteProgram(shaderProgram);
+
+    mEdges.clear();
+    mEdges.shrink_to_fit();
+
+    mVerts.clear();
+    mVerts.shrink_to_fit();
+
+    mFaces.clear();
+    mFaces.shrink_to_fit();
+
+    mOrderedVertexList.clear();
+    mOrderedVertexList.shrink_to_fit();
+
+    mOrderedNormalList.clear();
+    mOrderedNormalList.shrink_to_fit();
+
+    mVoronoiPoints.clear();
+    mVoronoiPoints.shrink_to_fit();
+
+    mUniqueVerts.clear();
+    mUniqueEdgePairs.clear();
+
+    mBoundingbox->~Boundingbox();
+    mCompound->~Compound();
 }
 
 // Add init stuff here, right now its just some random shit for the red ugly triangle
