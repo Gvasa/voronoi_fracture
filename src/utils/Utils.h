@@ -14,9 +14,14 @@
 const int WIDTH = 1024;
 const int HEIGHT = 768;
 
+//class LoadObj;
+
+
 class Utils {
 
 public:
+
+    static void hello() { std::cout << "hello" << std::endl; }
 
 static void printQuat(glm::quat q) {
     std::cout << glm::to_string(glm::eulerAngles(q)) << std::endl;
@@ -24,6 +29,8 @@ static void printQuat(glm::quat q) {
 
 
 private:
+
+    
 
 };
 

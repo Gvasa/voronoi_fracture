@@ -9,15 +9,15 @@
 #include "Scene.h"
 #include "Controls.h"
 #include "utils/Utils.h"
-#include "LoadObj.h"
+//#include "LoadObj.h"
 #include "utils/Debugpoint.h"
 
 GLFWwindow* window;
 Scene *scene;
-Geometry *mesh, *point1, *point2, *point3, *point4;
+Geometry *mesh;
 Geometry *floor_rect;
 Geometry *wall_rect;
-LoadObj *objectLoader;
+Utils *utilHandler;
 
 std::string windowTitle = "Voronoi Fracture";
 
@@ -34,6 +34,7 @@ double calcFPS(double, std::string);
 int main (int argc, char* argv[]) {
 
     scene = new Scene();
+    utilHandler = new Utils();
 
     // Magic
     glewExperimental = GL_TRUE;
@@ -58,26 +59,16 @@ int main (int argc, char* argv[]) {
 
     // HalfEdge mesh
     mesh = new HalfEdgeMesh();
-    point1 = new Debugpoint(Vector3<float>(-0.5f, 0.5f, 0.0f));
-    point2 = new Debugpoint(Vector3<float>(0.25f, 0.25f, 0.0f));
-    point3 = new Debugpoint(Vector3<float>(0.0f, -0.3f, 0.0f));
-    //point4 = new Debugpoint(Vector3<float>(0.0f, 0.0f, 0.0f));
+    mesh->setDebugMode(true);
 
-    // Load obj file
-    objectLoader = new LoadObj();
-    objectLoader->loadObject(mesh, "assets/sphere1.0.obj");
-    //mesh->scale(Vector3<float>(0.02f, 0.02f, 0.02f));
-    
+    mesh->createMesh("sphere1.0");
+
     mesh->addVoronoiPoint(Vector3<float>(-0.5f, 0.5f, 0.0f));
-    mesh->addVoronoiPoint(Vector3<float>(0.25f, 0.25f, 0.0f));
-    mesh->addVoronoiPoint(Vector3<float>(0.0f, -0.3f, 0.0f));
+    mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.5f, 0.0f));
+    mesh->addVoronoiPoint(Vector3<float>(0.0f, -0.707, 0.0f));
 
     scene->addGeometry(floor_rect);
     scene->addGeometry(wall_rect);
-    scene->addGeometry(point1);
-    scene->addGeometry(point2);
-    scene->addGeometry(point3);
-    //scene->addGeometry(point4);
     scene->addGeometry(mesh);
 
     initializeScene();
@@ -105,6 +96,7 @@ int main (int argc, char* argv[]) {
            glfwWindowShouldClose(window) == 0 );
 
     // Clean-up
+    //delete floor_rect;
     delete scene;
 
     // Close OpenGL window and terminate GLFW

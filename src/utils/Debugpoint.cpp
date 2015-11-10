@@ -7,15 +7,18 @@ const unsigned int Debugpoint::UNINITIALIZED = (std::numeric_limits<unsigned int
 
 Debugpoint::Debugpoint(Vector3<float> position) {
 
-    objLoader = new LoadObj();
-    objLoader->loadObject(this, "assets/sphere1.0.obj");
+    std::cout << "skapa ny" << std::endl;
 
-
+    createMesh("sphere1.0");
     scale(Vector3<float>(0.02f, 0.02f, 0.02f));
+
+    // scale(Vector3<float>(0.02f, 0.02f, 0.02f));
 
     translate(position);
 
     mColor = Vector4<float>(0.0f, 1.0f, 1.0f, 1.0f);
+
+        //initialize()
 }
 
 Debugpoint::~Debugpoint() {
@@ -29,7 +32,7 @@ Debugpoint::~Debugpoint() {
 // Add init stuff here, right now its just some random shit for the red ugly triangle
 void Debugpoint::initialize(Vector3<float> lightPosition) {
 
-    std::cout << "\nInitializing Half-Edge mesh ...\n\n";
+    std::cout << "\nInitializing Debug point ...\n\n";
 
     buildRenderData();
 
@@ -60,7 +63,7 @@ void Debugpoint::initialize(Vector3<float> lightPosition) {
         reinterpret_cast<void*>(0)  // array buffer offset
     );
 
-    std::cout << "\nHalf-Edge mesh initialized!\n" << std::endl;
+    std::cout << "\nDebug point initialized!\n" << std::endl;
 }
 
 // Add draw stuff here, right now its just some random shit for the red ugly triangle
@@ -135,6 +138,14 @@ bool Debugpoint::addFace(const std::vector<Vector3 <float> > verts) {
     getEdge(innerHalfEdgeIndex3).face = mFaces.size() - 1;
 
     return true;
+}
+void Debugpoint::createMesh(std::string objName) {
+
+    std::vector<std::vector<Vector3<float> > > vertexList = Geometry::mObjectLoader->getMeshVertexList(objName);
+
+    for(unsigned int i = 0; i < vertexList.size(); i++) 
+        addFace(vertexList[i]);
+
 }
 
 // Rotate the mesh

@@ -51,6 +51,8 @@ HalfEdgeMesh::~HalfEdgeMesh() {
 // Add init stuff here, right now its just some random shit for the red ugly triangle
 void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
+
+
     std::cout << "\nInitializing Half-Edge mesh ...\n\n";
 
     mBoundingbox = new Boundingbox(buildVertexData());
@@ -59,6 +61,9 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     mCompound = new Compound(mBoundingbox, mVoronoiPoints);
     mCompound->initialize();
+
+    for(unsigned int i = 0; i < mDebugPoints.size(); i++)
+        mDebugPoints[i]->initialize(lightPosition);
 
     std::cout << "Volume: " << volume() << std::endl << std::endl;
 
@@ -171,6 +176,11 @@ void HalfEdgeMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     mBoundingbox->render(sceneMatrices[I_MVP]);
     mCompound->render(sceneMatrices[I_MVP]);
 
+    if(mDebugMode) {
+        for(unsigned int i = 0; i < mDebugPoints.size(); i++)
+            mDebugPoints[i]->render(sceneMatrices);
+    }
+
 }
 
 // This is where we add a face to the half-edge structure
@@ -220,8 +230,16 @@ bool HalfEdgeMesh::addFace(const std::vector<Vector3 <float> > verts) {
     return true;
 }
 
+void HalfEdgeMesh::createMesh(std::string objName) {
+
+    std::vector<std::vector<Vector3<float> > > vertexList = Geometry::mObjectLoader->getMeshVertexList(objName);
+
+    for(unsigned int i = 0; i < vertexList.size(); i++) 
+        addFace(vertexList[i]);
+}
+
 // Rotate the mesh
-void HalfEdgeMesh::rotate(Vector3<float> axis, float angle){
+void HalfEdgeMesh::rotate(Vector3<float> axis, float angle) {
     
     //Compute the rotational matrix
     std::cout << std::endl << "Rotating..." << std::endl;
@@ -368,6 +386,13 @@ bool HalfEdgeMesh::addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsig
     return true;
 }
 
+void HalfEdgeMesh::addVoronoiPoint(Vector3<float> v) {
+
+    mDebugPoints.push_back(new Debugpoint(v));
+    mVoronoiPoints.push_back(v); 
+
+}
+
 //! Compute and return the normal at face at faceIndex
 Vector3<float> HalfEdgeMesh::calculateFaceNormal(unsigned int faceIndex) const {
 
@@ -406,7 +431,7 @@ std::vector<Vector3<float> > HalfEdgeMesh::buildVertexData() {
     for(unsigned int i = 0; i < mVerts.size(); i++) {
         vertexData.push_back(mVerts[i].pos);
     }
-
+    std::cout << "vertexdata: " << vertexData.size() << std::endl;
     return vertexData;
 }
 

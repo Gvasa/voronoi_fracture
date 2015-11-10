@@ -22,8 +22,9 @@
 // Classes
 #include "../Geometry.h"
 #include "../tools/shader.hpp"
-#include "../LoadObj.h"
 #include "Utils.h"
+
+class LoadObj;
 
 class Debugpoint : public Geometry {
 
@@ -37,6 +38,8 @@ public:
 
     //Adds a triangle (face) to the mesh    
     bool addFace(std::vector<Vector3 <float> >);
+
+    void createMesh(std::string);
 
     void rotate(Vector3<float>, float);
     

@@ -7,12 +7,12 @@
 
 //Classes
 #include "LoadObj.h"
-#include "HalfEdgeMesh.h"
 
-bool LoadObj::loadObject(Geometry *mesh, std::string fileName){
+bool LoadObj::loadObject(std::string objName){
 
-
-    std::cout << "\nLoading obj-file: " << fileName.substr(fileName.find("/")+1) <<  " ...\n";
+    std::string fileName = "assets/" + objName + ".obj";
+    
+    std::cout << "\nLoading obj-file: " << fileName <<  " ...\n";
 
     std::filebuf fb;
     if(fb.open (fileName, std::ios::in)) {
@@ -36,11 +36,13 @@ bool LoadObj::loadObject(Geometry *mesh, std::string fileName){
 	for(unsigned int t = 0; t < numTriangles; t++){
 		Vector3<unsigned int> & triangle = loadData.triangles[t];
 		std::vector<Vector3 <float> > verts;
+
 		verts.push_back(loadData.verts[triangle[0]]);
 		verts.push_back(loadData.verts[triangle[1]]);
 		verts.push_back(loadData.verts[triangle[2]]);
-
-		mesh->addFace(verts);
+        
+        mObjects[objName].push_back(verts);
+		//mesh->addFace(verts);
 	}
 
     std::cout << "\n" << fileName.substr(fileName.find("/")+1) << " successfully loaded!\n";
@@ -124,5 +126,20 @@ Vector3<unsigned int> LoadObj::readTri(std::istream &is){
 
     getline(is, v); // read indices
     return Vector3<unsigned int>(v) - Vector3<unsigned int>(1,1,1); // obj file format is 1-based
+}
+
+std::vector<std::vector<Vector3<float> > > LoadObj::getMeshVertexList(std::string objName) {
+
+    std::map<std::string, std::vector<std::vector<Vector3<float> > > >::iterator it = mObjects.find(objName);
+
+    if(it == mObjects.end()) {
+        if(loadObject(objName))
+            it = mObjects.find(objName);
+        else 
+            return std::vector<std::vector<Vector3<float> > >();
+    }
+
+    return it->second;
+
 }
 
