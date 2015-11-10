@@ -84,8 +84,8 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
         for (unsigned int j = i+1; j < voronoiPoints.size(); j++) {
             twoPoints.push_back(voronoiPoints[i]);
             twoPoints.push_back(voronoiPoints[j]);
-            std::cout << voronoiPoints[i] << std::endl;
-            std::cout << voronoiPoints[j] << std::endl << std::endl;
+            std::cout << std::endl << voronoiPoints[i] << std::endl;
+            std::cout << voronoiPoints[j] << std::endl;
             calculateSplittingPlane(boundingBox, twoPoints);
             twoPoints.clear();
             twoPoints.shrink_to_fit();
@@ -107,14 +107,17 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
     Vector3<float> mittPunkt = voronoiPoints[0] + (voronoiPoints[1] - voronoiPoints[0]) / 2.0f;  
     Vector3<float> normal = (voronoiPoints[1] - voronoiPoints[0]).Normalize();
 
+    std::cout << "mittPunkt: " << mittPunkt << std::endl;
+    std::cout << "normal: " << normal << std::endl;
+
     std::vector<Vector3<float> >    xPoints;
     std::vector<Vector3<float> >    yPoints;
     std::vector<Vector3<float> >    zPoints;
 
-    xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[1] - normal[1]*boundingValues[YMIN][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMIN][1], boundingValues[ZMIN][2]));
-    xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[1] - normal[1]*boundingValues[YMIN][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMIN][1], boundingValues[ZMAX][2]));
-    xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[1] - normal[1]*boundingValues[YMAX][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMAX][1], boundingValues[ZMIN][2]));
-    xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[1] - normal[1]*boundingValues[YMAX][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMAX][1], boundingValues[ZMAX][2]));   
+    xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMIN][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMIN][1], boundingValues[ZMIN][2]));
+    xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMIN][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMIN][1], boundingValues[ZMAX][2]));
+    xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMAX][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMAX][1], boundingValues[ZMIN][2]));
+    xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMAX][1] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[0], boundingValues[YMAX][1], boundingValues[ZMAX][2]));   
 
     yPoints.push_back(Vector3<float>(boundingValues[XMIN][0], (-normal[0]*boundingValues[XMIN][0] + normal[0]*mittPunkt[0] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[1], boundingValues[ZMIN][2]));
     yPoints.push_back(Vector3<float>(boundingValues[XMIN][0], (-normal[0]*boundingValues[XMIN][0] + normal[0]*mittPunkt[0] + normal[1]*mittPunkt[1] - normal[2]*boundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[1], boundingValues[ZMAX][2]));
@@ -125,6 +128,9 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
     zPoints.push_back(Vector3<float>(boundingValues[XMIN][0], boundingValues[YMAX][1], (-normal[0]*boundingValues[XMIN][0] + normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMAX][1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2]));
     zPoints.push_back(Vector3<float>(boundingValues[XMAX][0], boundingValues[YMIN][1], (-normal[0]*boundingValues[XMAX][0] + normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMIN][1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2]));
     zPoints.push_back(Vector3<float>(boundingValues[XMAX][0], boundingValues[YMAX][1], (-normal[0]*boundingValues[XMAX][0] + normal[0]*mittPunkt[0] - normal[1]*boundingValues[YMAX][1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2]));
+
+
+  //  xPoints.push_back(Vector3<float>( normal[0]*mi ));
 
     std::vector<Vector3<float> > okPoints;
 
@@ -156,7 +162,7 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
             mVerts.push_back(okPoints[2]);
 
             mVerts.push_back(okPoints[0]);
-            mVerts.push_back(okPoints[1]);
+            mVerts.push_back(okPoints[2]);
             mVerts.push_back(okPoints[3]);
             break;
         case 5:
