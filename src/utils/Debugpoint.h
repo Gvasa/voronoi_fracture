@@ -47,6 +47,8 @@ public:
     
     void scale(Vector3<float>);
 
+    void setColor(Vector4<float> c) { mColor = c; }
+
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
      */ 
