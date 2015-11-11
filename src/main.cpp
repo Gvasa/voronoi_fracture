@@ -27,6 +27,7 @@ void initializeScene();
 void mouseButton(GLFWwindow* window, int button, int action, int mods);
 void mouseMotion(GLFWwindow* window, double x, double y);
 void mouseScroll(GLFWwindow* window, double x, double y);
+void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mods);
 double calcFPS(double, std::string);
 
 
@@ -77,6 +78,7 @@ int main (int argc, char* argv[]) {
     glfwSetMouseButtonCallback(window, mouseButton);
     glfwSetCursorPosCallback(window, mouseMotion);
     glfwSetScrollCallback(window, mouseScroll);
+    glfwSetKeyCallback(window, keyboardInput);
 
     // render-loop
     do{
@@ -181,6 +183,17 @@ void mouseScroll(GLFWwindow* window, double x, double y) {
     scene->updateCameraZoom(x, y);
 }
     
+void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mods) {
+
+    if(action == GLFW_PRESS) {
+        switch(key) {
+            case GLFW_KEY_SPACE:
+                scene->resetCamera();
+            default:
+                break;
+        }
+    }
+}
 double calcFPS(double timeInterval = 1.0, std::string windowTitle = "NONE") {
 
     // Static values which only get initialised the first time the function runs
