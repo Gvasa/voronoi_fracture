@@ -108,69 +108,24 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
 
     }
 
-
+    std::vector<std::pair<Vector3<float>, Vector3<float> > > intersectionPoints;
     for(unsigned int i = 0; i < mSplittingPlanes.size(); i++) {
-        
-        Vector3<float> difference = mSplittingPlanes[i][0] - mSplittingPlanes[i][1];
-
-        unsigned int index;
-
-        if(difference[0] < EPSILON) 
-            index = 0;
-        else if(difference[1] < EPSILON)
-            index = 1;
-        else
-            index = 2;
-
-        for(unsigned int j = i + 1; j < mSplittingPlanes.size(); j++) {
+        for (unsigned int j = i + 1; j < mSplittingPlanes.size(); j++) {            
             
-            if(mSplittingPlanes[i][0][index] - mSplittingPlanes[j][0][index] < EPSILON) {
+            std::cout << "i - j " << i << " " << j << std::endl;
 
-                unsigned int s = mSplittingPlanes[j].size();
-                std::pair<Vector3<float>, Vector3<float> > p1;
-                std::pair<Vector3<float>, Vector3<float> > p2;
+            std::pair<Vector3<float>, Vector3<float> > intersectionPointsPair;
+            if(calculatePlaneIntersection(mSplittingPlanes[i], mSplittingPlanes[j], intersectionPointsPair)) {
+                std::cout << "VI HAR NÅGOt "<< std::endl;
+                std::cout << "punkt1: " << intersectionPointsPair.first << std::endl;
+                std::cout << "punkt2: " << intersectionPointsPair.second << std::endl;
 
-                p1 = std::make_pair(mSplittingPlanes[i][0], mSplittingPlanes[i][1]);
-
-                if(mSplittingPlanes[j][1][index] - mSplittingPlanes[j][0][index] < EPSILON) {
-                    p2 = std::make_pair(mSplittingPlanes[j][0], mSplittingPlanes[j][1]);
-                    /* 
-                    1. Beräkna skärningspunkt
-                    */
-                } else {
-                    p2 = std::make_pair(mSplittingPlanes[j][s-1], mSplittingPlanes[j][0]);
-                    /* 
-                    1. Beräkna skärningspunkt
-                    */
-                }
-
-                // Om skärningspunkter finns, kapa planen som skär varandra med nya skärningspunkter
+                mDebugpoints.push_back(new Debugpoint(intersectionPointsPair.first));
+                mDebugpoints.push_back(new Debugpoint(intersectionPointsPair.second));
 
             }
-
         }
     }
-
-
-   /* std::pair<Vector3<float>, Vector3<float> > e1;
-    std::pair<Vector3<float>, Vector3<float> > e2;
-    std::pair<Vector3<float>, Vector3<float> > e3;
-    std::pair<Vector3<float>, Vector3<float> > e4;
-
-    e1 = std::make_pair(Vector3<float>(-0.99f, 0.0f, 0.99f), Vector3<float>(0.99f, 0.0f, 0.99f));
-    e2 = std::make_pair(Vector3<float>(0.0f, -0.99f, 0.99f), Vector3<float>(0.0f, 0.99f, 0.99f));
-
-    e3 = std::make_pair(Vector3<float>(-0.99f, 0.0f, -0.99f), Vector3<float>(0.99f, 0.0f, -0.99f));
-    e4 = std::make_pair(Vector3<float>(0.0f, -0.99f, -0.99f), Vector3<float>(0.0f, 0.99f, -0.99f));
-
-    Vector3<float> v1;
-    Vector3<float> v2;
-
-    calculateLineIntersectionPoint(e1, e2, v1);
-    calculateLineIntersectionPoint(e3, e4, v2);
-
-    std::cout << "\nintersection point: " << v1 << std::endl << std::endl;
-    std::cout << "\nintersection point: " << v2 << std::endl << std::endl;*/
 }
 
 void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vector3<float> > voronoiPoints) {
@@ -223,16 +178,16 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
         if(zPoints[i][2] > mBoundingValues[ZMIN][2] && zPoints[i][2] < mBoundingValues[ZMAX][2])
             okPoints.push_back(zPoints[i]);
     }
-
+/*
     for(unsigned int i = 0; i < okPoints.size(); i++) {
         std::cout << "okPoints: " << okPoints[i] << std::endl;
     }
-
+*/
     okPoints = sortVertices(okPoints, normal);
-
+/*
     for(unsigned int i = 0; i < okPoints.size(); i++) {
         std::cout << "okPoints: " << okPoints[i] << std::endl;
-    }
+    }*/
 
     std::vector<Vector3<float> > points;
 
@@ -333,6 +288,115 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
     }
 }
 
+bool Compound::calculatePlaneIntersection( std::vector<Vector3<float> > plane1, std::vector<Vector3<float> > plane2, std::pair<Vector3<float> , Vector3<float> > &intersectionPair) {
+   
+    std::vector<Vector3<float> > iPoints;
+    Vector3<float> tempPoint;
+
+    for(unsigned int i = 0; i < plane1.size(); i++) {
+        unsigned int index = 0, i1 = 0, i2 = 0; //i1 and i2 used as indices in make_pair in second for loop
+        
+        Vector3<float> difference;
+        if(i == plane1.size()-1){
+            difference = plane1[i] - plane1[0];
+            i1 = i; i2 = 0;
+        } else{
+            difference = plane1[i] - plane1[i+1];
+            i1 = i; i2 = i+1;
+        }
+        
+        if(difference[0] < EPSILON || difference[0] > -EPSILON)
+            index = 0;
+        else if(difference[1] < EPSILON || difference[1] > -EPSILON)
+            index = 1;
+        else
+            index = 2;
+    
+
+        for(unsigned int j = 0; j < plane2.size(); j++) {
+
+            if(plane1[i][index] - plane2[j][index] < EPSILON || plane1[i][index] - plane2[j][index] > -EPSILON ) {
+
+                std::pair<Vector3<float>, Vector3<float> > pair1;
+                std::pair<Vector3<float>, Vector3<float> > pair2;
+
+                pair1 = std::make_pair(plane1[i1], plane1[i2]); // needs to check case for first and last point as pair
+
+                if(j == 0){
+                    if(plane2[0][index] - plane2[1][index] < EPSILON || plane2[0][index] - plane2[1][index] > -EPSILON)
+                        pair2 = std::make_pair(plane2[0], plane2[1]);
+                    else
+                        pair2 = std::make_pair(plane2[0], plane2[plane2.size()]);
+                } else {
+                    pair2 = std::make_pair(plane2[j], plane2[j+1]);        
+                }
+                
+                if(calculateLineIntersectionPoint(pair1, pair2, tempPoint)) {
+                    iPoints.push_back(tempPoint);
+                    break;
+                }
+            }  
+        }
+    }
+
+    if(iPoints.size() >= 2) {
+        intersectionPair = std::make_pair(iPoints[0], iPoints[1]);
+        return true;
+    } 
+
+     // Vector3<float> difference = mSplittingPlanes[i][0] - mSplittingPlanes[i][1];
+
+        // unsigned int index;
+
+        // if(difference[0] < EPSILON) 
+        //     index = 0;
+        // else if(difference[1] < EPSILON)
+        //     index = 1;
+        // else
+        //     index = 2;
+
+
+
+
+        // for(unsigned int j = i + 1; j < mSplittingPlanes.size(); j++) {
+             
+        //     if(mSplittingPlanes[i][0][index] - mSplittingPlanes[j][0][index] < EPSILON) {
+
+        //         unsigned int s = mSplittingPlanes[j].size();
+        //         std::pair<Vector3<float>, Vector3<float> > p1;
+        //         std::pair<Vector3<float>, Vector3<float> > p2;
+
+        //         p1 = std::make_pair(mSplittingPlanes[i][0], mSplittingPlanes[i][1]);
+
+        //         if(mSplittingPlanes[j][1][index] - mSplittingPlanes[j][0][index] < EPSILON) {
+        //             p2 = std::make_pair(mSplittingPlanes[j][0], mSplittingPlanes[j][1]);
+        
+        //             /* 
+        //             1. Beräkna skärningspunkt
+        //             */
+        //         } else {
+        //             p2 = std::make_pair(mSplittingPlanes[j][s-1], mSplittingPlanes[j][0]);
+        //             /* 
+        //             1. Beräkna skärningspunkt
+        //             */
+        //         }
+
+        //         Vector3<float> intersectionPoint1 = calculateLineIntersectionPoint(p1, p2, intersectionPoint);
+
+
+
+        //         // Om skärningspunkter finns, kapa planen som skär varandra med nya skärningspunkter
+
+        //     }
+
+//        }
+ //   }
+
+
+
+
+    return false;
+} 
 
 bool Compound::calculateLineIntersectionPoint(  std::pair<Vector3<float>, Vector3<float> > edge1, 
                                                 std::pair<Vector3<float>, Vector3<float> > edge2, 
@@ -349,11 +413,13 @@ bool Compound::calculateLineIntersectionPoint(  std::pair<Vector3<float>, Vector
  
     float s = (Cross(dv3, dv2) * Cross(dv1, dv2)) / (Cross(dv1, dv2).Length() * Cross(dv1, dv2).Length());
 
-    if (s >= 0.0f && s <= 1.0f) {
-
+    if (s >= -EPSILON && s <= 1.0f + EPSILON) {
+        std::cout << "S: " << s << std::endl;
+        debug
         intersectionPoint = edge1.first + dv1.EntryMult(Vector3<float>(s,s,s));
 
-        mDebugpoints.push_back(new Debugpoint(intersectionPoint));
+        //mDebugpoints.push_back(new Debugpoint(intersectionPoint));
+        //mDebugpoints.push_back(new Debugpoint(intersectionPoint));
 
         return true;
     }

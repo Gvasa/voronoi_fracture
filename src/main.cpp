@@ -64,9 +64,12 @@ int main (int argc, char* argv[]) {
 
     mesh->createMesh("sphere1.0");
 
-    mesh->addVoronoiPoint(Vector3<float>(-0.99f, 0.0f, 0.99f));
-    mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.0f, -0.5f));
-    mesh->addVoronoiPoint(Vector3<float>(-0.5f, 0.5f, 0.0f));
+
+    mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
+    mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, -0.99f));
+    mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.0f, 0.0f));
+    mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.8f, 0.0f));
+
 
     scene->addGeometry(floor_rect);
     scene->addGeometry(wall_rect);

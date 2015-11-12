@@ -30,7 +30,7 @@ class Debugpoint : public Geometry {
 
 public:
 
-    Debugpoint(Vector3<float>);
+    Debugpoint(Vector3<float>, Vector4<float> c = Vector4<float>(1.0f, 0.0f, 1.0f, 1.0f));
     ~Debugpoint();
 
     void initialize(Vector3<float>);

@@ -7,7 +7,7 @@ const unsigned int HalfEdgeMesh::UNINITIALIZED = (std::numeric_limits<unsigned i
 
 HalfEdgeMesh::HalfEdgeMesh() {
 
-    mMaterial.color         = Vector4<float>(0.2f, 0.6f, 0.2f, 0.8f);
+    mMaterial.color         = Vector4<float>(0.2f, 0.6f, 0.2f, 0.f);
     mMaterial.ambient       = Vector4<float>(0.3f, 0.3f, 0.3f, 1.0f);
     mMaterial.diffuse       = Vector4<float>(0.8f, 0.8f, 0.8f, 1.0f);
     mMaterial.specular      = Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
@@ -50,8 +50,6 @@ HalfEdgeMesh::~HalfEdgeMesh() {
 
 // Add init stuff here, right now its just some random shit for the red ugly triangle
 void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
-
-
 
     std::cout << "\nInitializing Half-Edge mesh ...\n\n";
 
@@ -388,7 +386,7 @@ bool HalfEdgeMesh::addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsig
 
 void HalfEdgeMesh::addVoronoiPoint(Vector3<float> v) {
 
-    mDebugPoints.push_back(new Debugpoint(v));
+    mDebugPoints.push_back(new Debugpoint(v, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f)));
     mVoronoiPoints.push_back(v); 
 
 }

@@ -7,7 +7,7 @@
 #define YMIN 3
 #define ZMAX 4
 #define ZMIN 5
-#define EPSILON 0.001
+#define EPSILON 0.0001
 
 
 #include <map>
@@ -50,6 +50,8 @@ private:
     void calculateVoronoiPattern(Boundingbox *, std::vector<Vector3<float> >);
     
     void calculateSplittingPlane(Boundingbox *, std::vector<Vector3<float> >);
+
+    bool calculatePlaneIntersection( std::vector<Vector3<float> >, std::vector<Vector3<float> >, std::pair<Vector3<float>, Vector3<float> > &);
     
     bool calculateLineIntersectionPoint(std::pair<Vector3<float>, Vector3<float> >, std::pair<Vector3<float>, Vector3<float> >, Vector3<float> &);
     

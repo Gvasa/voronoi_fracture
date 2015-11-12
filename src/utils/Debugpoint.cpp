@@ -5,20 +5,13 @@ const unsigned int Debugpoint::BORDER = (std::numeric_limits<unsigned int>::max)
 const unsigned int Debugpoint::UNINITIALIZED = (std::numeric_limits<unsigned int>::max)()-1;
 
 
-Debugpoint::Debugpoint(Vector3<float> position) {
-
-    std::cout << "skapa ny" << std::endl;
+Debugpoint::Debugpoint(Vector3<float> position, Vector4<float> c)
+: mColor(c) {
 
     createMesh("sphere1.0");
     scale(Vector3<float>(0.02f, 0.02f, 0.02f));
 
-    // scale(Vector3<float>(0.02f, 0.02f, 0.02f));
-
     translate(position);
-
-    mColor = Vector4<float>(0.0f, 1.0f, 1.0f, 1.0f);
-
-        //initialize()
 }
 
 Debugpoint::~Debugpoint() {

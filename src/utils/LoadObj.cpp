@@ -135,7 +135,7 @@ std::vector<std::vector<Vector3<float> > > LoadObj::getMeshVertexList(std::strin
     if(it == mObjects.end()) {
         if(loadObject(objName))
             it = mObjects.find(objName);
-        else 
+        else
             return std::vector<std::vector<Vector3<float> > >();
     }
 
