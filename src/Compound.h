@@ -1,15 +1,6 @@
 #ifndef COMPOUND_H
 #define COMPOUND_H
 
-#define XMAX 0
-#define XMIN 1
-#define YMAX 2
-#define YMIN 3
-#define ZMAX 4
-#define ZMIN 5
-#define EPSILON 0.01
-
-
 #include <map>
 #include <iomanip>
 #include <GL/glew.h>
@@ -20,6 +11,7 @@
 #include "math/Matrix4x4.h"
 #include "tools/shader.hpp"
 #include "Boundingbox.h"
+#include "Splittingplane.h"
 #include "utils/Utils.h"
 #include "utils/Debugpoint.h"
 
@@ -50,7 +42,7 @@ private:
 
     void calculateVoronoiPattern(Boundingbox *, std::vector<Vector3<float> >);
     
-    void calculateSplittingPlane(Boundingbox *, std::vector<Vector3<float> >, unsigned int);
+    void calculateSplittingPlane(Boundingbox *, std::pair<Vector3<float>, Vector3<float> >, unsigned int);
 
     bool calculatePlaneIntersection( std::vector<Vector3<float> >, std::vector<Vector3<float> >, std::pair<Vector3<float>, Vector3<float> > &);
     
@@ -62,7 +54,7 @@ private:
 
     std::vector<Vector3<float> > mVerts;
     std::vector<Vector3<float> > mColors;
-    std::vector<std::vector<Vector3<float> > > mSplittingPlanes;
+    std::vector<Splittingplane *> mSplittingPlanes;
     std::vector<Debugpoint *> mDebugpoints;
     std::vector<Vector3<float> > mBoundingValues;
 

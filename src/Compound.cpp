@@ -35,95 +35,28 @@ Compound::~Compound() {
 }
 
 void Compound::initialize() {
-    std::cout << "\n-----------Initializing Compound ...----------\n";
 
-    glGenVertexArrays(1, &vertexArrayID);
-    glBindVertexArray(vertexArrayID);
-
-    shaderProgram = LoadShaders( "shaders/ColorDebugVertex.glsl", "shaders/ColorDebugFragment.glsl" );
-
-    // Set names for our uniforms, same as in shaders
-    MVPLoc = glGetUniformLocation(shaderProgram, "MVP");
-    //ColorLoc = glGetUniformLocation(shaderProgram, "color");
-
-    glGenBuffers(1, &vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, mVerts.size() * sizeof(Vector3<float>), &mVerts[0], GL_STATIC_DRAW);
-
-     // 1st attribute buffer : vertices
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(
-        0,                          // attribute 0. I.e. layout 0 in shader
-        3,                          // size
-        GL_FLOAT,                   // type
-        GL_FALSE,                   // normalized?
-        0,                          // stride
-        reinterpret_cast<void*>(0)  // array buffer offset
-    );
-
-    glGenBuffers(1, &colorBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-    glBufferData(GL_ARRAY_BUFFER, mColors.size() * sizeof(Vector3<float>), &mColors[0], GL_STATIC_DRAW);
-    // 2nd attribute buffer : normals
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(
-        1,                          // attribute 1. I.e. layout 1 in shader
-        3,                          // size
-        GL_FLOAT,                   // type
-        GL_FALSE,                   // normalized?
-        0,                          // stride
-        reinterpret_cast<void*>(0)  // array buffer offset
-    );
+    std::cout << "\nInitializing Compound...\n" << std::endl;
 
     for(unsigned int i = 0; i < mDebugpoints.size(); i++)
         mDebugpoints[i]->initialize(Vector3<float>(0.0f, 0.0f, 0.0f));
 
-    std::cout << "\nCompount Initialized!\n" << std::endl;
+    for(unsigned int i = 0; i < mSplittingPlanes.size(); i++)
+        mSplittingPlanes[i]->initialize();
+
+    std::cout << "\nCompound Initialized!\n" << std::endl;
 }
 
 void Compound::render(Matrix4x4<float> MVP) {
 
-    glDisable( GL_CULL_FACE );
-    glDisable( GL_DEPTH_TEST );
-    glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-     // Use shader
-    glUseProgram(shaderProgram);
-
-    // Pass values of our matrices and materials to the GPU via uniforms
-    glUniformMatrix4fv(MVPLoc, 1, GL_FALSE, &MVP(0, 0));
-    //glUniform4f(ColorLoc, mColor[0], mColor[1], mColor[2], mColor[3]);
-
-    // Rebind the buffer data, vertices are now updated
-    glBindVertexArray(vertexArrayID);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, mVerts.size() * sizeof(Vector3<float>), &mVerts[0], GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-    glBufferData(GL_ARRAY_BUFFER, mColors.size() * sizeof(Vector3<float>), &mColors[0], GL_STATIC_DRAW);
-
-    // Draw geometry
-    
-    //draw triangles
-    glDrawArrays(GL_TRIANGLES, 0, mVerts.size());
-
-    
-    // Unbind
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glDisableVertexAttribArray(0);
-
-    glDisable( GL_BLEND );
-    glEnable( GL_DEPTH_TEST );
-    glEnable( GL_CULL_FACE );
-
     std::vector<Matrix4x4<float> > tmp;
     tmp.push_back(MVP);
 
+    for(unsigned int i = 0; i < mSplittingPlanes.size(); i++)
+        mSplittingPlanes[i]->render(MVP);
+
     for(unsigned int i = 0; i < mDebugpoints.size(); i++)
         mDebugpoints[i]->render(tmp);
-
 }
 
 void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vector3<float> > voronoiPoints) {
@@ -131,42 +64,52 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
     unsigned int planeCounter = 0;
 
     for(unsigned int i = 0; i < voronoiPoints.size(); i++) {
-        std::vector<Vector3<float> > twoPoints;
+        
+        std::pair<Vector3<float>, Vector3<float> > voronoiPair;
 
         for (unsigned int j = i+1; j < voronoiPoints.size(); j++) {
-            twoPoints.push_back(voronoiPoints[i]);
-            twoPoints.push_back(voronoiPoints[j]);
+
+            voronoiPair = std::make_pair(voronoiPoints[i], voronoiPoints[j]);
             std::cout << std::endl << voronoiPoints[i] << std::endl;
             std::cout << voronoiPoints[j] << std::endl;
-            calculateSplittingPlane(boundingBox, twoPoints, planeCounter);
+            calculateSplittingPlane(boundingBox, voronoiPair, planeCounter);
             planeCounter++;
-            twoPoints.clear();
-            twoPoints.shrink_to_fit();
         }
 
     }
 
-    std::vector<std::pair<Vector3<float>, Vector3<float> > > intersectionPoints;
-    
+    std::vector<std::pair<std::pair<unsigned int, unsigned int>, std::pair<Vector3<float>, Vector3<float> > > > planeIntersections;
+
     for(unsigned int i = 0; i < mSplittingPlanes.size(); i++) {
         for (unsigned int j = i + 1; j < mSplittingPlanes.size(); j++) {
 
             std::pair<Vector3<float>, Vector3<float> > intersectionPointsPair;
-            if(calculatePlaneIntersection(mSplittingPlanes[i], mSplittingPlanes[j], intersectionPointsPair)) {
+            if(calculatePlaneIntersection(mSplittingPlanes[i]->getVertexList(), mSplittingPlanes[j]->getVertexList(), intersectionPointsPair)) {
 
                 mDebugpoints.push_back(new Debugpoint(intersectionPointsPair.first));
                 mDebugpoints.push_back(new Debugpoint(intersectionPointsPair.second));
+
+                planeIntersections.push_back(std::make_pair(std::make_pair(i,j), intersectionPointsPair));
             }
         }
     }
+
+    //for(unsigned int i = 0; i < planeIntersections.size(); i++) {
+        
+        unsigned int index1 = planeIntersections[2].first.first;
+        unsigned int index2 = planeIntersections[2].first.second;
+        //std::cout << "plane1: " << index1 << "\tplane2: " << index2 << std::endl;
+        mSplittingPlanes[index1]->resolveIntersection(planeIntersections[2].second);
+        mSplittingPlanes[index2]->resolveIntersection(planeIntersections[2].second);
+    //}
 }
 
-void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vector3<float> > voronoiPoints, unsigned int planeIndex) {
+void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::pair<Vector3<float>, Vector3<float> > voronoiPoints, unsigned int planeIndex) {
         
     mBoundingValues = boundingBox->getBoundingValues();
 
-    Vector3<float> mittPunkt = voronoiPoints[0] + (voronoiPoints[1] - voronoiPoints[0]) / 2.0f;  
-    Vector3<float> normal = (voronoiPoints[1] - voronoiPoints[0]).Normalize();
+    Vector3<float> mittPunkt = voronoiPoints.first + (voronoiPoints.second - voronoiPoints.first) / 2.0f;  
+    Vector3<float> normal = (voronoiPoints.second - voronoiPoints.first).Normalize();
 
     std::cout << "mittPunkt: " << mittPunkt << std::endl;
     std::cout << "normal: " << normal << std::endl;
@@ -205,141 +148,7 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::vector<Vec
 
     okPoints = sortVertices(okPoints, normal);
 
-    std::vector<Vector3<float> > points;
-
-    switch(okPoints.size()) {
-        case 3:
-            mVerts.push_back(okPoints[0]);
-            mVerts.push_back(okPoints[1]);
-            mVerts.push_back(okPoints[2]);
-
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-            
-            points.push_back(okPoints[0]);
-            points.push_back(okPoints[1]);
-            points.push_back(okPoints[2]);
-
-            mSplittingPlanes.push_back(points);
-
-            points.clear();
-            points.shrink_to_fit();
-
-            break;
-        case 4:
-            mVerts.push_back(okPoints[0]);
-            mVerts.push_back(okPoints[1]);
-            mVerts.push_back(okPoints[2]);
-
-            mVerts.push_back(okPoints[0]);
-            mVerts.push_back(okPoints[2]);
-            mVerts.push_back(okPoints[3]);
-
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-
-            points.push_back(okPoints[0]);
-            points.push_back(okPoints[1]);
-            points.push_back(okPoints[2]);
-            points.push_back(okPoints[3]);
-
-            mSplittingPlanes.push_back(points);
-
-            points.clear();
-            points.shrink_to_fit();
-
-            break;
-        case 5:
-            mVerts.push_back(okPoints[0]);
-            mVerts.push_back(okPoints[1]);
-            mVerts.push_back(okPoints[2]);
-
-            mVerts.push_back(okPoints[0]);
-            mVerts.push_back(okPoints[2]);
-            mVerts.push_back(okPoints[3]);
-
-            mVerts.push_back(okPoints[0]);
-            mVerts.push_back(okPoints[3]);
-            mVerts.push_back(okPoints[4]);
-
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-
-            points.push_back(okPoints[0]);
-            points.push_back(okPoints[1]);
-            points.push_back(okPoints[2]);
-            points.push_back(okPoints[3]);
-            points.push_back(okPoints[4]);
-
-            mSplittingPlanes.push_back(points);
-
-            points.clear();
-            points.shrink_to_fit();
-
-            break;
-        case 6:
-            mVerts.push_back(okPoints[0]);
-            mVerts.push_back(okPoints[1]);
-            mVerts.push_back(okPoints[2]);
-
-            mVerts.push_back(okPoints[0]);
-            mVerts.push_back(okPoints[2]);
-            mVerts.push_back(okPoints[3]);
-
-            mVerts.push_back(okPoints[0]);
-            mVerts.push_back(okPoints[3]);
-            mVerts.push_back(okPoints[4]);
-
-            mVerts.push_back(okPoints[0]);
-            mVerts.push_back(okPoints[4]);
-            mVerts.push_back(okPoints[5]);
-
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-            mColors.push_back(mColorScale[planeIndex]);
-
-            points.push_back(okPoints[0]);
-            points.push_back(okPoints[1]);
-            points.push_back(okPoints[2]);
-            points.push_back(okPoints[3]);
-            points.push_back(okPoints[4]);
-            points.push_back(okPoints[5]);
-
-            mSplittingPlanes.push_back(points);
-
-            points.clear();
-            points.shrink_to_fit();
-
-            break;
-        default:
-            break;
-    }
+    mSplittingPlanes.push_back(new Splittingplane(okPoints, mBoundingValues, voronoiPoints, normal, getColor(mSplittingPlanes.size())));
 }
 
 bool Compound::calculatePlaneIntersection( std::vector<Vector3<float> > plane1, std::vector<Vector3<float> > plane2, std::pair<Vector3<float> , Vector3<float> > &intersectionPair) {
@@ -425,8 +234,7 @@ bool Compound::calculateLineIntersectionPoint(  std::pair<Vector3<float>, Vector
     float s = (Cross(dv3, dv2) * Cross(dv1, dv2)) / (Cross(dv1, dv2).Length() * Cross(dv1, dv2).Length());
 
     if (s >= -EPSILON && s <= 1.0f + EPSILON) {
-        std::cout << "S: " << s << std::endl;
-        debug
+
         intersectionPoint = edge1.first + dv1.EntryMult(Vector3<float>(s,s,s));
 
         return true;
