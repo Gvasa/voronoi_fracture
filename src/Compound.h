@@ -7,7 +7,7 @@
 #define YMIN 3
 #define ZMAX 4
 #define ZMIN 5
-#define EPSILON 0.0001
+#define EPSILON 0.01
 
 
 #include <map>
@@ -41,6 +41,7 @@ private:
     // Shader data
     GLuint vertexArrayID;
     GLuint vertexBuffer;
+    GLuint colorBuffer;
     GLuint shaderProgram;
 
     GLint MVPLoc; // MVP Matrix
@@ -49,7 +50,7 @@ private:
 
     void calculateVoronoiPattern(Boundingbox *, std::vector<Vector3<float> >);
     
-    void calculateSplittingPlane(Boundingbox *, std::vector<Vector3<float> >);
+    void calculateSplittingPlane(Boundingbox *, std::vector<Vector3<float> >, unsigned int);
 
     bool calculatePlaneIntersection( std::vector<Vector3<float> >, std::vector<Vector3<float> >, std::pair<Vector3<float>, Vector3<float> > &);
     
@@ -60,11 +61,14 @@ private:
     bool compareAngle(std::pair<float, Vector3<float> > p1, std::pair<float, Vector3<float> > p2) { return p1.first < p2.first; }
 
     std::vector<Vector3<float> > mVerts;
+    std::vector<Vector3<float> > mColors;
     std::vector<std::vector<Vector3<float> > > mSplittingPlanes;
     std::vector<Debugpoint *> mDebugpoints;
     std::vector<Vector3<float> > mBoundingValues;
 
     bool mWireframe = false;
+
+    std::vector<Vector3<float> > mColorScale;
 };
 
 #endif // COMPOUND_H
