@@ -39,6 +39,10 @@ private:
 
     bool calculateLineIntersectionPoint(std::pair<Vector3<float>, Vector3<float> >);
 
+    bool calculatePointLineIntersection(Vector3<float>);
+
+    void calculateClosestDistance(Vector3<float>, std::vector<Vector3<float> > &);
+
     std::vector<Vector3<float> > sortVertices(std::vector<Vector3<float> >);
 
     void buildRenderData();
@@ -58,6 +62,8 @@ private:
     std::vector<Vector3<float> > mUniqueVerts;
 
     std::vector<Vector3<float> > mBoundingValues;
+
+    std::vector<std::pair<Vector3<float>, Vector3<float> > > mIntersectedPoints;
 
     Vector4<float> mColor;
 

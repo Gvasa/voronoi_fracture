@@ -92,6 +92,20 @@ void Splittingplane::render(Matrix4x4<float> MVP) {
 
 void Splittingplane::resolveIntersection(std::pair<Vector3<float>, Vector3<float> > intersectionEdge) {
 
+
+    for(auto it = mIntersectedPoints.begin(); it != mIntersectedPoints.end(); ++it) {
+
+        float diff1 = ((*it).first - intersectionEdge.first).Length();
+        float diff2 = ((*it).second - intersectionEdge.second).Length();
+
+        if((diff1 > -EPSILON && diff1 < EPSILON) && (diff2 > -EPSILON && diff2 < EPSILON)) {
+            std::cout << "DU FINNS JU REDAN!" << std::endl;
+            return;
+        }
+    }
+
+    mIntersectedPoints.push_back(intersectionEdge);
+
     std::vector<Vector3<float> > resolvedVertices;
 
     resolvedVertices.push_back(intersectionEdge.first);
@@ -110,6 +124,12 @@ void Splittingplane::resolveIntersection(std::pair<Vector3<float>, Vector3<float
         }
 
         std::cout << "p1: " << mUniqueVerts[i] << "\tp2: " << intersectionPoint << std::endl;
+
+        if(calculatePointLineIntersection(intersectionPoint)) {
+            calculateClosestDistance(intersectionPoint, resolvedVertices);
+            break;
+        }
+
         if(calculateLineIntersectionPoint(std::make_pair(mUniqueVerts[i], intersectionPoint)))
             resolvedVertices.push_back(mUniqueVerts[i]);
     }
@@ -126,25 +146,57 @@ bool Splittingplane::calculateLineIntersectionPoint(std::pair<Vector3<float>, Ve
     Vector3<float> voronoiPoint2 = mVoronoiPoints.second;
 
     Vector3<float> difference = edge.second - edge.first;
+
+    std::cout << "voronoi1: " << voronoiPoint1 << "\t voronoi2: " << voronoiPoint2 << std::endl;
+
+    unsigned int i1 = 0;
+    unsigned int i2 = 0;
        
     if((difference[0] < EPSILON && difference[0] > -EPSILON) && (edge.first[0] < mBoundingValues[XMIN][0] + EPSILON || edge.first[0] > mBoundingValues[XMAX][0] - EPSILON)) {
 
         voronoiPoint1[0] = edge.first[0];
         voronoiPoint2[0] = edge.first[0];
 
+        i1 = 1;
+        i2 = 2;
+
     } else if((difference[1] < EPSILON && difference[1] > -EPSILON) && (edge.first[1] < mBoundingValues[YMIN][1] + EPSILON || edge.first[1] > mBoundingValues[YMAX][1] - EPSILON)) {
         
         voronoiPoint1[1] = edge.first[1];
         voronoiPoint2[1] = edge.first[1];
 
+        i1 = 0;
+        i2 = 2;
+
     } else {
         
         voronoiPoint1[2] = edge.first[2];
         voronoiPoint2[2] = edge.first[2];
+
+        i1 = 0;
+        i2 = 1;
     }
 
-    std::cout << "voronoi1: " << voronoiPoint1 << "\t voronoi2: " << voronoiPoint2 << std::endl;
+    float x1 = edge.first[i1], x2 = edge.second[i1], x3 = voronoiPoint1[i1], x4 = voronoiPoint2[i1];
+    float y1 = edge.first[i2], y2 = edge.second[i2], y3 = voronoiPoint1[i2], y4 = voronoiPoint2[i2];
 
+    float d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+
+    if(d < EPSILON && d > -EPSILON)
+        return false;
+
+    float pre = (x1 * y2 - y1 * x2), post = (x3 * y4 - y3 * x4);
+    float x = (pre * (x3 - x4) - (x1 - x2) * post) / d;
+    float y = (pre * (y3 - y4) - (y1 - y2) * post) / d;
+
+    if((x < std::min(x1, x2) - EPSILON || x > std::max(x1, x2) + EPSILON) || (x < std::min(x3, x4) - EPSILON || x > std::max(x3, x4) + EPSILON))
+        return false;
+    if((y < std::min(y1, y2) - EPSILON || y > std::max(y1, y2) + EPSILON) || (y < std::min(y3, y4) - EPSILON || y > std::max(y3, y4) + EPSILON))
+        return false;
+
+    return true;
+    
+/*
     Vector3<float> dv1 = edge.second - edge.first;
     Vector3<float> dv2 = voronoiPoint2 - voronoiPoint1;
     Vector3<float> dv3 = voronoiPoint1  - edge.first;
@@ -168,7 +220,63 @@ bool Splittingplane::calculateLineIntersectionPoint(std::pair<Vector3<float>, Ve
         return true;
     }
 
+    return false;*/
+}
+
+
+bool Splittingplane::calculatePointLineIntersection(Vector3<float> intersectionPoint) {
+
+    Vector3<float> difference = mVoronoiPoints.second - mVoronoiPoints.first;
+
+    unsigned int i1 = 0;
+    unsigned int i2 = 0;
+       
+    if(difference[0] < EPSILON && difference[0] > -EPSILON) {
+
+        i1 = 1;
+        i2 = 2;
+
+    } else if(difference[1] < EPSILON && difference[1] > -EPSILON) {
+
+        i1 = 0;
+        i2 = 2;
+
+    } else {
+
+        i1 = 0;
+        i2 = 1;
+    }
+
+    float k = (mVoronoiPoints.second[i2] - mVoronoiPoints.first[i2]) / (mVoronoiPoints.second[i1] - mVoronoiPoints.first[i1]);
+
+    float m = k * mVoronoiPoints.first[i1] + mVoronoiPoints.first[i2];
+
+    float line = k * intersectionPoint[i1] + m;
+
+    if(intersectionPoint[i2] < line + EPSILON && intersectionPoint[i2] > line - EPSILON)
+        return true;
+
     return false;
+}
+
+
+void Splittingplane::calculateClosestDistance(Vector3<float> intersectionPoint, std::vector<Vector3<float> > &resolvedVertices) {
+
+    std::vector<float> distances;
+    Vector3<float> midPoint = mVoronoiPoints.first + ((mVoronoiPoints.second - mVoronoiPoints.first) / 2.0f);
+    float averageDistance = 0.0f;
+
+    for(unsigned int i = 0; i < mUniqueVerts.size(); i++) {
+        averageDistance += (mUniqueVerts[i] - midPoint).Length();
+        distances.push_back((mUniqueVerts[i] - midPoint).Length());
+    }
+
+    averageDistance /= distances.size();
+
+    for(unsigned int i = 0; i < distances.size(); i++) {
+        if(distances[i] < averageDistance + EPSILON)
+            resolvedVertices.push_back(mUniqueVerts[i]);
+    }
 }
 
 
