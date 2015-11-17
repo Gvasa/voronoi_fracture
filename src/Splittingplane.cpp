@@ -53,6 +53,9 @@ void Splittingplane::initialize() {
         reinterpret_cast<void*>(0)  // array buffer offset
     );
 
+    for(unsigned int i = 0; i < mDebugPoints.size(); i++)
+        mDebugPoints[i]->initialize(Vector3<float>(0.0f, 0.0f, 0.0f));
+
     std::cout << "\nCompount Initialized!\n" << std::endl;
 }
 
@@ -87,6 +90,12 @@ void Splittingplane::render(Matrix4x4<float> MVP) {
     glDisable( GL_BLEND );
     glEnable( GL_DEPTH_TEST );
     glEnable( GL_CULL_FACE );
+
+    std::vector<Matrix4x4<float> > v;
+    v.push_back(MVP);
+
+    for(unsigned int i = 0; i < mDebugPoints.size(); i++)
+        mDebugPoints[i]->render(v);
 }
 
 
@@ -110,28 +119,184 @@ void Splittingplane::resolveIntersection(std::pair<Vector3<float>, Vector3<float
 
     resolvedVertices.push_back(intersectionEdge.first);
     resolvedVertices.push_back(intersectionEdge.second);
-
+/*
     for(unsigned int i = 0; i < mUniqueVerts.size(); i++) {
 
         Vector3<float> intersectionPoint;
         
         if((intersectionEdge.first - mUniqueVerts[i]).Length() < (intersectionEdge.second - mUniqueVerts[i]).Length()) {
             intersectionPoint = intersectionEdge.first;
-            std::cout << "-------------  true  --------------" << std::endl;
+            std::cout << "-------------  IP = " << intersectionPoint << " --------------" << std::endl;
         } else {
             intersectionPoint = intersectionEdge.second;
-            std::cout << "-------------  false  --------------" << std::endl;
+            std::cout << "-------------  IP = " << intersectionPoint << " --------------" << std::endl;
         }
 
         std::cout << "p1: " << mUniqueVerts[i] << "\tp2: " << intersectionPoint << std::endl;
 
         if(calculatePointLineIntersection(intersectionPoint)) {
             calculateClosestDistance(intersectionPoint, resolvedVertices);
+            debug
             break;
         }
 
-        if(calculateLineIntersectionPoint(std::make_pair(mUniqueVerts[i], intersectionPoint)))
+        if(calculateLineIntersectionPoint(std::make_pair(mUniqueVerts[i], intersectionPoint))) {
+            debug
             resolvedVertices.push_back(mUniqueVerts[i]);
+        }
+    }
+*/    
+    std::cout << "VPUNKTERS: " << mVoronoiPoints.first << ", " << mVoronoiPoints.second << std::endl; 
+    Vector3<float> difference = mVoronoiPoints.first - mVoronoiPoints.second;
+    std::cout << "DIFFERENCE: " << difference << std::endl;
+
+    unsigned int i1 = 0;
+    unsigned int i2 = 0;
+    unsigned int i3 = 0;
+
+    unsigned int projection; 
+
+    if(fabs(difference[0]) > fabs(difference[1] + EPSILON)) {
+        if(fabs(difference[0]) > fabs(difference[2] + EPSILON)) {
+            i1 = 2;
+            i2 = 1;
+            i3 = 0;
+            std::cout << "projicerar på X" << std::endl;
+            projection = XPROJECTION;
+        } else {
+            i1 = 0;
+            i2 = 1;
+            i3 = 2;
+            std::cout << "projicerar på Z" << std::endl;
+            projection = ZPROJECTION;
+        }
+    } else {
+        i1 = 2;
+        i2 = 0;
+        i3 = 1;
+
+        std::cout << "projicerar på y" << std::endl;
+        //projection = YPROJECTION;
+    }
+
+    //float maxDifference std::max(std::max(fabs(difference[0]), fabs(difference[1])), fabs(difference[2]));
+    /*   
+    if((difference[0] < EPSILON && difference[0] > -EPSILON)) {
+
+        i1 = 2;
+        i2 = 1;
+        std::cout << "projicerar på X" << std::endl;
+        
+    } else if((difference[1] < EPSILON && difference[1] > -EPSILON)) {
+        
+        i1 = 0;
+        i2 = 2;
+        std::cout << "projicerar på Y" << std::endl;
+    } else {
+
+        i1 = 0;
+        i2 = 1;
+        std::cout << "projicerar på Z" << std::endl;
+    }*/
+
+    Vector3<float> mittPunkt = intersectionEdge.first + (intersectionEdge.second - intersectionEdge.first) / 2.0f;  
+    std::cout << "interSectionCenter: " << mittPunkt << std::endl;
+
+    mDebugPoints.push_back(new Debugpoint(mittPunkt, Vector4<float>(0.0f, 0.0f, 0.0f, 1.0f)));
+
+   /* for(unsigned int i = 0; i < vertices.size(); i++) {
+        
+        Vector3<float> v = vertices[i] - centerPoint;
+
+        float angle = atan2(v[s], v[t]);
+
+        unsortedVertices.push_back(std::make_pair(angle, vertices[i]));
+    }
+*/  
+    Vector3<float> vCenter = mVoronoiPoints.first + (mVoronoiPoints.second - mVoronoiPoints.first) / 2.0f;
+    vCenter = vCenter - mittPunkt;
+
+    if(projection == YPROJECTION)
+        vCenter[i2] = -vCenter[i2];
+
+  
+    Vector3<float> centerV1 = mVoronoiPoints.first - mittPunkt;
+    Vector3<float> centerV2 = mVoronoiPoints.second - mittPunkt;
+    float angleV1 = atan2(centerV1[i2], centerV1[i1]);
+    float angleV2 = atan2(centerV2[i2], centerV2[i1]);
+    float vCenterAngle = atan2(vCenter[i2], vCenter[i1]);
+    
+
+    std::cout << "----- ANGLE: \t vP: " << angleV1 << " vP2: " << angleV2 << std::endl;
+    
+   // std::cout << "Vcenter: " << vCenter << " vCenterAngle: " << vCenterAngle << std::endl;
+
+
+    mDebugPoints.push_back(new Debugpoint(vCenter, Vector4<float>(0.0f, 0.0f, 1.0f, 1.0f)));
+    float angle = angleV1;
+
+    if((angleV1 > 0.0f && angleV2 < 0.0f) || (angleV1 < 0.0f && angleV2 > 0.0f)) {
+
+        std::cout << "--- GICK IN I IFSATS ----" << std::endl;
+
+        Vector3<float> v1v2 = mVoronoiPoints.second - mVoronoiPoints.first;
+        Vector3<float> i1i2 = intersectionEdge.second - intersectionEdge.first;
+
+        std::cout << "v1: " << mVoronoiPoints.first << "   v2: " << mVoronoiPoints.second << std::endl;
+        std::cout << "i1: " << intersectionEdge.first << "   i2: " << intersectionEdge.second << std::endl;
+        std::cout << "v1v2: " << v1v2 << std::endl;
+        std::cout << "i1i2: " << i1i2 << std::endl;
+
+        if(v1v2[i2] > -EPSILON && i1i2[i1] < EPSILON) {
+            i1i2 *= -1;
+            std::cout << "v1v2[i2] > 0.0 & i1i2[i1] < 0.0f" << std::endl;
+            std::cout << "efter flipp: " << i1i2 << std::endl;
+        } else if(v1v2[i2] < EPSILON && i1i2[i1] > -EPSILON) {
+            i1i2 *= -1;
+            std::cout << "v1v2[i2] < 0.0 & i1i2[i1] > 0.0f" << std::endl;
+            std::cout << "efter flipp: " << i1i2 << std::endl;
+        }
+
+        std::cout << "v1v2 * i1i2: " << v1v2 * i1i2 << std::endl;
+
+        v1v2[i3] = 0.0f;
+        i1i2[i3] = 0.0f;
+
+        float angleVoronoiIntersect = acos(v1v2 * i1i2);
+
+        std::cout << "angleVoronoiIntersect: " << angleVoronoiIntersect << std::endl;
+
+        if( angleVoronoiIntersect < (M_PI/2.0f) + EPSILON ) {
+            angle = angleV1;
+            std::cout << "valde vinkel Voronoi1" << std::endl;
+            std::cout << "angle: " << angle << std::endl;
+        } else {
+            angle = angleV2;
+            std::cout << "valde vinkel Voronoi2" << std::endl;
+            std::cout << "angle: " << angle << std::endl;
+        }
+    }
+    
+    for(unsigned int i = 0; i < mUniqueVerts.size(); i++) {
+        
+        Vector3<float> center_current_point = mUniqueVerts[i] - mittPunkt; 
+
+        float angle_current_point = atan2(center_current_point[i2], center_current_point[i1]);
+
+        std::cout << "Angle2: \t " << angle_current_point << std::endl;
+        std::cout << "---- VERT: \t " << mUniqueVerts[i] << std::endl;
+        if(angle < 0.0f) {
+            if(angle_current_point < 0.0f) {
+                std::cout << "la till för mindre: " << std::endl;
+                resolvedVertices.push_back(mUniqueVerts[i]);
+            }
+        } else {
+            if(angle_current_point > 0.0f) {
+                std::cout << "la till för större: " << std::endl;
+                resolvedVertices.push_back(mUniqueVerts[i]);
+            }
+        }
+
     }
 
     mUniqueVerts = sortVertices(resolvedVertices);
@@ -159,7 +324,8 @@ bool Splittingplane::calculateLineIntersectionPoint(std::pair<Vector3<float>, Ve
 
         i1 = 1;
         i2 = 2;
-
+        std::cout << "projicerar på X" << std::endl;
+        
     } else if((difference[1] < EPSILON && difference[1] > -EPSILON) && (edge.first[1] < mBoundingValues[YMIN][1] + EPSILON || edge.first[1] > mBoundingValues[YMAX][1] - EPSILON)) {
         
         voronoiPoint1[1] = edge.first[1];
@@ -167,6 +333,7 @@ bool Splittingplane::calculateLineIntersectionPoint(std::pair<Vector3<float>, Ve
 
         i1 = 0;
         i2 = 2;
+        std::cout << "projicerar på Y" << std::endl;
 
     } else {
         
@@ -175,7 +342,13 @@ bool Splittingplane::calculateLineIntersectionPoint(std::pair<Vector3<float>, Ve
 
         i1 = 0;
         i2 = 1;
+        std::cout << "projicerar på Z" << std::endl;
     }
+
+    std::cout << "-- projicerade punkter --" << std::endl;
+    std::cout << "p1: (" << edge.first[i1] << ", " << edge.first[i2] << ")" << "p2: (" << edge.second[i1] << ", " << edge.second[i2] << ")"  << std::endl;
+    std::cout << "p1: (" << voronoiPoint1[i1] << ", " << voronoiPoint1[i2] << ")" << "p2: (" << voronoiPoint2[i1] << ", " << voronoiPoint2[i2] << ")"  << std::endl;
+
 
     float x1 = edge.first[i1], x2 = edge.second[i1], x3 = voronoiPoint1[i1], x4 = voronoiPoint2[i1];
     float y1 = edge.first[i2], y2 = edge.second[i2], y3 = voronoiPoint1[i2], y4 = voronoiPoint2[i2];

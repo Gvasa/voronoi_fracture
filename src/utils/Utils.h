@@ -12,6 +12,9 @@
 #define YMIN 3
 #define ZMAX 4
 #define ZMIN 5
+#define XPROJECTION 0
+#define YPROJECTION 1
+#define ZPROJECTION 2
 
 #include <iostream>
 #include <glm/gtx/string_cast.hpp>

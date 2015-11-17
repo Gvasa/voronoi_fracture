@@ -68,6 +68,8 @@ private:
     Vector4<float> mColor;
 
     Vector3<float> mNormal;
+
+    std::vector<Debugpoint *> mDebugPoints;
 };
 
 #endif // SPLITTINGPLANE_H

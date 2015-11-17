@@ -66,8 +66,8 @@ int main (int argc, char* argv[]) {
 
     mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.0f));
     mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.6f, 0.0f));
-    mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.7f, 0.0f));
-    //mesh->addVoronoiPoint(Vector3<float>(0.2f, -0.7f, 0.5f));
+    //mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.7f, 0.0f));
+    mesh->addVoronoiPoint(Vector3<float>(0.2f, -0.7f, 0.5f));
 
     scene->addGeometry(floor_rect);
     scene->addGeometry(wall_rect);
