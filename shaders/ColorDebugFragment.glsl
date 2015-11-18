@@ -1,14 +1,15 @@
 #version 330 core
 
-uniform vec4 color;
 // Ouput data
 out vec4 fragColor;
+
+in vec4 outColor;
 
 
 void main()
 {
 
 	// Output color = red 
-	fragColor = color;
+	fragColor = outColor;
 
 }

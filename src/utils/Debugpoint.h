@@ -5,35 +5,33 @@
  *
  *****************************************************************************/
 
-#ifndef HALFEDGEMESH_H
-#define HALFEDGEMESH_H
+#ifndef DEBUGPOINT_H
+#define DEBUGPOINT_H
 
 // Libs and headers
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <map>
 #include <limits>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+
 // Classes
-#include "Geometry.h"
-#include "tools/shader.hpp"
-#include "utils/Utils.h"
-#include "utils/Debugpoint.h"
-#include "Boundingbox.h"
-#include "Compound.h"
+#include "../Geometry.h"
+#include "../tools/shader.hpp"
+#include "Utils.h"
 
-class Debugpoint;
-class Compound;
+class LoadObj;
 
-class HalfEdgeMesh : public Geometry {
+class Debugpoint : public Geometry {
 
 public:
 
-    HalfEdgeMesh();
-    ~HalfEdgeMesh();
+    Debugpoint(Vector3<float>, Vector4<float> c = Vector4<float>(1.0f, 0.0f, 1.0f, 1.0f));
+    ~Debugpoint();
 
     void initialize(Vector3<float>);
     void render(std::vector<Matrix4x4<float> >);
@@ -43,28 +41,26 @@ public:
 
     void createMesh(std::string);
 
-    void setDebugMode(bool b) { mDebugMode = b; }
-    
     void rotate(Vector3<float>, float);
     
     void translate(Vector3<float>);
     
     void scale(Vector3<float>);
 
-    float volume() const;
+    void setColor(Vector4<float> c) { mColor = c; }
 
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
      */ 
     class EdgeIterator {
-        friend class HalfEdgeMesh; 
+        friend class Debugpoint; 
 
     protected:
-        HalfEdgeMesh const *mHem;
+        Debugpoint const *mHem;
         mutable unsigned int mIndex;
 
         //constructor
-        EdgeIterator(HalfEdgeMesh const *hem, unsigned int index) {
+        EdgeIterator(Debugpoint const *hem, unsigned int index) {
             mHem = hem;
             
             //protext against outside access
@@ -98,27 +94,14 @@ private:
     // Shader data
     GLuint vertexArrayID;
     GLuint vertexBuffer;
-    GLuint normalBuffer;
     GLuint shaderProgram;
 
     // Shader indices for Matrices
     GLint MVPLoc;           // MVP matrix
-    GLint MVLoc;            // MV matrix
-    GLint MVLightLoc;       // MVLight matrix
-    GLint NMLoc;            // NM matrix
-    GLint lightPosLoc;      // Light position
-    GLint colorLoc;         // Color
-    GLint lightAmbLoc;      // Ambient light
-    GLint lightDifLoc;      // Diffuse light
-    GLint lightSpeLoc;      // Specular light
-    GLint specularityLoc;   // Specular constant
-    GLint shinynessLoc;     // How much specularity (magnitude)
+    GLint ColorLoc;
+    Vector4<float> mColor;
 
-    struct Material : public Geometry::Material {   
-    } mMaterial;
-
-    
-    // Halfedge data
+    LoadObj *objLoader;
 
     // Denotes a reference to a border, only for face pointers
     const static unsigned int BORDER;
@@ -175,11 +158,7 @@ private:
 
     /*
      * MEMBER VARIABLES
-     */
-    Boundingbox *mBoundingbox;
-
-    Compound *mCompound;
-    
+     */    
     // The edges of the mesh
     std::vector<HalfEdge> mEdges;
     // The vertices in the mesh
@@ -188,14 +167,6 @@ private:
     std::vector<Face> mFaces;
     // Vertex list in drawing order
     std::vector< Vector3<float> > mOrderedVertexList;
-    // Normal list in drawing order
-    std::vector< Vector3<float> > mOrderedNormalList;
-
-    std::vector< Vector3<float> > mVoronoiPoints;
-
-    std::vector<Debugpoint *> mDebugPoints;
-
-    bool mDebugMode = false;
 
     /*
      * MEMBER FUNCTIONS
@@ -207,14 +178,8 @@ private:
     //Add a half edge pair, from vertex 1 to vertex2, to the mesh.
     bool addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsigned int &index1, unsigned int &index2);
 
-    //add a voronoiPoint to the mesh, if debugmode = true it will add a debugpoint
-    void addVoronoiPoint(Vector3<float> v);
-
     //! Compute and return the normal at a face at faceIndex
     Vector3<float> calculateFaceNormal(unsigned int faceIndex) const;
-
-    //! Compute and return the normal at a vertex at vertIndex
-    Vector3<float> calculateVertNormal(unsigned int vertIndex) const;
 
     std::vector<Vector3<float> > buildVertexData();
 
@@ -251,9 +216,7 @@ private:
     unsigned int getNumFaces() const {  return mFaces.size(); }
     //Return number of Edges
     unsigned int getNumEdges() const {  return mEdges.size(); }
-    
-
 
 };
 
-#endif // HALFEDGEMESH_H
+#endif // DEBUGPOINT_H

@@ -45,6 +45,7 @@ public:
     void updateCameraZoom(double x, double y);
     void mouseButtonClick(double x, double y) { control.dragStart(x, y); }
     void mouseButtonRelease() { control.dragEnd(); }
+    void resetCamera();
 
 private:
 

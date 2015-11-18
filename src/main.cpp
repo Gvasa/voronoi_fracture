@@ -9,14 +9,15 @@
 #include "Scene.h"
 #include "Controls.h"
 #include "utils/Utils.h"
-#include "LoadObj.h"
+//#include "LoadObj.h"
+#include "utils/Debugpoint.h"
 
 GLFWwindow* window;
 Scene *scene;
 Geometry *mesh;
 Geometry *floor_rect;
 Geometry *wall_rect;
-LoadObj *objectLoader;
+Utils *utilHandler;
 
 std::string windowTitle = "Voronoi Fracture";
 
@@ -26,6 +27,7 @@ void initializeScene();
 void mouseButton(GLFWwindow* window, int button, int action, int mods);
 void mouseMotion(GLFWwindow* window, double x, double y);
 void mouseScroll(GLFWwindow* window, double x, double y);
+void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mods);
 double calcFPS(double, std::string);
 
 
@@ -33,6 +35,7 @@ double calcFPS(double, std::string);
 int main (int argc, char* argv[]) {
 
     scene = new Scene();
+    utilHandler = new Utils();
 
     // Magic
     glewExperimental = GL_TRUE;
@@ -57,11 +60,24 @@ int main (int argc, char* argv[]) {
 
     // HalfEdge mesh
     mesh = new HalfEdgeMesh();
+    mesh->setDebugMode(true);
 
-    // Load obj file
-    objectLoader = new LoadObj();
-    objectLoader->loadObject(mesh, "assets/cow.obj");
+    mesh->createMesh("sphere1.0");
+/*
+    mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.0f));
+    mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.6f, 0.0f));
+    mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.7f, 0.0f));
+    mesh->addVoronoiPoint(Vector3<float>(0.2f, -0.7f, 0.5f));
+    */
 
+    mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.5f));
+    mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.6f, -0.37f));
+    mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.0f, 0.9f));
+/*
+    mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
+    mesh->addVoronoiPoint(Vector3<float>(0.9f, 0.9f, 0.997f));
+    mesh->addVoronoiPoint(Vector3<float>(0.7f, -0.8f, 0.0f));
+*/
     scene->addGeometry(floor_rect);
     scene->addGeometry(wall_rect);
     scene->addGeometry(mesh);
@@ -72,6 +88,7 @@ int main (int argc, char* argv[]) {
     glfwSetMouseButtonCallback(window, mouseButton);
     glfwSetCursorPosCallback(window, mouseMotion);
     glfwSetScrollCallback(window, mouseScroll);
+    glfwSetKeyCallback(window, keyboardInput);
 
     // render-loop
     do{
@@ -176,6 +193,17 @@ void mouseScroll(GLFWwindow* window, double x, double y) {
     scene->updateCameraZoom(x, y);
 }
     
+void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mods) {
+
+    if(action == GLFW_PRESS) {
+        switch(key) {
+            case GLFW_KEY_SPACE:
+                scene->resetCamera();
+            default:
+                break;
+        }
+    }
+}
 double calcFPS(double timeInterval = 1.0, std::string windowTitle = "NONE") {
 
     // Static values which only get initialised the first time the function runs

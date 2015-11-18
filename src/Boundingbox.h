@@ -3,6 +3,7 @@
 
 #include <map>
 #include <iomanip>
+#include <chrono>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -20,6 +21,10 @@ public:
 
     void initialize();
     void render(Matrix4x4<float>);
+    void setWireFrame(bool w) { mWireframe = w; };
+
+    std::map<std::string, unsigned int> getBoundingValuesIndex() { return mBoundingValuesIndex; }
+    std::vector<Vector3<float> > getBoundingValues() { return mBoundingValues; }
 
 private:
 
@@ -29,13 +34,20 @@ private:
     GLuint shaderProgram;
 
     GLint MVPLoc; // MVP Matrix
+    GLint ColorLoc;
+    Vector4<float> mColor;
 
 
     void calculateBoundingbox(std::vector<Vector3<float> >);
+    void calculateConvexHull(std::vector<Vector3<float> >);
 
     std::vector<Vector3<float> > mVerts;
+    std::vector<Vector3<float> > mBoundingValues;
+    std::map<std::string, unsigned int> mBoundingValuesIndex;
 
-    bool drawWireframe = true;
+    bool mWireframe = false;
+
+
 };
 
 #endif // BOUNDINGBOX_H

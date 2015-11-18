@@ -15,6 +15,7 @@
 #include "math/Vector3.h"
 #include "math/Vector4.h"
 #include "math/Matrix4x4.h"
+#include "utils/LoadObj.h"
 
 class Geometry {
 
@@ -33,6 +34,8 @@ public:
      * A Geometry might have the following: 
      */
     virtual bool addFace(std::vector<Vector3<float> >) {};
+
+    virtual void createMesh(std::string) {};
     
     // Matrix operations
     virtual void rotate(Vector3<float>, float) {
@@ -44,6 +47,16 @@ public:
     virtual void scale(Vector3<float>) {
         std::cout << "\nGeometry does not have scaling implemented!\n";
     };
+    virtual float volume() const {
+        std::cout << "\nGeometry does not have volume implemented!\n";
+    };
+    virtual void addVoronoiPoint(Vector3<float>) {
+        std::cout << "\nGeometry does not have addVoronoiPoint implemented!\n";
+    }
+
+    virtual void setDebugMode(bool) {
+        std::cout << "\nGeometry does not have setDebugMode implemented!\n";
+    }
 
 protected:
 
@@ -51,6 +64,10 @@ protected:
     virtual Vector3<float> calculateFaceNormal(unsigned int faceIndex) const {
         std::cout << "\nGeometry does not have the function 'calculateFaceNormal' implemented\n";
     };
+
+    
+    
+    LoadObj *mObjectLoader = new LoadObj();   
 
 public:
 
@@ -90,6 +107,7 @@ public:
         float specularity;
         float shinyness;
     };
+
 };
 
 #endif // GEOMETRY_H

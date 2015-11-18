@@ -132,3 +132,9 @@ void Scene::updateCameraZoom(double x, double y) {
     if((3.0 + (camera.zoom - y / 5.0f)) > 0.1f)  
         camera.zoom -= y / 5.0f;
 }
+
+void Scene::resetCamera() {
+    glm::quat identityQuat;
+    camera.orientation = identityQuat;
+    camera.zoom = 0;
+}

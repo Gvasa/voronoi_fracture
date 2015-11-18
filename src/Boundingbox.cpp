@@ -1,15 +1,24 @@
 #include "Boundingbox.h"
 
 Boundingbox::Boundingbox(std::vector<Vector3<float> > uniqueVerts) {
-
+    mColor = Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
     calculateBoundingbox(uniqueVerts);
-
 }
 
 
 Boundingbox::~Boundingbox() {
+    
+    glDeleteBuffers(1, &vertexBuffer);
+    glDeleteVertexArrays(1, &vertexArrayID);
+    glDeleteProgram(shaderProgram);
+
     mVerts.clear();
-    //mVerts.shrink_to_fit();
+    mVerts.shrink_to_fit();
+
+    mBoundingValues.clear();
+    mBoundingValues.shrink_to_fit();
+
+    mBoundingValuesIndex.clear();
 }
 
 
@@ -24,6 +33,7 @@ void Boundingbox::initialize() {
 
     // Set names for our uniforms, same as in shaders
     MVPLoc = glGetUniformLocation(shaderProgram, "MVP");
+    ColorLoc = glGetUniformLocation(shaderProgram, "color");
 
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -46,9 +56,6 @@ void Boundingbox::initialize() {
 
 void Boundingbox::render(Matrix4x4<float> MVP) {
 
-    //borde inte sättas här, de borde tas in i render function med en kosntant typ RENDER_WITH_WIREFRAME
-    drawWireframe = true;
-
     glDisable( GL_CULL_FACE );
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
@@ -58,6 +65,7 @@ void Boundingbox::render(Matrix4x4<float> MVP) {
 
     // Pass values of our matrices and materials to the GPU via uniforms
     glUniformMatrix4fv(MVPLoc, 1, GL_FALSE, &MVP(0, 0));
+    glUniform4f(ColorLoc, mColor[0], mColor[1], mColor[2], mColor[3]);
 
     // Rebind the buffer data, vertices are now updated
     glBindVertexArray(vertexArrayID);
@@ -67,7 +75,7 @@ void Boundingbox::render(Matrix4x4<float> MVP) {
     // Draw geometry
 
     
-    if(drawWireframe)   //Draw Wireframe
+    if(mWireframe)   //Draw Wireframe
         glDrawArrays(GL_LINES, 0, mVerts.size()); // 3 indices starting at 0 -> 1 triangle
     else                //draw triangles
         glDrawArrays(GL_TRIANGLES, 0, mVerts.size());
@@ -85,84 +93,98 @@ void Boundingbox::render(Matrix4x4<float> MVP) {
 
 void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts) {
 
-    std::map<std::string, unsigned int> boundingValues;
+    //std::map<std::string, unsigned int> mBoundingValuesIndex;
+
 
     for(unsigned int i = 0; i < uniqueVerts.size(); i++) {
 
-        if(uniqueVerts.at(i)[0] < uniqueVerts.at(boundingValues["xMin"])[0]){
-            boundingValues["xMin"] = i;
+        if(uniqueVerts.at(i)[0] < uniqueVerts.at(mBoundingValuesIndex["xMin"])[0]){
+            mBoundingValuesIndex["xMin"] = i;
         }
-        if(uniqueVerts.at(i)[0] > uniqueVerts.at(boundingValues["xMax"])[0]){
-            boundingValues["xMax"] = i;
-        }
-        
-        if(uniqueVerts.at(i)[1] < uniqueVerts.at(boundingValues["yMin"])[1]){
-            boundingValues["yMin"] = i;
-        }
-        if(uniqueVerts.at(i)[1] > uniqueVerts.at(boundingValues["yMax"])[1]){
-            boundingValues["yMax"] = i;
+        if(uniqueVerts.at(i)[0] > uniqueVerts.at(mBoundingValuesIndex["xMax"])[0]){
+            mBoundingValuesIndex["xMax"] = i;
         }
         
-        if(uniqueVerts.at(i)[2] < uniqueVerts.at(boundingValues["zMin"])[2]){
-            boundingValues["zMin"] = i;
+        if(uniqueVerts.at(i)[1] < uniqueVerts.at(mBoundingValuesIndex["yMin"])[1]){
+            mBoundingValuesIndex["yMin"] = i;
         }
-        if(uniqueVerts.at(i)[2] > uniqueVerts.at(boundingValues["zMax"])[2]){
-            boundingValues["zMax"] = i;
+        if(uniqueVerts.at(i)[1] > uniqueVerts.at(mBoundingValuesIndex["yMax"])[1]){
+            mBoundingValuesIndex["yMax"] = i;
         }
+        
+        if(uniqueVerts.at(i)[2] < uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]){
+            mBoundingValuesIndex["zMin"] = i;
+        }
+        if(uniqueVerts.at(i)[2] > uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]){
+            mBoundingValuesIndex["zMax"] = i;
+        }
+    }  
+
+    for(std::map<std::string, unsigned int>::iterator it = mBoundingValuesIndex.begin(); it != mBoundingValuesIndex.end(); ++it) {
+        std::cout << (*it).first << "  " << uniqueVerts.at((*it).second) << std::endl;
+        mBoundingValues.push_back(uniqueVerts[(*it).second]);
+        std::cout << "pushat: " << uniqueVerts[(*it).second] << std::endl;
     }
 
     // xMin Plane
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
 
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
 
     //xMax Plane
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
 
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
 
     //yMin Plane
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
 
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
 
      //yMax Plane
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
 
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
 
      //zMin Plane
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
 
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]));
 
      //zMax Plane
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
 
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMin"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMax"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
-    mVerts.push_back(Vector3<float>(uniqueVerts.at(boundingValues["xMin"])[0], uniqueVerts.at(boundingValues["yMax"])[1], uniqueVerts.at(boundingValues["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMin"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMax"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
+    mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
+
+}
+
+void Boundingbox::calculateConvexHull(std::vector<Vector3<float> > points) {
+
+
+
 
 }
