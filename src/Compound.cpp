@@ -95,8 +95,8 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
     }
 
     std::map<unsigned int, std::vector<std::pair<Vector3<float>, Vector3<float> > > > uniqueIntersections;
-
-    /*for(unsigned int i = 0; i < planeIntersections.size(); i++) {
+/*
+    for(unsigned int i = 0; i < planeIntersections.size(); i++) {
         
         unsigned int index1 = planeIntersections[i].first.first;
         unsigned int index2 = planeIntersections[i].first.second;
