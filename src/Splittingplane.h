@@ -37,12 +37,6 @@ public:
 
 private:
 
-    bool calculateLineIntersectionPoint(std::pair<Vector3<float>, Vector3<float> >);
-
-    bool calculatePointLineIntersection(Vector3<float>);
-
-    void calculateClosestDistance(Vector3<float>, std::vector<Vector3<float> > &);
-
     std::vector<Vector3<float> > sortVertices(std::vector<Vector3<float> >);
 
     void buildRenderData();

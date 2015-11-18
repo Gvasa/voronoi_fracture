@@ -63,6 +63,7 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
 
     unsigned int planeCounter = 0;
 
+    //from our voronoipoints create splitting planes and store them in mSplittingplanes
     for(unsigned int i = 0; i < voronoiPoints.size(); i++) {
         
         std::pair<Vector3<float>, Vector3<float> > voronoiPair;
@@ -80,6 +81,7 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
 
     std::vector<std::pair<std::pair<unsigned int, unsigned int>, std::pair<Vector3<float>, Vector3<float> > > > planeIntersections;
 
+    //calculate all the intersections between all the planes
     for(unsigned int i = 0; i < mSplittingPlanes.size(); i++) {
         for (unsigned int j = i + 1; j < mSplittingPlanes.size(); j++) {
 
@@ -95,7 +97,8 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
     }
 
     std::map<unsigned int, std::vector<std::pair<Vector3<float>, Vector3<float> > > > uniqueIntersections;
-/*
+
+    //resolve the intersections between the planes and return the new clipped planes.
     for(unsigned int i = 0; i < planeIntersections.size(); i++) {
         
         unsigned int index1 = planeIntersections[i].first.first;
@@ -103,23 +106,7 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
         
         mSplittingPlanes[index1]->resolveIntersection(planeIntersections[i].second);
         mSplittingPlanes[index2]->resolveIntersection(planeIntersections[i].second);
-    }*/
- 
-    unsigned int index1 = planeIntersections[0].first.first;
-    unsigned int index2 = planeIntersections[0].first.second;
-    
-    mSplittingPlanes[index1]->resolveIntersection(planeIntersections[0].second);
-    //mSplittingPlanes[index2]->resolveIntersection(planeIntersections[0].second);
-/*
-    Vector3<float> v1 = Vector3<float>(0.0f, 0.0f, 0.0f);
-    Vector3<float> v2 = Vector3<float>(1.0f, 0.0f, 0.0f);
-    Vector3<float> v3 = Vector3<float>(0.0f, 1.0f, 0.0f);
-    Vector3<float> v4 = Vector3<float>(-1.0f, 0.0f, 0.0f);
-    Vector3<float> v5 = Vector3<float>(0.0f, -1.0f, 0.0f);
-*/
-
-
-
+    }
 }
 
 void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::pair<Vector3<float>, Vector3<float> > voronoiPoints, unsigned int planeIndex) {
@@ -128,10 +115,7 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::pair<Vecto
 
     Vector3<float> mittPunkt = voronoiPoints.first + (voronoiPoints.second - voronoiPoints.first) / 2.0f;  
     Vector3<float> normal = (voronoiPoints.second - voronoiPoints.first).Normalize();
-
-    std::cout << "mittPunkt: " << mittPunkt << std::endl;
-    std::cout << "normal: " << normal << std::endl;
-
+    
     std::vector<Vector3<float> >    xPoints;
     std::vector<Vector3<float> >    yPoints;
     std::vector<Vector3<float> >    zPoints;
