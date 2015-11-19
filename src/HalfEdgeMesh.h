@@ -33,9 +33,11 @@ class HalfEdgeMesh : public Geometry {
 public:
 
     HalfEdgeMesh();
+
     ~HalfEdgeMesh();
 
     void initialize(Vector3<float>);
+
     void render(std::vector<Matrix4x4<float> >);
 
     //Adds a triangle (face) to the mesh    
@@ -52,6 +54,8 @@ public:
     void scale(Vector3<float>);
 
     float volume() const;
+
+    void updateVoronoiPoint(Vector3<float>, unsigned int);
 
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!

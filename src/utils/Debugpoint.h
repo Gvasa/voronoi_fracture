@@ -49,6 +49,10 @@ public:
 
     void setColor(Vector4<float> c) { mColor = c; }
 
+    void updatePosition(Vector3<float>);
+
+    Vector3<float> getPosition() { return mPosition; }
+
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
      */ 
@@ -100,6 +104,7 @@ private:
     GLint MVPLoc;           // MVP matrix
     GLint ColorLoc;
     Vector4<float> mColor;
+    Vector3<float> mPosition;
 
     LoadObj *objLoader;
 

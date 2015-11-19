@@ -21,6 +21,8 @@ Utils *utilHandler;
 
 std::string windowTitle = "Voronoi Fracture";
 
+unsigned int currentVoronoiIndex = 0;
+
 
 int initializeOpenGL();
 void initializeScene();
@@ -63,11 +65,11 @@ int main (int argc, char* argv[]) {
     mesh->setDebugMode(true);
 
     mesh->createMesh("sphere1.0");
-/*
-    mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.0f));
+
+   /* mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.0f));
     mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.6f, 0.0f));
     mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.7f, 0.0f));
-    mesh->addVoronoiPoint(Vector3<float>(0.2f, -0.7f, 0.5f));
+//    mesh->addVoronoiPoint(Vector3<float>(0.2f, -0.7f, 0.5f));
     */
 
     mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.5f));
@@ -196,9 +198,15 @@ void mouseScroll(GLFWwindow* window, double x, double y) {
 void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
     if(action == GLFW_PRESS) {
+        
         switch(key) {
+            
             case GLFW_KEY_SPACE:
                 scene->resetCamera();
+                break;
+            case GLFW_KEY_W:
+                mesh->updateVoronoiPoint(Vector3<float>(0.0f, 0.0f, -0.01f), 2);
+                break;
             default:
                 break;
         }

@@ -333,6 +333,15 @@ std::vector<Vector3<float> > Splittingplane::sortVertices(std::vector<Vector3<fl
 }
 
 
+void Splittingplane::resetSplittingPlane() {
+
+    if(mIntersectedPoints.size() > 0) {
+        mIntersectedPoints.clear();
+        mIntersectedPoints.shrink_to_fit();
+    }
+}
+
+
 void Splittingplane::buildRenderData() {
 
     mVerts.clear();

@@ -315,6 +315,18 @@ float HalfEdgeMesh::volume() const {
     return volume / 3.0f;
 }
 
+
+void HalfEdgeMesh::updateVoronoiPoint(Vector3<float> dp, unsigned int index) {
+
+    mVoronoiPoints[index] += dp;
+
+    std::cout << "voronoiposition[" << index << "]: " << mVoronoiPoints[index] << std::endl;
+
+    mDebugPoints[index]->updatePosition(dp);
+
+    mCompound->update(mBoundingbox, mVoronoiPoints);
+}
+
 // This is where we add a vertex to the half-edge structure
 bool HalfEdgeMesh::addVertex(const Vector3<float> &v, unsigned int &index) {
 
