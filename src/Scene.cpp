@@ -14,6 +14,7 @@ cameraHandler camera;
 
 Scene::Scene() {
 
+    control = new Controls(300.f);
 }
 
 
@@ -23,6 +24,8 @@ Scene::~Scene() {
 
     for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
         (*it)->~Geometry();
+
+    delete control;
 
     std::cout << "Clean-up done" << std::endl;
 }
@@ -120,11 +123,11 @@ Matrix4x4<float> Scene::toMatrix4x4(glm::mat3 m) {
 
 
 void Scene::updateCameraPosition(double x, double y) {
-    if(! control.dragged())
+    if(! control->dragged())
         return;
 
-    control.rotate(camera.orientation, x, y);
-    control.dragUpdate(x, y);
+    control->rotate(camera.orientation, x, y);
+    control->dragUpdate(x, y);
 }
 
 void Scene::updateCameraZoom(double x, double y) { 

@@ -15,6 +15,7 @@
 #define XPROJECTION 0
 #define YPROJECTION 1
 #define ZPROJECTION 2
+#define MAX_VORONOI_POINTS 3
 
 #include <iostream>
 #include <glm/gtx/string_cast.hpp>

@@ -35,11 +35,15 @@ public:
 
     void setColor(Vector4<float> c) { mColor = c; }
 
+    void resetSplittingPlane();
+
+    void buildRenderData();
+
+    std::vector<Vector3<float> > getUniqueVerts() { return mUniqueVerts; }
+
 private:
 
     std::vector<Vector3<float> > sortVertices(std::vector<Vector3<float> >);
-
-    void buildRenderData();
 
     // Shader data
     GLuint vertexArrayID;

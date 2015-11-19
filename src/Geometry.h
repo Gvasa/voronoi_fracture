@@ -33,10 +33,12 @@ public:
     /* 
      * A Geometry might have the following: 
      */
-    virtual bool addFace(std::vector<Vector3<float> >) {};
-
-    virtual void createMesh(std::string) {};
-    
+    virtual bool addFace(std::vector<Vector3<float> >) {
+        std::cout << "\nGeometry does not have addFace implemented!\n";
+    };
+    virtual void createMesh(std::string) {
+        std::cout << "\nGeometry does not have createMesh implemented!\n";
+    };
     // Matrix operations
     virtual void rotate(Vector3<float>, float) {
         std::cout << "\nGeometry does not have rotation implemented!\n";
@@ -52,11 +54,13 @@ public:
     };
     virtual void addVoronoiPoint(Vector3<float>) {
         std::cout << "\nGeometry does not have addVoronoiPoint implemented!\n";
-    }
-
+    };
     virtual void setDebugMode(bool) {
         std::cout << "\nGeometry does not have setDebugMode implemented!\n";
-    }
+    };
+    virtual void updateVoronoiPoint(Vector3<float>, unsigned int) {
+        std::cout << "\nGeometry does not have updateVoronoiPoint implemented!\n";
+    };
 
 protected:
 

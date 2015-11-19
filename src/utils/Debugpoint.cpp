@@ -5,13 +5,13 @@ const unsigned int Debugpoint::BORDER = (std::numeric_limits<unsigned int>::max)
 const unsigned int Debugpoint::UNINITIALIZED = (std::numeric_limits<unsigned int>::max)()-1;
 
 
-Debugpoint::Debugpoint(Vector3<float> position, Vector4<float> c)
-: mColor(c) {
+Debugpoint::Debugpoint(Vector3<float> p, Vector4<float> c)
+: mColor(c), mPosition(p) {
 
     createMesh("sphere1.0");
     scale(Vector3<float>(0.02f, 0.02f, 0.02f));
 
-    translate(position);
+    translate(p);
 }
 
 Debugpoint::~Debugpoint() {
@@ -195,6 +195,18 @@ void Debugpoint::scale(Vector3<float> s){
         v = scalingMatrix * v;
         mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
     }
+}
+
+
+void Debugpoint::updatePosition(Vector3<float> dp) {
+
+    mPosition += dp;
+
+    translate(dp);
+
+    std::cout << "debugPointPosition: " << mPosition << std::endl;
+
+    updateRenderData();
 }
 
 // This is where we add a vertex to the half-edge structure

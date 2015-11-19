@@ -43,8 +43,8 @@ public:
     void addGeometry(Geometry *);
     void updateCameraPosition(double x, double y);
     void updateCameraZoom(double x, double y);
-    void mouseButtonClick(double x, double y) { control.dragStart(x, y); }
-    void mouseButtonRelease() { control.dragEnd(); }
+    void mouseButtonClick(double x, double y) { control->dragStart(x, y); }
+    void mouseButtonRelease() { control->dragEnd(); }
     void resetCamera();
 
 private:
@@ -59,7 +59,7 @@ private:
         Vector4<float> color;
         Vector3<float> position;
     } mPointLight;
-    Controls control = Controls(300.f);
+    Controls *control;
 };
 
 #endif // SCENE_H

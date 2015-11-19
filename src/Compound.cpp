@@ -17,21 +17,13 @@ Compound::Compound(Boundingbox* boundingBox, std::vector<Vector3 <float> > voron
     mColorScale.push_back(Vector3<float>(255.0f/255.0f,255.0f/255.0f,153.0f/255.0f));
     mColorScale.push_back(Vector3<float>(177.0f/255.0f,89.0f/255.0f,40.0f/255.0f));
 
-    calculateVoronoiPattern(boundingBox, voronoiPoints);    
+    calculateVoronoiPattern(boundingBox, voronoiPoints);
 }
 
 Compound::~Compound() {
 
-    glDeleteBuffers(1, &vertexBuffer);
-    glDeleteBuffers(1, &colorBuffer);
-    glDeleteVertexArrays(1, &vertexArrayID);
-    glDeleteProgram(shaderProgram);
-
-    mVerts.clear();
-    mVerts.shrink_to_fit();
-
-    mColors.clear();
-    mColors.shrink_to_fit();
+    mColorScale.clear();
+    mColorScale.shrink_to_fit();
 }
 
 void Compound::initialize() {
@@ -59,9 +51,62 @@ void Compound::render(Matrix4x4<float> MVP) {
         mDebugpoints[i]->render(tmp);
 }
 
+void Compound::update(Boundingbox *bBox, std::vector<Vector3<float> > vPoints) {
+
+
+    std::cout << "FÖRE!!!" << std::endl;
+
+    unsigned int index = 0;
+    for(std::vector<Splittingplane *>::iterator it = mSplittingPlanes.begin(); it != mSplittingPlanes.end(); ++it) {
+        std::cout << "\nplane " << index << " : " << std::endl;
+        for(std::vector<Vector3<float> >::iterator it2 = (*it)->getUniqueVerts().begin(); it2 != (*it)->getUniqueVerts().end(); ++it2) {
+            std::cout << "vert: " << (*it2) << std::endl;
+        }
+        index++;
+    }
+
+
+    for(std::vector<Splittingplane *>::iterator it = mSplittingPlanes.begin(); it != mSplittingPlanes.end(); ++it) {
+        (*it)->resetSplittingPlane();
+    }
+
+
+    if(mDebugpoints.size() > 0) {
+        mDebugpoints.clear();
+        mDebugpoints.shrink_to_fit();
+    }
+
+    if(mSplittingPlanes.size() > 0) {
+        mSplittingPlanes.clear();
+        mSplittingPlanes.shrink_to_fit();
+    }
+
+    //std::cout << "mSplittingPlanes.size() före: " << mSplittingPlanes.size() << std::endl;
+
+    calculateVoronoiPattern(bBox, vPoints);
+
+    std::cout << "EFTER!!!" << std::endl;
+
+    index = 0;
+    for(std::vector<Splittingplane *>::iterator it = mSplittingPlanes.begin(); it != mSplittingPlanes.end(); ++it) {
+        std::cout << "\nplane " << index << " : " << std::endl;
+        for(std::vector<Vector3<float> >::iterator it2 = (*it)->getUniqueVerts().begin(); it2 != (*it)->getUniqueVerts().end(); ++it2) {
+            std::cout << "vert: " << (*it2) << std::endl;
+        }
+        index++;
+    }
+
+    //std::cout << "mSplittingPlanes.size() efter: " << mSplittingPlanes.size() << std::endl;
+
+    for(std::vector<Splittingplane *>::iterator it = mSplittingPlanes.begin(); it != mSplittingPlanes.end(); ++it)
+        (*it)->buildRenderData();
+}
+
 void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vector3<float> > voronoiPoints) {
 
     unsigned int planeCounter = 0;
+
+    std::cout << "updated voronoipoint: " << voronoiPoints[0] << std::endl;
 
     //from our voronoipoints create splitting planes and store them in mSplittingplanes
     for(unsigned int i = 0; i < voronoiPoints.size(); i++) {
@@ -75,8 +120,8 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
             std::cout << voronoiPoints[j] << std::endl;
             calculateSplittingPlane(boundingBox, voronoiPair, planeCounter);
             planeCounter++;
+            std::cout << "\ncompute splitting plane!\n";
         }
-
     }
 
     std::vector<std::pair<std::pair<unsigned int, unsigned int>, std::pair<Vector3<float>, Vector3<float> > > > planeIntersections;
@@ -110,7 +155,10 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
 }
 
 void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::pair<Vector3<float>, Vector3<float> > voronoiPoints, unsigned int planeIndex) {
-        
+    
+    mBoundingValues.clear();
+    mBoundingValues.shrink_to_fit();
+
     mBoundingValues = boundingBox->getBoundingValues();
 
     Vector3<float> mittPunkt = voronoiPoints.first + (voronoiPoints.second - voronoiPoints.first) / 2.0f;  
