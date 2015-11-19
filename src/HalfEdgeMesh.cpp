@@ -7,7 +7,7 @@ const unsigned int HalfEdgeMesh::UNINITIALIZED = (std::numeric_limits<unsigned i
 
 HalfEdgeMesh::HalfEdgeMesh() {
 
-    mMaterial.color         = Vector4<float>(0.2f, 0.6f, 0.2f, 0.f);
+    mMaterial.color         = Vector4<float>(0.2f, 0.6f, 0.2f, 0.1f);
     mMaterial.ambient       = Vector4<float>(0.3f, 0.3f, 0.3f, 1.0f);
     mMaterial.diffuse       = Vector4<float>(0.8f, 0.8f, 0.8f, 1.0f);
     mMaterial.specular      = Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
