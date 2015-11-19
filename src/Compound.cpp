@@ -98,9 +98,14 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
                 mDebugpoints.push_back(new Debugpoint(intersectionPointsPair.second));
 
                 mPlaneIntersections.push_back(std::make_pair(std::make_pair(i,j), intersectionPointsPair));
+                std::cout << i << " " << j << std::endl;
             }
+            
+            
         }
     }
+
+    std::cout << "planeIntersection size: " << mPlaneIntersections.size() << std::endl;
 
     //resolve the intersections between the planes and return the new clipped planes.
     for(unsigned int i = 0; i < mPlaneIntersections.size(); i++) {
@@ -110,7 +115,87 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
         
         mSplittingPlanes[index1]->resolveIntersection(mPlaneIntersections[i].second, voronoiMassCenter);
         mSplittingPlanes[index2]->resolveIntersection(mPlaneIntersections[i].second, voronoiMassCenter);
+
+        calculateConvexShape(index1, index2, i);
     }
+}
+
+void Compound::calculateConvexShape(unsigned int index1, unsigned int index2, unsigned int currentConvex) {
+
+
+
+    std::vector<Vector3<float> > v1 = mSplittingPlanes[index1]->getVertexList();
+    std::vector<Vector3<float> > v2 = mSplittingPlanes[index2]->getVertexList();
+
+    
+    std::vector<Vector3<float> > uniqueVerticesToAdd;
+    std::vector<unsigned int> verticesIndex;
+
+   // auto iterator = uniqueVerticesToAdd.begin();
+
+/*
+    std::cout << "------ v1 -----" << std::endl;
+    for(unsigned int i = 0; i < v1.size() ; i++){
+        std::cout << "mUniqueVerts[" << i << "]: " << v1[i] << std::endl;
+
+        auto it = std::find(uniqueVerticesToAdd.begin(), uniqueVerticesToAdd.end(), v1[i]);
+
+        if(it == uniqueVerticesToAdd.end()) {
+            uniqueVerticesToAdd.push_back(v1[i]);
+            verticesIndex.push_back(uniqueVerticesToAdd.size() - 1);
+        } else {
+            std::cout << "fanns innan så pushar: " << std::endl;
+            verticesIndex.push_back(it - uniqueVerticesToAdd.begin() - 1);
+        }
+
+       /* if((std::find(uniqueVerticesToAdd.begin(), uniqueVerticesToAdd.end(), v1[i]) == uniqueVerticesToAdd.end()))
+            uniqueVerticesToAdd.push_back(v1[i]);
+*/
+ /*   }
+    
+    std::cout << "------ v2 -----" << std::endl;
+    for(unsigned int i = 0; i < v2.size() ; i++){
+        std::cout << "mUniqueVerts[" << i << "]: " << v2[i] << std::endl;
+
+        auto it2 = std::find(uniqueVerticesToAdd.begin(), uniqueVerticesToAdd.end(), v2[i]);
+
+        if(it2 == uniqueVerticesToAdd.end()) {
+
+            uniqueVerticesToAdd.push_back(v2[i]);
+            verticesIndex.push_back(uniqueVerticesToAdd.size() - 1);
+        } else {
+            std::cout << "fanns innan så pushar: " << std::endl;
+            verticesIndex.push_back(it2 - uniqueVerticesToAdd.begin() - 1);
+        }
+       // if((std::find(uniqueVerticesToAdd.begin(), uniqueVerticesToAdd.end(), v2[i]) == uniqueVerticesToAdd.end()))
+            //uniqueVerticesToAdd.push_back(v2[i]);
+    }
+
+    std::cout << "------ uniqueVertsToAdd -----" << std::endl;
+    for(unsigned int i = 0; i < uniqueVerticesToAdd.size() ; i++)
+        std::cout << "vertsToAdd[" << i << "]: " << uniqueVerticesToAdd[i] << std::endl;
+ /*   
+    std::cout << "------ verticesIndex -----" << std::endl;
+    for(unsigned int i = 0; i < verticesIndex.size() ; i++)
+        std::cout << "verticesIndex[" << i << "]: " << verticesIndex[i] << std::endl;
+    
+    
+    std::cout << "------ uniqueVerticesToAdd with verticesIndex -----" << std::endl;
+    for(unsigned int i = 0; i < verticesIndex.size() ; i++)
+        std::cout << "verticesIndex[" << i << "]: " << uniqueVerticesToAdd[verticesIndex[i]] << std::endl;
+    
+    */
+   // mUniqueConvexList.push_back(uniqueVerticesToAdd);
+   // std::cout << "mUniqueConvexList size: " << mUniqueConvexList.size() << std:: endl;
+
+   // mConvexList.push_back(verticesIndex);
+   // std::cout << "mConvexList size: " << mUniqueConvexList.size() << std:: endl;
+    /*for(unsigned int i = 0; i < mConvexShapes[currentConvex].size() ; i++){
+       // std::cout << "mConvexShapes[currentConvex][i]: " << mConvexShapes[currentConvex][i] << std::endl;
+    } */
+
+    std::cout << std::endl;
+
 }
 
 void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::pair<Vector3<float>, Vector3<float> > voronoiPoints, unsigned int planeIndex) {
@@ -208,6 +293,7 @@ bool Compound::calculatePlaneIntersection( std::vector<Vector3<float> > plane1, 
                 
                 // Check if an intersection is found between the two edges
                 if(calculateLineIntersectionPoint(pair1, pair2, tempPoint)) {
+                    std::cout << "tempPoint" <<tempPoint << std::endl;
                     iPoints.push_back(tempPoint);
                     break;
                 }

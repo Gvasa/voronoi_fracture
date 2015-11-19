@@ -43,6 +43,8 @@ private:
 
     void calculateVoronoiPattern(Boundingbox *, std::vector<Vector3<float> >);
     
+    void calculateConvexShape(unsigned int, unsigned int, unsigned int);
+    
     void calculateSplittingPlane(Boundingbox *, std::pair<Vector3<float>, Vector3<float> >, unsigned int);
 
     bool calculatePlaneIntersection( std::vector<Vector3<float> >, std::vector<Vector3<float> >, std::pair<Vector3<float>, Vector3<float> > &);
@@ -58,7 +60,9 @@ private:
     std::vector<Splittingplane *> mSplittingPlanes;
     std::vector<Debugpoint *> mDebugpoints;
     std::vector<Vector3<float> > mBoundingValues;
-    
+    std::vector<std::vector<Vector3<float> > > mUniqueConvexList;
+    std::vector<std::vector<unsigned int> > mConvexList;
+
     bool mWireframe = false;
 
     std::vector<Vector3<float> > mColorScale;
