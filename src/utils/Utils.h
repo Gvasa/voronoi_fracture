@@ -5,6 +5,7 @@
 #define GLM_FORCE_RADIANS
 
 #define EPSILON 0.01
+#define EPSILON_2 0.001
 
 #define XMAX 0
 #define XMIN 1
