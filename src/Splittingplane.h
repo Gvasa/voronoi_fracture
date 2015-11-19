@@ -29,7 +29,7 @@ public:
 
     void render(Matrix4x4<float>);
 
-    void resolveIntersection(std::pair<Vector3<float>, Vector3<float> >);
+    void resolveIntersection(std::pair<Vector3<float>, Vector3<float> >, Vector3<float>);
 
     std::vector<Vector3<float> > getVertexList() { return mUniqueVerts; }
 
@@ -64,6 +64,9 @@ private:
     Vector3<float> mNormal;
 
     std::vector<Debugpoint *> mDebugPoints;
+
+    std::vector<std::pair<std::pair<unsigned int, unsigned int>, std::pair<Vector3<float>, Vector3<float> > > > mPlaneIntersections;
+
 };
 
 #endif // SPLITTINGPLANE_H

@@ -17,7 +17,7 @@ Compound::Compound(Boundingbox* boundingBox, std::vector<Vector3 <float> > voron
     mColorScale.push_back(Vector3<float>(255.0f/255.0f,255.0f/255.0f,153.0f/255.0f));
     mColorScale.push_back(Vector3<float>(177.0f/255.0f,89.0f/255.0f,40.0f/255.0f));
 
-    calculateVoronoiPattern(boundingBox, voronoiPoints);    
+    calculateVoronoiPattern(boundingBox, voronoiPoints);
 }
 
 Compound::~Compound() {
@@ -62,6 +62,8 @@ void Compound::render(Matrix4x4<float> MVP) {
 void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vector3<float> > voronoiPoints) {
 
     unsigned int planeCounter = 0;
+    Vector3<float> voronoiMassCenter = Vector3<float>(0.0f, 0.0f, 0.0f);
+
 
     //from our voronoipoints create splitting planes and store them in mSplittingplanes
     for(unsigned int i = 0; i < voronoiPoints.size(); i++) {
@@ -77,9 +79,13 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
             planeCounter++;
         }
 
+        voronoiMassCenter += voronoiPoints[i];
     }
 
-    std::vector<std::pair<std::pair<unsigned int, unsigned int>, std::pair<Vector3<float>, Vector3<float> > > > planeIntersections;
+    voronoiMassCenter /= voronoiPoints.size();
+
+    std::vector<std::pair<std::pair<unsigned int, unsigned int>, std::pair<Vector3<float>, Vector3<float> > > > mPlaneIntersections;
+    std::vector<std::pair<unsigned int, unsigned int> > allPlaneIntersections;
 
     //calculate all the intersections between all the planes
     for(unsigned int i = 0; i < mSplittingPlanes.size(); i++) {
@@ -91,21 +97,19 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
                 mDebugpoints.push_back(new Debugpoint(intersectionPointsPair.first));
                 mDebugpoints.push_back(new Debugpoint(intersectionPointsPair.second));
 
-                planeIntersections.push_back(std::make_pair(std::make_pair(i,j), intersectionPointsPair));
+                mPlaneIntersections.push_back(std::make_pair(std::make_pair(i,j), intersectionPointsPair));
             }
         }
     }
 
-    std::map<unsigned int, std::vector<std::pair<Vector3<float>, Vector3<float> > > > uniqueIntersections;
-
     //resolve the intersections between the planes and return the new clipped planes.
-    for(unsigned int i = 0; i < planeIntersections.size(); i++) {
+    for(unsigned int i = 0; i < mPlaneIntersections.size(); i++) {
         
-        unsigned int index1 = planeIntersections[i].first.first;
-        unsigned int index2 = planeIntersections[i].first.second;
+        unsigned int index1 = mPlaneIntersections[i].first.first;
+        unsigned int index2 = mPlaneIntersections[i].first.second;
         
-        mSplittingPlanes[index1]->resolveIntersection(planeIntersections[i].second);
-        mSplittingPlanes[index2]->resolveIntersection(planeIntersections[i].second);
+        mSplittingPlanes[index1]->resolveIntersection(mPlaneIntersections[i].second, voronoiMassCenter);
+        mSplittingPlanes[index2]->resolveIntersection(mPlaneIntersections[i].second, voronoiMassCenter);
     }
 }
 
@@ -116,9 +120,9 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::pair<Vecto
     Vector3<float> mittPunkt = voronoiPoints.first + (voronoiPoints.second - voronoiPoints.first) / 2.0f;  
     Vector3<float> normal = (voronoiPoints.second - voronoiPoints.first).Normalize();
     
-    std::vector<Vector3<float> >    xPoints;
-    std::vector<Vector3<float> >    yPoints;
-    std::vector<Vector3<float> >    zPoints;
+    std::vector<Vector3<float> > xPoints;
+    std::vector<Vector3<float> > yPoints;
+    std::vector<Vector3<float> > zPoints;
 
     xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*mBoundingValues[YMIN][1] + normal[1]*mittPunkt[1] - normal[2]*mBoundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[0], mBoundingValues[YMIN][1], mBoundingValues[ZMIN][2]));
     xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*mBoundingValues[YMIN][1] + normal[1]*mittPunkt[1] - normal[2]*mBoundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[0], mBoundingValues[YMIN][1], mBoundingValues[ZMAX][2]));
@@ -213,6 +217,7 @@ bool Compound::calculatePlaneIntersection( std::vector<Vector3<float> > plane1, 
 
     // We want two intersection points per pair of planes, so that they create an edge
     if(iPoints.size() == 2) {
+
         intersectionPair = std::make_pair(iPoints[0], iPoints[1]);
         return true;
     } 
@@ -230,12 +235,12 @@ bool Compound::calculateLineIntersectionPoint(  std::pair<Vector3<float>, Vector
 
     float angle = dv3 * Cross(dv1, dv2);
 
-    if(angle > EPSILON || angle < -EPSILON)
+    if(angle > EPSILON_2 || angle < -EPSILON_2)
         return false;
  
     float s = (Cross(dv3, dv2) * Cross(dv1, dv2)) / (Cross(dv1, dv2).Length() * Cross(dv1, dv2).Length());
 
-    if (s >= -EPSILON && s <= 1.0f + EPSILON) {
+    if (s >= -EPSILON_2 && s <= 1.0f + EPSILON_2) {
 
         intersectionPoint = edge1.first + dv1.EntryMult(Vector3<float>(s,s,s));
 
@@ -250,7 +255,7 @@ std::vector<Vector3<float> > Compound::sortVertices(std::vector<Vector3<float> >
     Vector3<float> centerPoint = Vector3<float>(0.0f, 0.0f, 0.0f);
 
     for(unsigned int i = 0; i < plane.size(); i++) {
-        centerPoint += plane[i];
+        centerPoint += plane[i];    
     }
 
     centerPoint /= plane.size();

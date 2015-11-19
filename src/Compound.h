@@ -58,7 +58,7 @@ private:
     std::vector<Splittingplane *> mSplittingPlanes;
     std::vector<Debugpoint *> mDebugpoints;
     std::vector<Vector3<float> > mBoundingValues;
-
+    
     bool mWireframe = false;
 
     std::vector<Vector3<float> > mColorScale;

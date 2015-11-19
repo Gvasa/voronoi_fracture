@@ -99,16 +99,24 @@ void Splittingplane::render(Matrix4x4<float> MVP) {
 }
 
 
-void Splittingplane::resolveIntersection(std::pair<Vector3<float>, Vector3<float> > intersectionEdge) {
+void Splittingplane::resolveIntersection(std::pair<Vector3<float>, Vector3<float> > intersectionEdge, Vector3<float> voronoiMassCenter) {
 
     // Check if the intersectionedge already has been tested with the plane
+    //std::cout << "---- testar plan ---- " 
     for(auto it = mIntersectedPoints.begin(); it != mIntersectedPoints.end(); ++it) {
 
-        float diff1 = ((*it).first - intersectionEdge.first).Length();
-        float diff2 = ((*it).second - intersectionEdge.second).Length();
+        if( ( (intersectionEdge.first - (*it).first).Length() < EPSILON ) &&  ( (intersectionEdge.first - (*it).first).Length() > -EPSILON) ){
+            if( ( (intersectionEdge.second - (*it).second).Length() < EPSILON ) &&  ( (intersectionEdge.second - (*it).second).Length() > -EPSILON) )     
+                return;
+            else
+                continue;
 
-        if((diff1 > -EPSILON && diff1 < EPSILON) && (diff2 > -EPSILON && diff2 < EPSILON))
-            return;
+        } else if( ( (intersectionEdge.first - (*it).second).Length() < EPSILON ) &&  ( (intersectionEdge.first - (*it).second).Length() > -EPSILON) ) {
+            if( ( (intersectionEdge.second - (*it).first).Length() < EPSILON ) &&  ( (intersectionEdge.second - (*it).first).Length() > -EPSILON) )
+                return;
+            else
+                continue;
+        }
     }
 
     //if it hasn't been tested add it to the tested edges.
@@ -161,16 +169,33 @@ void Splittingplane::resolveIntersection(std::pair<Vector3<float>, Vector3<float
     //this is a special case when the two voronoi points has one positive and one negative value
     //it will calculate which voronoi points to use when deciding if plane points should be kept or not
     if((angleV1 > 0.0f && angleV2 < 0.0f) || (angleV1 < 0.0f && angleV2 > 0.0f)) {
+        std::cout << "--- ifsats -- " << std::endl;
+
 
         Vector3<float> v1v2 = mVoronoiPoints.second - mVoronoiPoints.first;
         Vector3<float> i1i2 = intersectionEdge.second - intersectionEdge.first;
 
         //make sure that the two vectors being tested is pointing correctly (both positive)
-        if(v1v2[i2] > -EPSILON && i1i2[i1] < EPSILON) 
+       /*
+        if(v1v2[i2] > intersectionCenter - EPSILON && i1i2[i1] < intersectionCenter + EPSILON) 
             i1i2 *= -1;
-        else if(v1v2[i2] < EPSILON && i1i2[i1] > -EPSILON) 
+        else if(v1v2[i2] < intersectionCenter + EPSILON && i1i2[i1] > intersectionCenter - EPSILON) 
             i1i2 *= -1;
-        
+        */
+        std::cout << "IPC: " << intersectionCenter << std::endl;
+        std::cout << "v1v2: " << v1v2 << std::endl;
+        std::cout << "i1i2: " << i1i2 << std::endl;
+
+        if(v1v2[i2] < intersectionCenter[i2] - EPSILON)
+            v1v2 *= -1;
+        if(i1i2[i2] < intersectionCenter[i2] - EPSILON)
+            i1i2 *= -1;
+         
+
+        std::cout << "---- flip ----" << std::endl;
+        std::cout << "v1v2: " << v1v2 << std::endl;
+        std::cout << "i1i2: " << i1i2 << std::endl;
+
         v1v2[i3] = 0.0f;
         i1i2[i3] = 0.0f;
         
@@ -184,9 +209,20 @@ void Splittingplane::resolveIntersection(std::pair<Vector3<float>, Vector3<float
         float dot;
         float det;
 
+        std::cout << "angleVoronoiIntersect: " << angleVoronoiIntersect << std::endl;
+
+
+        Vector3<float> v1vc = mVoronoiPoints.first - voronoiMassCenter;
+        Vector3<float> v2vc = mVoronoiPoints.second - voronoiMassCenter;
+
+        v1vc[i3] = 0.0f;
+        v2vc[i3] = 0.0f;
+
         //depending on the angle between the two vectors we choose which voronoi point to use
-        if( angleVoronoiIntersect > (M_PI/2.0f) + EPSILON ) {
-            
+        //if( angleVoronoiIntersect < (M_PI/2.0f) + EPSILON ) {
+        if( v1vc.Length() > v2vc.Length() ) {
+            std::cout << "valde mVoronoiPoints.first: " << mVoronoiPoints.first << std::endl; 
+
             vm = (mVoronoiPoints.first - intersectionCenter).Normalize();
             vm[i3] = 0.0f;
 
@@ -198,7 +234,9 @@ void Splittingplane::resolveIntersection(std::pair<Vector3<float>, Vector3<float
 
             angle = atan2(det, dot);
         } else {
-            
+                
+            std::cout << "valde mVoronoiPoints.second: " << mVoronoiPoints.second << std::endl;
+
             vm = (mVoronoiPoints.second - intersectionCenter).Normalize();
             vm[i3] = 0.0f;
 
