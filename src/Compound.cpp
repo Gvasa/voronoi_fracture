@@ -53,69 +53,6 @@ void Compound::render(Matrix4x4<float> MVP) {
         mDebugpoints[i]->render(tmp);
 }
 
-void Compound::update(Boundingbox *bBox, std::vector<Vector3<float> > vPoints) {
-
-    /*std::cout << "FÖRE!!!" << std::endl;
-
-    unsigned int index = 0;
-    for(std::vector<Splittingplane *>::iterator it = mSplittingPlanes.begin(); it != mSplittingPlanes.end(); ++it) {
-        std::cout << "\nplane " << index << " : " << std::endl;
-        for(std::vector<Vector3<float> >::iterator it2 = (*it)->getUniqueVerts().begin(); it2 != (*it)->getUniqueVerts().end(); ++it2) {
-            std::cout << "vert: " << (*it2) << std::endl;
-        }
-        index++;
-    }
-
-    std::cout << "\nmSplittingPlanes.size(): " << mSplittingPlanes.size() << std::endl;
-    std::cout << "mDebugpoints.size(): " << mDebugpoints.size() << std::endl << std::endl;
-
-    for(std::vector<Splittingplane *>::iterator it = mSplittingPlanes.begin(); it != mSplittingPlanes.end(); ++it) {
-        (*it)->resetSplittingPlane();
-    }
-
-
-    if(mDebugpoints.size() > 0) {
-        
-        for(unsigned int i = 0; i < mDebugpoints.size(); ++i)
-            delete mDebugpoints[i];
-
-        mDebugpoints.clear();
-        mDebugpoints.shrink_to_fit();
-    }
-
-    if(mSplittingPlanes.size() > 0) {
-
-        for(unsigned int i = 0; i < mSplittingPlanes.size(); ++i)
-            delete mSplittingPlanes[i];
-
-        mSplittingPlanes.clear();
-        mSplittingPlanes.shrink_to_fit();
-    }
-
-    //std::cout << "mSplittingPlanes.size() före: " << mSplittingPlanes.size() << std::endl;
-
-    calculateVoronoiPattern(bBox, vPoints);
-
-    std::cout << "EFTER!!!" << std::endl;
-
-    index = 0;
-    for(std::vector<Splittingplane *>::iterator it = mSplittingPlanes.begin(); it != mSplittingPlanes.end(); ++it) {
-        std::cout << "\nplane " << index << " : " << std::endl;
-        for(std::vector<Vector3<float> >::iterator it2 = (*it)->getUniqueVerts().begin(); it2 != (*it)->getUniqueVerts().end(); ++it2) {
-            std::cout << "vert: " << (*it2) << std::endl;
-        }
-        index++;
-    }
-
-    std::cout << "\nmSplittingPlanes.size(): " << mSplittingPlanes.size() << std::endl;
-    std::cout << "mDebugpoints.size(): " << mDebugpoints.size() << std::endl << std::endl;
-
-    //std::cout << "mSplittingPlanes.size() efter: " << mSplittingPlanes.size() << std::endl;
-
-    for(std::vector<Splittingplane *>::iterator it = mSplittingPlanes.begin(); it != mSplittingPlanes.end(); ++it)
-        (*it)->buildRenderData();
-*/
-}
 
 void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vector3<float> > voronoiPoints) {
 

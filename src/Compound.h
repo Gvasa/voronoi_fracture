@@ -30,7 +30,6 @@ public:
     
     void setWireFrame(bool w) { mWireframe = w; };
 
-    void update(Boundingbox *, std::vector<Vector3<float> >);
 
 private:
 
