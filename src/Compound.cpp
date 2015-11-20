@@ -22,16 +22,10 @@ Compound::Compound(Boundingbox* boundingBox, std::vector<Vector3 <float> > voron
 
 Compound::~Compound() {
 
-    glDeleteBuffers(1, &vertexBuffer);
-    glDeleteBuffers(1, &colorBuffer);
-    glDeleteVertexArrays(1, &vertexArrayID);
-    glDeleteProgram(shaderProgram);
-
-    mVerts.clear();
-    mVerts.shrink_to_fit();
-
-    mColors.clear();
-    mColors.shrink_to_fit();
+    if(mColorScale.size() > 0) {
+        mColorScale.clear();
+        mColorScale.shrink_to_fit();
+    }
 }
 
 void Compound::initialize() {
@@ -59,11 +53,11 @@ void Compound::render(Matrix4x4<float> MVP) {
         mDebugpoints[i]->render(tmp);
 }
 
+
 void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vector3<float> > voronoiPoints) {
 
     unsigned int planeCounter = 0;
     Vector3<float> voronoiMassCenter = Vector3<float>(0.0f, 0.0f, 0.0f);
-
 
     //from our voronoipoints create splitting planes and store them in mSplittingplanes
     for(unsigned int i = 0; i < voronoiPoints.size(); i++) {
@@ -77,6 +71,7 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
             std::cout << voronoiPoints[j] << std::endl;
             calculateSplittingPlane(boundingBox, voronoiPair, planeCounter);
             planeCounter++;
+            std::cout << "\ncompute splitting plane!\n";
         }
 
         voronoiMassCenter += voronoiPoints[i];
@@ -102,6 +97,25 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
         }
     }
 
+    // Check if any splittingplanes have intersected, if not we want to remove
+    // the one that is created between the points with longest distance
+    if(mPlaneIntersections.size() == 0) {
+
+        float dist = 0.0f;
+        unsigned int index = 0;
+
+        for(unsigned int i = 0; i < mSplittingPlanes.size(); i++) {
+
+            std::pair<Vector3<float>, Vector3<float> > vPoints = mSplittingPlanes[i]->getVoronoiPoints();
+
+            if((vPoints.first - vPoints.second).Length() > dist) {
+                dist = (vPoints.first - vPoints.second).Length();
+                index = i;
+            }
+        }    
+        mSplittingPlanes.erase(mSplittingPlanes.begin()+index);
+    }
+
     //resolve the intersections between the planes and return the new clipped planes.
     for(unsigned int i = 0; i < mPlaneIntersections.size(); i++) {
         
@@ -114,7 +128,10 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
 }
 
 void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::pair<Vector3<float>, Vector3<float> > voronoiPoints, unsigned int planeIndex) {
-        
+    
+    mBoundingValues.clear();
+    mBoundingValues.shrink_to_fit();
+
     mBoundingValues = boundingBox->getBoundingValues();
 
     Vector3<float> mittPunkt = voronoiPoints.first + (voronoiPoints.second - voronoiPoints.first) / 2.0f;  

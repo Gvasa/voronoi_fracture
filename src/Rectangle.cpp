@@ -12,7 +12,7 @@ Rectangle::Rectangle(float w, float h, Vector3<float> p)
     mMaterial.diffuse       = Vector4<float>(0.8f, 0.8f, 0.8f, 1.0f);
     mMaterial.specular      = Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
     mMaterial.specularity   = 50.0f;
-    mMaterial.shinyness     = 0.8f;
+    mMaterial.shinyness     = 0.6f;
 
     std::cout << "\nPlane created!\n";
 }

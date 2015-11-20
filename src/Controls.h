@@ -26,8 +26,11 @@ public:
     ~Controls();
 
     void dragStart(double x, double y);
+    
     void dragUpdate(double x, double y);
+    
     void dragEnd();
+    
     bool dragged() const { return mDragged; }
 
     glm::quat& rotate(glm::quat &orientation, double x, double y);

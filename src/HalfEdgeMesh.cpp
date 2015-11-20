@@ -7,7 +7,7 @@ const unsigned int HalfEdgeMesh::UNINITIALIZED = (std::numeric_limits<unsigned i
 
 HalfEdgeMesh::HalfEdgeMesh() {
 
-    mMaterial.color         = Vector4<float>(0.2f, 0.6f, 0.2f, 0.f);
+    mMaterial.color         = Vector4<float>(0.2f, 0.6f, 0.2f, 0.4f);
     mMaterial.ambient       = Vector4<float>(0.3f, 0.3f, 0.3f, 1.0f);
     mMaterial.diffuse       = Vector4<float>(0.8f, 0.8f, 0.8f, 1.0f);
     mMaterial.specular      = Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
@@ -23,29 +23,52 @@ HalfEdgeMesh::~HalfEdgeMesh() {
     glDeleteVertexArrays(1, &vertexArrayID);
     glDeleteProgram(shaderProgram);
 
-    mEdges.clear();
-    mEdges.shrink_to_fit();
+    if(mEdges.size() > 0) {
+        mEdges.clear();
+        mEdges.shrink_to_fit();
+    }
 
-    mVerts.clear();
-    mVerts.shrink_to_fit();
+    if(mVerts.size() > 0) {
+        mVerts.clear();
+        mVerts.shrink_to_fit();
+    }
 
-    mFaces.clear();
-    mFaces.shrink_to_fit();
+    if(mFaces.size() > 0) {
+        mFaces.clear();
+        mFaces.shrink_to_fit();
+    }
 
-    mOrderedVertexList.clear();
-    mOrderedVertexList.shrink_to_fit();
+    if(mOrderedVertexList.size() > 0) {
+        mOrderedVertexList.clear();
+        mOrderedVertexList.shrink_to_fit();
+    }
 
-    mOrderedNormalList.clear();
-    mOrderedNormalList.shrink_to_fit();
+    if(mOrderedNormalList.size() > 0) {
+        mOrderedNormalList.clear();
+        mOrderedNormalList.shrink_to_fit();
+    }
 
-    mVoronoiPoints.clear();
-    mVoronoiPoints.shrink_to_fit();
+    if(mVoronoiPoints.size() > 0) {
+        mVoronoiPoints.clear();
+        mVoronoiPoints.shrink_to_fit();
+    }
 
-    mUniqueVerts.clear();
-    mUniqueEdgePairs.clear();
+    if(mUniqueVerts.size() > 0) {
+        mUniqueVerts.clear();
+    }
 
-    mBoundingbox->~Boundingbox();
-    mCompound->~Compound();
+    for(unsigned int i = 0; i < mDebugPoints.size(); ++i)
+        delete mDebugPoints[i];
+
+    mDebugPoints.clear();
+    mDebugPoints.shrink_to_fit();
+
+    if(mBoundingbox != NULL)
+        delete mBoundingbox;
+
+    if(mCompound != NULL)
+        delete mCompound;
+
 }
 
 // Add init stuff here, right now its just some random shit for the red ugly triangle
@@ -57,11 +80,8 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
     mBoundingbox->initialize();
     mBoundingbox->setWireFrame(true);
 
-    mCompound = new Compound(mBoundingbox, mVoronoiPoints);
-    mCompound->initialize();
-
-    for(unsigned int i = 0; i < mDebugPoints.size(); i++)
-        mDebugPoints[i]->initialize(lightPosition);
+    /*for(unsigned int i = 0; i < mDebugPoints.size(); i++)
+        mDebugPoints[i]->initialize(lightPosition);*/
 
     std::cout << "Volume: " << volume() << std::endl << std::endl;
 
@@ -172,7 +192,9 @@ void HalfEdgeMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     glDisable( GL_BLEND );
 
     mBoundingbox->render(sceneMatrices[I_MVP]);
-    mCompound->render(sceneMatrices[I_MVP]);
+    
+    if(mCompoundIsComputed)
+        mCompound->render(sceneMatrices[I_MVP]);
 
     if(mDebugMode) {
         for(unsigned int i = 0; i < mDebugPoints.size(); i++)
@@ -229,6 +251,8 @@ bool HalfEdgeMesh::addFace(const std::vector<Vector3 <float> > verts) {
 }
 
 void HalfEdgeMesh::createMesh(std::string objName) {
+
+    loadVoronoiPoints(objName);
 
     std::vector<std::vector<Vector3<float> > > vertexList = Geometry::mObjectLoader->getMeshVertexList(objName);
 
@@ -315,6 +339,23 @@ float HalfEdgeMesh::volume() const {
     return volume / 3.0f;
 }
 
+
+void HalfEdgeMesh::updateVoronoiPoint(Vector3<float> dp, unsigned int index) {
+
+    mVoronoiPoints[index] += dp;
+
+    mDebugPoints[index]->updatePosition(dp);
+}
+
+
+void HalfEdgeMesh::computeVoronoiPattern() {
+
+    mCompound = new Compound(mBoundingbox, mVoronoiPoints);
+    mCompound->initialize();
+
+    mCompoundIsComputed = true;
+}
+
 // This is where we add a vertex to the half-edge structure
 bool HalfEdgeMesh::addVertex(const Vector3<float> &v, unsigned int &index) {
 
@@ -387,7 +428,9 @@ bool HalfEdgeMesh::addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsig
 void HalfEdgeMesh::addVoronoiPoint(Vector3<float> v) {
 
     mDebugPoints.push_back(new Debugpoint(v, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f)));
-    mVoronoiPoints.push_back(v); 
+    mVoronoiPoints.push_back(v);
+
+    mDebugPoints[mDebugPoints.size()-1]->initialize(Vector3<float>(0.0f, 0.0f, 0.0f));
 
 }
 

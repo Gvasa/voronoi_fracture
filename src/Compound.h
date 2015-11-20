@@ -21,6 +21,7 @@ class Compound {
 public:
 
     Compound(Boundingbox*, std::vector<Vector3<float> >);
+    
     ~Compound();
 
     void initialize();
@@ -29,16 +30,11 @@ public:
     
     void setWireFrame(bool w) { mWireframe = w; };
 
+
 private:
 
-    // Shader data
-    GLuint vertexArrayID;
-    GLuint vertexBuffer;
-    GLuint colorBuffer;
-    GLuint shaderProgram;
+    // Member functions
 
-    GLint MVPLoc; // MVP Matrix
-    GLint ColorLoc;
     Vector4<float> mColor;
 
     void calculateVoronoiPattern(Boundingbox *, std::vector<Vector3<float> >);
@@ -53,10 +49,12 @@ private:
     
     bool compareAngle(std::pair<float, Vector3<float> > p1, std::pair<float, Vector3<float> > p2) { return p1.first < p2.first; }
 
-    std::vector<Vector3<float> > mVerts;
-    std::vector<Vector3<float> > mColors;
+    // Instance variables
+
     std::vector<Splittingplane *> mSplittingPlanes;
+
     std::vector<Debugpoint *> mDebugpoints;
+
     std::vector<Vector3<float> > mBoundingValues;
     
     bool mWireframe = false;

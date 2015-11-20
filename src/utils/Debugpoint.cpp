@@ -5,21 +5,35 @@ const unsigned int Debugpoint::BORDER = (std::numeric_limits<unsigned int>::max)
 const unsigned int Debugpoint::UNINITIALIZED = (std::numeric_limits<unsigned int>::max)()-1;
 
 
-Debugpoint::Debugpoint(Vector3<float> position, Vector4<float> c)
-: mColor(c) {
+Debugpoint::Debugpoint(Vector3<float> p, Vector4<float> c)
+: mColor(c), mPosition(p) {
 
-    createMesh("sphere1.0");
+    createMesh("lowPolySphere1.0");
     scale(Vector3<float>(0.02f, 0.02f, 0.02f));
 
-    translate(position);
+    translate(p);
 }
 
 Debugpoint::~Debugpoint() {
+
+    std::cout << "\ndelete debugpoint!" << std::endl;
 
     // Cleanup VBO
     glDeleteBuffers(1, &vertexBuffer);
     glDeleteVertexArrays(1, &vertexArrayID);
     glDeleteProgram(shaderProgram);
+
+    mEdges.clear();
+    mEdges.shrink_to_fit();
+
+    mVerts.clear();
+    mVerts.shrink_to_fit();
+
+    mFaces.clear();
+    mFaces.shrink_to_fit();
+
+    mOrderedVertexList.clear();
+    mOrderedVertexList.shrink_to_fit();
 }
 
 // Add init stuff here, right now its just some random shit for the red ugly triangle
@@ -195,6 +209,16 @@ void Debugpoint::scale(Vector3<float> s){
         v = scalingMatrix * v;
         mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
     }
+}
+
+
+void Debugpoint::updatePosition(Vector3<float> dp) {
+
+    mPosition += dp;
+
+    translate(dp);
+
+    updateRenderData();
 }
 
 // This is where we add a vertex to the half-edge structure
