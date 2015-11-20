@@ -39,8 +39,7 @@ public:
     void initialize(Vector3<float>);
 
     void render(std::vector<Matrix4x4<float> >);
-
-    //Adds a triangle (face) to the mesh    
+ 
     bool addFace(std::vector<Vector3 <float> >);
 
     void createMesh(std::string);
@@ -56,6 +55,10 @@ public:
     float volume() const;
 
     void updateVoronoiPoint(Vector3<float>, unsigned int);
+
+    void computeVoronoiPattern();
+
+    void markCurrentVoronoiPoint(unsigned int i, Vector4<float> c) { mDebugPoints[i]->setColor(c); }
 
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
@@ -200,6 +203,8 @@ private:
     std::vector<Debugpoint *> mDebugPoints;
 
     bool mDebugMode = false;
+
+    bool mCompoundIsComputed = false;
 
     /*
      * MEMBER FUNCTIONS

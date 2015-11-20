@@ -14,15 +14,29 @@ Splittingplane::Splittingplane(
 
 Splittingplane::~Splittingplane() {
 
+    std::cout << "\ndelete splitting plane!" << std::endl;
+
     glDeleteBuffers(1, &vertexBuffer);
     glDeleteVertexArrays(1, &vertexArrayID);
     glDeleteProgram(shaderProgram);
 
-    mVerts.clear();
-    mVerts.shrink_to_fit();
+    if(mVerts.size() > 0) {
+        mVerts.clear();
+        mVerts.shrink_to_fit();
+    }
 
-    mUniqueVerts.clear();
-    mUniqueVerts.shrink_to_fit();
+    if(mUniqueVerts.size() > 0) {
+        mUniqueVerts.clear();
+        mUniqueVerts.shrink_to_fit();
+    }
+
+    for(unsigned int i = 0; i < mDebugPoints.size(); ++i)
+        delete mDebugPoints[i];
+
+    if(mDebugPoints.size() > 0) {
+        mDebugPoints.clear();
+        mDebugPoints.shrink_to_fit();
+    }
 }
 
 

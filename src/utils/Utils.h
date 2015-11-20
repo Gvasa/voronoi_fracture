@@ -33,7 +33,6 @@ const int HEIGHT = 768;
 
 //class LoadObj;
 
-
 class Utils {
 
 public:
@@ -47,20 +46,33 @@ private:
 };
 
 static Vector4<float> mColorScale[12] = {
-        Vector4<float>(166.0f/255.0f,206.0f/255.0f,227.0f/255.0f, 0.5f),
-        Vector4<float>(31.0f/255.0f,120.0f/255.0f,180.0f/255.0f, 0.5f),
-        Vector4<float>(178.0f/255.0f,223.0f/255.0f,138.0f/255.0f, 0.5f),
-        Vector4<float>(51.0f/255.0f,160.0f/255.0f,44.0f/255.0f, 0.5f),
-        Vector4<float>(251.0f/255.0f,154.0f/255.0f,153.0f/255.0f, 0.5f),
-        Vector4<float>(227.0f/255.0f,26.0f/255.0f,28.0f/255.0f, 0.5f),
-        Vector4<float>(253.0f/255.0f,191.0f/255.0f,111.0f/255.0f, 0.5f),
-        Vector4<float>(255.0f/255.0f,127.0f/255.0f,0.0f/255.0f, 0.5f),
-        Vector4<float>(202.0f/255.0f,178.0f/255.0f,214.0f/255.0f, 0.5f),
-        Vector4<float>(106.0f/255.0f,61.0f/255.0f,154.0f/255.0f, 0.5f),
-        Vector4<float>(255.0f/255.0f,255.0f/255.0f,153.0f/255.0f, 0.5f),
-        Vector4<float>(177.0f/255.0f,89.0f/255.0f,40.0f/255.0f, 0.5f)
+        Vector4<float>(166.0f/255.0f, 206.0f/255.0f, 227.0f/255.0f, 0.5f),
+        Vector4<float>(31.0f /255.0f, 120.0f/255.0f, 180.0f/255.0f, 0.5f),
+        Vector4<float>(178.0f/255.0f, 223.0f/255.0f, 138.0f/255.0f, 0.5f),
+        Vector4<float>(51.0f /255.0f, 160.0f/255.0f, 44.0f /255.0f, 0.5f),
+        Vector4<float>(251.0f/255.0f, 154.0f/255.0f, 153.0f/255.0f, 0.5f),
+        Vector4<float>(227.0f/255.0f, 26.0f /255.0f, 28.0f /255.0f, 0.5f),
+        Vector4<float>(253.0f/255.0f, 191.0f/255.0f, 111.0f/255.0f, 0.5f),
+        Vector4<float>(255.0f/255.0f, 127.0f/255.0f, 0.0f  /255.0f, 0.5f),
+        Vector4<float>(202.0f/255.0f, 178.0f/255.0f, 214.0f/255.0f, 0.5f),
+        Vector4<float>(106.0f/255.0f, 61.0f /255.0f, 154.0f/255.0f, 0.5f),
+        Vector4<float>(255.0f/255.0f, 255.0f/255.0f, 153.0f/255.0f, 0.5f),
+        Vector4<float>(177.0f/255.0f, 89.0f /255.0f, 40.0f /255.0f, 0.5f)
     };
 
 static Vector4<float> getColor(unsigned int i) { return mColorScale[i]; }
+
+static void loadVoronoiPoints(std::string objName) {
+
+    if(objName == "sphere1.0") {
+        std::cout << "\n---- sphere1.0 ----\n";
+    } else if(objName == "cow") {
+        std::cout << "\n---- cow ----\n";
+    } else if(objName == "bunnySmall") {
+        std::cout << "\n---- bunnySmall ----\n";
+    } else {
+        std::cout << "\n---- load standard setup ----\n";
+    }
+}
 
 #endif // UTILS_H

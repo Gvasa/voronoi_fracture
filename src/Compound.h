@@ -34,6 +34,8 @@ public:
 
 private:
 
+    // Member functions
+
     Vector4<float> mColor;
 
     void calculateVoronoiPattern(Boundingbox *, std::vector<Vector3<float> >);
@@ -48,8 +50,12 @@ private:
     
     bool compareAngle(std::pair<float, Vector3<float> > p1, std::pair<float, Vector3<float> > p2) { return p1.first < p2.first; }
 
+    // Instance variables
+
     std::vector<Splittingplane *> mSplittingPlanes;
+
     std::vector<Debugpoint *> mDebugpoints;
+
     std::vector<Vector3<float> > mBoundingValues;
     
     bool mWireframe = false;

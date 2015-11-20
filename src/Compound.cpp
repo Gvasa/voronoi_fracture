@@ -22,8 +22,10 @@ Compound::Compound(Boundingbox* boundingBox, std::vector<Vector3 <float> > voron
 
 Compound::~Compound() {
 
-    mColorScale.clear();
-    mColorScale.shrink_to_fit();
+    if(mColorScale.size() > 0) {
+        mColorScale.clear();
+        mColorScale.shrink_to_fit();
+    }
 }
 
 void Compound::initialize() {
@@ -53,8 +55,7 @@ void Compound::render(Matrix4x4<float> MVP) {
 
 void Compound::update(Boundingbox *bBox, std::vector<Vector3<float> > vPoints) {
 
-
-    std::cout << "FÖRE!!!" << std::endl;
+    /*std::cout << "FÖRE!!!" << std::endl;
 
     unsigned int index = 0;
     for(std::vector<Splittingplane *>::iterator it = mSplittingPlanes.begin(); it != mSplittingPlanes.end(); ++it) {
@@ -65,6 +66,8 @@ void Compound::update(Boundingbox *bBox, std::vector<Vector3<float> > vPoints) {
         index++;
     }
 
+    std::cout << "\nmSplittingPlanes.size(): " << mSplittingPlanes.size() << std::endl;
+    std::cout << "mDebugpoints.size(): " << mDebugpoints.size() << std::endl << std::endl;
 
     for(std::vector<Splittingplane *>::iterator it = mSplittingPlanes.begin(); it != mSplittingPlanes.end(); ++it) {
         (*it)->resetSplittingPlane();
@@ -72,11 +75,19 @@ void Compound::update(Boundingbox *bBox, std::vector<Vector3<float> > vPoints) {
 
 
     if(mDebugpoints.size() > 0) {
+        
+        for(unsigned int i = 0; i < mDebugpoints.size(); ++i)
+            delete mDebugpoints[i];
+
         mDebugpoints.clear();
         mDebugpoints.shrink_to_fit();
     }
 
     if(mSplittingPlanes.size() > 0) {
+
+        for(unsigned int i = 0; i < mSplittingPlanes.size(); ++i)
+            delete mSplittingPlanes[i];
+
         mSplittingPlanes.clear();
         mSplittingPlanes.shrink_to_fit();
     }
@@ -96,10 +107,14 @@ void Compound::update(Boundingbox *bBox, std::vector<Vector3<float> > vPoints) {
         index++;
     }
 
+    std::cout << "\nmSplittingPlanes.size(): " << mSplittingPlanes.size() << std::endl;
+    std::cout << "mDebugpoints.size(): " << mDebugpoints.size() << std::endl << std::endl;
+
     //std::cout << "mSplittingPlanes.size() efter: " << mSplittingPlanes.size() << std::endl;
 
     for(std::vector<Splittingplane *>::iterator it = mSplittingPlanes.begin(); it != mSplittingPlanes.end(); ++it)
         (*it)->buildRenderData();
+*/
 }
 
 void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vector3<float> > voronoiPoints) {
@@ -143,6 +158,25 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
                 mPlaneIntersections.push_back(std::make_pair(std::make_pair(i,j), intersectionPointsPair));
             }
         }
+    }
+
+    // Check if any splittingplanes have intersected, if not we want to remove
+    // the one that is created between the points with longest distance
+    if(mPlaneIntersections.size() == 0) {
+
+        float dist = 0.0f;
+        unsigned int index = 0;
+
+        for(unsigned int i = 0; i < mSplittingPlanes.size(); i++) {
+
+            std::pair<Vector3<float>, Vector3<float> > vPoints = mSplittingPlanes[i]->getVoronoiPoints();
+
+            if((vPoints.first - vPoints.second).Length() > dist) {
+                dist = (vPoints.first - vPoints.second).Length();
+                index = i;
+            }
+        }    
+        mSplittingPlanes.erase(mSplittingPlanes.begin()+index);
     }
 
     //resolve the intersections between the planes and return the new clipped planes.

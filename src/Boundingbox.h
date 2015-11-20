@@ -17,32 +17,47 @@ class Boundingbox {
 public:
 
     Boundingbox(std::vector<Vector3<float> >);
+    
     ~Boundingbox();
 
     void initialize();
+    
     void render(Matrix4x4<float>);
+    
     void setWireFrame(bool w) { mWireframe = w; };
 
     std::map<std::string, unsigned int> getBoundingValuesIndex() { return mBoundingValuesIndex; }
+    
     std::vector<Vector3<float> > getBoundingValues() { return mBoundingValues; }
 
 private:
 
+    // Member functions
+
+    void calculateBoundingbox(std::vector<Vector3<float> >);
+    
+    void calculateConvexHull(std::vector<Vector3<float> >);
+
     // Shader data
+
     GLuint vertexArrayID;
+    
     GLuint vertexBuffer;
+    
     GLuint shaderProgram;
 
     GLint MVPLoc; // MVP Matrix
+    
     GLint ColorLoc;
+    
+    // Member variables
+
     Vector4<float> mColor;
 
-
-    void calculateBoundingbox(std::vector<Vector3<float> >);
-    void calculateConvexHull(std::vector<Vector3<float> >);
-
     std::vector<Vector3<float> > mVerts;
+    
     std::vector<Vector3<float> > mBoundingValues;
+    
     std::map<std::string, unsigned int> mBoundingValuesIndex;
 
     bool mWireframe = false;

@@ -27,6 +27,7 @@ public:
      * A Geometry must have the following: 
      */
     virtual void initialize(Vector3<float>) = 0;
+    
     virtual void render(std::vector<Matrix4x4<float> >) = 0;
 
 
@@ -61,6 +62,12 @@ public:
     virtual void updateVoronoiPoint(Vector3<float>, unsigned int) {
         std::cout << "\nGeometry does not have updateVoronoiPoint implemented!\n";
     };
+    virtual void computeVoronoiPattern() {
+        std::cout << "\nGeometry does not have computeVoronoiPattern implemented!\n";
+    };
+    virtual void markCurrentVoronoiPoint(unsigned int, Vector4<float>) {
+        std::cout << "\nGeometry does not have markCurrentVoronoiPoint implemented!\n";
+    }
 
 protected:
 

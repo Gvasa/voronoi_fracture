@@ -21,7 +21,11 @@ Utils *utilHandler;
 
 std::string windowTitle = "Voronoi Fracture";
 
-unsigned int currentVoronoiIndex = 0;
+bool voronoiPatternIsComputed = false;
+const unsigned int maximumVoronoiPoints = 3;
+unsigned int currentNumberOfVoronoiPoints = 1;
+int currentVoronoiIndex = 0;
+float stepSize = 0.05f;
 
 
 int initializeOpenGL();
@@ -64,22 +68,31 @@ int main (int argc, char* argv[]) {
     mesh = new HalfEdgeMesh();
     mesh->setDebugMode(true);
 
-    mesh->createMesh("sphere1.0");
+    //mesh->createMesh("sphere1.0");
+    mesh->createMesh("bunnySmall");
+    mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
+    mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
 
    /* mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.0f));
     mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.6f, 0.0f));
     mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.7f, 0.0f));
-//    mesh->addVoronoiPoint(Vector3<float>(0.2f, -0.7f, 0.5f));
+    //mesh->addVoronoiPoint(Vector3<float>(0.2f, -0.7f, 0.5f));
     */
 
-    mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.5f));
-    mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.6f, -0.37f));
-    mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.0f, 0.9f));
+   /* mesh->addVoronoiPoint(Vector3<float>(-0.5f, -0.7f, 0.5f));
+    mesh->addVoronoiPoint(Vector3<float>(0.1f, 0.6f, -0.37f));
+    mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.6f, 0.9f));
+*/
+    //mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
 /*
     mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
     mesh->addVoronoiPoint(Vector3<float>(0.9f, 0.9f, 0.997f));
     mesh->addVoronoiPoint(Vector3<float>(0.7f, -0.8f, 0.0f));
 */
+
+    mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
+    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+
     scene->addGeometry(floor_rect);
     scene->addGeometry(wall_rect);
     scene->addGeometry(mesh);
@@ -204,14 +217,91 @@ void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mo
             case GLFW_KEY_SPACE:
                 scene->resetCamera();
                 break;
+
             case GLFW_KEY_W:
-                mesh->updateVoronoiPoint(Vector3<float>(0.0f, 0.0f, -0.01f), 2);
+                if(!voronoiPatternIsComputed)
+                    mesh->updateVoronoiPoint(Vector3<float>(0.0f, 0.0f, -stepSize), currentVoronoiIndex);
                 break;
+
+            case GLFW_KEY_S:
+                if(!voronoiPatternIsComputed)
+                    mesh->updateVoronoiPoint(Vector3<float>(0.0f, 0.0f, stepSize), currentVoronoiIndex);
+                break;
+
+            case GLFW_KEY_A:
+                if(!voronoiPatternIsComputed)
+                    mesh->updateVoronoiPoint(Vector3<float>(-stepSize, 0.0f, 0.0f), currentVoronoiIndex);
+                break;
+
+            case GLFW_KEY_D:
+                if(!voronoiPatternIsComputed)
+                    mesh->updateVoronoiPoint(Vector3<float>(stepSize, 0.0f, 0.0f), currentVoronoiIndex);
+                break;
+
+            case GLFW_KEY_E:
+                if(!voronoiPatternIsComputed)
+                    mesh->updateVoronoiPoint(Vector3<float>(0.0f, stepSize, 0.0f), currentVoronoiIndex);
+                break;
+
+            case GLFW_KEY_Q:
+                if(!voronoiPatternIsComputed)
+                    mesh->updateVoronoiPoint(Vector3<float>(0.0f, -stepSize, 0.0f), currentVoronoiIndex);
+                break;
+
+            case GLFW_KEY_ENTER:
+                if(currentNumberOfVoronoiPoints >= 2) {
+                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
+                    mesh->computeVoronoiPattern();
+                    voronoiPatternIsComputed = true;
+                } else {
+                    std::cout << "\nError!\n";
+                    std::cout << "Create atleast 2 voronoi points in order to compute the pattern!\n\n";
+                }
+                break;
+
+            case GLFW_KEY_UP:
+                if(currentVoronoiIndex == maximumVoronoiPoints - 1) {
+                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
+                    currentVoronoiIndex = 0;
+                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+                } else {
+                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
+                    currentVoronoiIndex++;
+                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+                }
+                break;
+
+            case GLFW_KEY_DOWN:
+                if(currentVoronoiIndex == 0) {
+                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
+                    currentVoronoiIndex = maximumVoronoiPoints - 1;
+                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+                } else {
+                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
+                    currentVoronoiIndex--;
+                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+                }
+                break;
+
+            case GLFW_KEY_C:
+                    if(currentNumberOfVoronoiPoints <= maximumVoronoiPoints) {
+                        currentNumberOfVoronoiPoints++;
+                        mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
+                        currentVoronoiIndex = currentNumberOfVoronoiPoints-1;
+                        mesh->markCurrentVoronoiPoint(currentVoronoiIndex-1, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
+                        mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+                    } else {
+                        std::cout << "\nMaximum number of points already added!\n";
+                    }
+                break;
+
             default:
                 break;
         }
     }
 }
+
+
 double calcFPS(double timeInterval = 1.0, std::string windowTitle = "NONE") {
 
     // Static values which only get initialised the first time the function runs

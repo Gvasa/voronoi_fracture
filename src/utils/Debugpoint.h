@@ -31,9 +31,11 @@ class Debugpoint : public Geometry {
 public:
 
     Debugpoint(Vector3<float>, Vector4<float> c = Vector4<float>(1.0f, 0.0f, 1.0f, 1.0f));
+
     ~Debugpoint();
 
     void initialize(Vector3<float>);
+
     void render(std::vector<Matrix4x4<float> >);
 
     //Adds a triangle (face) to the mesh    
@@ -97,13 +99,18 @@ private:
 
     // Shader data
     GLuint vertexArrayID;
+    
     GLuint vertexBuffer;
+    
     GLuint shaderProgram;
 
     // Shader indices for Matrices
     GLint MVPLoc;           // MVP matrix
+    
     GLint ColorLoc;
+    
     Vector4<float> mColor;
+    
     Vector3<float> mPosition;
 
     LoadObj *objLoader;

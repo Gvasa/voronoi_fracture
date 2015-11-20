@@ -41,17 +41,26 @@ public:
 
     std::vector<Vector3<float> > getUniqueVerts() { return mUniqueVerts; }
 
+    std::pair<Vector3<float>, Vector3<float> > getVoronoiPoints() { return mVoronoiPoints; }
+
 private:
+
+    // Member functions
 
     std::vector<Vector3<float> > sortVertices(std::vector<Vector3<float> >);
 
     // Shader data
     GLuint vertexArrayID;
+    
     GLuint vertexBuffer;
+    
     GLuint shaderProgram;
 
     GLint MVPLoc;       // MVP Matrix
+    
     GLint ColorLoc;     // Color Vector
+
+    // Instance variables
 
     std::vector<Vector3<float> > mVerts;
 

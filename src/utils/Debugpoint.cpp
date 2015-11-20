@@ -8,7 +8,7 @@ const unsigned int Debugpoint::UNINITIALIZED = (std::numeric_limits<unsigned int
 Debugpoint::Debugpoint(Vector3<float> p, Vector4<float> c)
 : mColor(c), mPosition(p) {
 
-    createMesh("sphere1.0");
+    createMesh("lowPolySphere1.0");
     scale(Vector3<float>(0.02f, 0.02f, 0.02f));
 
     translate(p);
@@ -16,10 +16,24 @@ Debugpoint::Debugpoint(Vector3<float> p, Vector4<float> c)
 
 Debugpoint::~Debugpoint() {
 
+    std::cout << "\ndelete debugpoint!" << std::endl;
+
     // Cleanup VBO
     glDeleteBuffers(1, &vertexBuffer);
     glDeleteVertexArrays(1, &vertexArrayID);
     glDeleteProgram(shaderProgram);
+
+    mEdges.clear();
+    mEdges.shrink_to_fit();
+
+    mVerts.clear();
+    mVerts.shrink_to_fit();
+
+    mFaces.clear();
+    mFaces.shrink_to_fit();
+
+    mOrderedVertexList.clear();
+    mOrderedVertexList.shrink_to_fit();
 }
 
 // Add init stuff here, right now its just some random shit for the red ugly triangle
@@ -203,8 +217,6 @@ void Debugpoint::updatePosition(Vector3<float> dp) {
     mPosition += dp;
 
     translate(dp);
-
-    std::cout << "debugPointPosition: " << mPosition << std::endl;
 
     updateRenderData();
 }
