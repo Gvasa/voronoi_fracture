@@ -12,12 +12,12 @@
 //#include "LoadObj.h"
 #include "utils/Debugpoint.h"
 
-GLFWwindow* window;
-Scene *scene;
-Geometry *mesh;
-Geometry *floor_rect;
-Geometry *wall_rect;
-Utils *utilHandler;
+GLFWwindow* window = nullptr;
+Scene *scene = nullptr;
+Geometry *mesh = nullptr;
+Geometry *floor_rect = nullptr;
+Geometry *wall_rect = nullptr;
+Utils *utilHandler = nullptr;
 
 std::string windowTitle = "Voronoi Fracture";
 
@@ -69,9 +69,10 @@ int main (int argc, char* argv[]) {
     mesh->setDebugMode(true);
 
     //mesh->createMesh("sphere1.0");
-    mesh->createMesh("bunnySmall");
-    mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
-    mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
+    //mesh->createMesh("bunnySmall");
+    mesh->createMesh("cube");
+    //mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
+    //mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
 
    /* mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.0f));
     mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.6f, 0.0f));
@@ -252,6 +253,7 @@ void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mo
                 if(currentNumberOfVoronoiPoints >= 2) {
                     mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
                     mesh->computeVoronoiPattern();
+                    scene->splitMesh(dynamic_cast<HalfEdgeMesh*>(mesh));
                     voronoiPatternIsComputed = true;
                 } else {
                     std::cout << "\nError!\n";

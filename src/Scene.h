@@ -23,6 +23,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "Geometry.h"
+#include "ClippingMesh.h"
 #include "math/Matrix4x4.h"
 #include "math/Vector3.h"
 #include "Controls.h"
@@ -35,30 +36,42 @@ class Scene{
 public:
 
     Scene();
+    
     ~Scene();
 
     void initialize();
+    
     void render();
 
     void addGeometry(Geometry *);
+    
     void updateCameraPosition(double x, double y);
+    
     void updateCameraZoom(double x, double y);
+    
     void mouseButtonClick(double x, double y) { control->dragStart(x, y); }
+    
     void mouseButtonRelease() { control->dragEnd(); }
+    
     void resetCamera();
+
+    void splitMesh(HalfEdgeMesh *);
 
 private:
 
     Matrix4x4<float> toMatrix4x4(glm::mat4);
+    
     Matrix4x4<float> toMatrix4x4(glm::mat3);
 
     std::vector<Geometry *>mGeometries;
+    
     std::vector<Matrix4x4<float> >mSceneMatrices;
 
     struct LightSource {
         Vector4<float> color;
         Vector3<float> position;
     } mPointLight;
+    
     Controls *control;
 };
 

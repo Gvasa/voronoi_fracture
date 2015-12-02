@@ -30,8 +30,10 @@ public:
     
     virtual void render(std::vector<Matrix4x4<float> >) = 0;
 
+    virtual unsigned int getType() = 0;
 
-    /* 
+
+    /*
      * A Geometry might have the following: 
      */
     virtual bool addFace(std::vector<Vector3<float> >) {
@@ -67,6 +69,9 @@ public:
     };
     virtual void markCurrentVoronoiPoint(unsigned int, Vector4<float>) {
         std::cout << "\nGeometry does not have markCurrentVoronoiPoint implemented!\n";
+    }
+    virtual bool isCompoundComputed() {
+        std::cout << "\nGeometry does not have isCompoundComputed implemented!\n";
     }
 
 protected:

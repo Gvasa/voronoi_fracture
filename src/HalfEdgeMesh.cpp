@@ -80,11 +80,6 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
     mBoundingbox->initialize();
     mBoundingbox->setWireFrame(true);
 
-    /*for(unsigned int i = 0; i < mDebugPoints.size(); i++)
-        mDebugPoints[i]->initialize(lightPosition);*/
-
-    std::cout << "Volume: " << volume() << std::endl << std::endl;
-
     buildRenderData();
 
     // Update face normals
@@ -350,10 +345,11 @@ void HalfEdgeMesh::updateVoronoiPoint(Vector3<float> dp, unsigned int index) {
 
 void HalfEdgeMesh::computeVoronoiPattern() {
 
-    mCompound = new Compound(mBoundingbox, mVoronoiPoints);
-    mCompound->initialize();
-
-    mCompoundIsComputed = true;
+    if(!mCompoundIsComputed) {
+        mCompound = new Compound(mBoundingbox, mVoronoiPoints);
+        mCompound->initialize();
+        mCompoundIsComputed = true;
+    }
 }
 
 // This is where we add a vertex to the half-edge structure

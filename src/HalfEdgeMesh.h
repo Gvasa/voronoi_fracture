@@ -54,11 +54,17 @@ public:
 
     float volume() const;
 
+    unsigned int getType() { return HALFEDGEMESH; }
+
     void updateVoronoiPoint(Vector3<float>, unsigned int);
 
     void computeVoronoiPattern();
 
     void markCurrentVoronoiPoint(unsigned int i, Vector4<float> c) { mDebugPoints[i]->setColor(c); }
+
+    bool isCompoundComputed() { return mCompoundIsComputed; }
+
+    Compound* getCompound() { return mCompound; }
 
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
@@ -183,9 +189,9 @@ private:
     /*
      * MEMBER VARIABLES
      */
-    Boundingbox *mBoundingbox;
+    Boundingbox *mBoundingbox = nullptr;
 
-    Compound *mCompound;
+    Compound *mCompound = nullptr;
     
     // The edges of the mesh
     std::vector<HalfEdge> mEdges;
@@ -245,7 +251,8 @@ private:
     //! A utility data structure to speed up removal of redundant edges
     std::map<OrderedPair, unsigned int> mUniqueEdgePairs;
 
-     //! Return the edge at index i
+public:
+    //! Return the edge at index i
     HalfEdge& getEdge(unsigned int i) { return mEdges.at(i); }
     const HalfEdge& getEdge(unsigned int i) const { return mEdges.at(i); }
     //! Return the face at index i
@@ -260,9 +267,6 @@ private:
     unsigned int getNumFaces() const {  return mFaces.size(); }
     //Return number of Edges
     unsigned int getNumEdges() const {  return mEdges.size(); }
-    
-
-
 };
 
 #endif // HALFEDGEMESH_H

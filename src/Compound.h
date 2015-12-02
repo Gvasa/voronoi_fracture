@@ -30,6 +30,10 @@ public:
     
     void setWireFrame(bool w) { mWireframe = w; };
 
+    Splittingplane* getSplittingPlane(unsigned int i) { return mSplittingPlanes[i]; }
+
+    unsigned int getNumberOfSplittingPlanes() { return mSplittingPlanes.size(); }
+
 
 private:
 

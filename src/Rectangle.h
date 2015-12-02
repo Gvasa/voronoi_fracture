@@ -13,30 +13,40 @@
 // Classes
 #include "Geometry.h"
 #include "tools/shader.hpp"
+#include "utils/Utils.h"
 
 class Rectangle : public Geometry {
 
 public:
 
     Rectangle(float, float, Vector3<float>);
+    
     ~Rectangle();
 
     void initialize(Vector3<float>);
+
     void render(std::vector<Matrix4x4<float> >);
 
     void addVertex(Vector3<float> v) { mVerts.push_back(v); };
+    
     void addNormal(Vector3<float> n) { mNormals.push_back(n); };
+    
     void createVertices(float, float);
 
     void rotate(Vector3<float>, float);
+    
     void translate(Vector3<float>);
+    
     void scale(Vector3<float>);
+
+    unsigned int getType() { return RECTANGLE; }
 
 private:
 
     Vector3<float> mPosition;
 
     std::vector<Vector3<float> > mVerts;
+    
     std::vector<Vector3<float> > mNormals;
 
     // Shader data

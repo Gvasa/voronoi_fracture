@@ -51,6 +51,8 @@ public:
 
     void setColor(Vector4<float> c) { mColor = c; }
 
+    unsigned int getType() { return DEBUGPOINT; }
+
     void updatePosition(Vector3<float>);
 
     Vector3<float> getPosition() { return mPosition; }

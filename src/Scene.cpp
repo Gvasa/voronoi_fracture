@@ -47,6 +47,15 @@ void Scene::initialize() {
 
     for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
         (*it)->initialize(mPointLight.position);
+
+    // Control the volume
+    float volume = 0;
+
+    for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it){
+        if((*it)->getType() == HALFEDGEMESH)
+            volume += (*it)->volume();
+    }
+    std::cout << "\nMesh volume: " << volume << std::endl;
 }
 
 // render all geometries
@@ -140,4 +149,13 @@ void Scene::resetCamera() {
     glm::quat identityQuat;
     camera.orientation = identityQuat;
     camera.zoom = 0;
+}
+
+void Scene::splitMesh(HalfEdgeMesh *he) {
+
+    if(he->isCompoundComputed()) {
+        ClippingMesh * cm = new ClippingMesh(he);
+        cm->print();
+        cm->clipMesh();
+    }
 }
