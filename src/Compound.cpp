@@ -79,6 +79,7 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
         voronoiMassCenter += voronoiPoints[i];
     }
 
+
     voronoiMassCenter /= voronoiPoints.size();
 
     std::vector<std::pair<std::pair<unsigned int, unsigned int>, std::pair<Vector3<float>, Vector3<float> > > > mPlaneIntersections;
@@ -118,6 +119,7 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
         mSplittingPlanes.erase(mSplittingPlanes.begin()+index);
     }
 
+    calculateBoundingBoxPoints();
     //resolve the intersections between the planes and return the new clipped planes.
     for(unsigned int i = 0; i < mPlaneIntersections.size(); i++) {
         
@@ -131,6 +133,11 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
 
         std::cout << "TESTAR mSplittingplanes[" << index1 << "] & mSplittingplanes[" << index2 << "]   - convex: " << i <<  std::endl;
         calculateConvexShape(index1, index2, i);
+    }
+
+    for(unsigned int i = 0; i < mUniqueConvexList.size(); i++) {
+        for(unsigned int j = 0; j < mUniqueConvexList[i].size(); j++)
+            std::cout << "mUniqueConvexList[" << i << "][" << j << "]: " << mUniqueConvexList[i][j] << std::endl;
     }
 }
 
@@ -192,7 +199,6 @@ void Compound::calculateConvexShape(unsigned int index1, unsigned int index2, un
     
     //calculate if a corner point should be added or not.
     for(unsigned int i = 0; i < mBoundingPoints.size(); i++) {
-        
         distance1 = (mBoundingPoints[i] - voronoiDistances[0].second).Length();
         distance2 = (mBoundingPoints[i] - voronoiDistances[1].second).Length();
         distance3 = (mBoundingPoints[i] - voronoiDistances[2].second).Length();
@@ -202,6 +208,10 @@ void Compound::calculateConvexShape(unsigned int index1, unsigned int index2, un
             verticesIndex.push_back(verticesIndex.back() + 1);
         }
     }
+
+    for(unsigned int i = 0; i < uniqueVerticesToAdd.size(); i++) 
+        mDebugpoints.push_back(new Debugpoint(uniqueVerticesToAdd[i]));
+
 
     //add our newly created uniquelist and indexlist to our private vectors
     mUniqueConvexList.push_back(uniqueVerticesToAdd);
