@@ -39,12 +39,16 @@ private:
 
     void calculateVoronoiPattern(Boundingbox *, std::vector<Vector3<float> >);
     
+    void calculateConvexShape(unsigned int, unsigned int, unsigned int);
+    
     void calculateSplittingPlane(Boundingbox *, std::pair<Vector3<float>, Vector3<float> >, unsigned int);
 
     bool calculatePlaneIntersection( std::vector<Vector3<float> >, std::vector<Vector3<float> >, std::pair<Vector3<float>, Vector3<float> > &);
     
     bool calculateLineIntersectionPoint(std::pair<Vector3<float>, Vector3<float> >, std::pair<Vector3<float>, Vector3<float> >, Vector3<float> &);
     
+    void calculateBoundingBoxPoints();
+
     std::vector<Vector3<float> > sortVertices(std::vector<Vector3<float> >, Vector3<float>);
     
     bool compareAngle(std::pair<float, Vector3<float> > p1, std::pair<float, Vector3<float> > p2) { return p1.first < p2.first; }
@@ -56,7 +60,13 @@ private:
     std::vector<Debugpoint *> mDebugpoints;
 
     std::vector<Vector3<float> > mBoundingValues;
-    
+    //std::vector<Vector3<float> > mBoundingPoints;
+    std::vector<Vector3<float> > mBoundingPoints;
+    std::vector<std::vector<Vector3<float> > > mUniqueConvexList;
+    std::vector<std::vector<unsigned int> > mConvexList;
+    std::vector<Vector3<float> > mVoronoiPoints;
+    std::vector<Vector3<float> > mMassCenters;
+
     bool mWireframe = false;
 
     std::vector<Vector3<float> > mColorScale;

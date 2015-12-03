@@ -77,13 +77,13 @@ int main (int argc, char* argv[]) {
     mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.6f, 0.0f));
     mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.7f, 0.0f));
     //mesh->addVoronoiPoint(Vector3<float>(0.2f, -0.7f, 0.5f));
-    */
-
+    
    /* mesh->addVoronoiPoint(Vector3<float>(-0.5f, -0.7f, 0.5f));
     mesh->addVoronoiPoint(Vector3<float>(0.1f, 0.6f, -0.37f));
     mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.6f, 0.9f));
 */
     //mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+
 /*
     mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
     mesh->addVoronoiPoint(Vector3<float>(0.9f, 0.9f, 0.997f));

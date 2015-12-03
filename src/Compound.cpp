@@ -38,6 +38,7 @@ void Compound::initialize() {
     for(unsigned int i = 0; i < mSplittingPlanes.size(); i++)
         mSplittingPlanes[i]->initialize();
 
+
     std::cout << "\nCompound Initialized!\n" << std::endl;
 }
 
@@ -57,6 +58,7 @@ void Compound::render(Matrix4x4<float> MVP) {
 void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vector3<float> > voronoiPoints) {
 
     unsigned int planeCounter = 0;
+    mVoronoiPoints = voronoiPoints;
     Vector3<float> voronoiMassCenter = Vector3<float>(0.0f, 0.0f, 0.0f);
 
     //from our voronoipoints create splitting planes and store them in mSplittingplanes
@@ -122,9 +124,88 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
         unsigned int index1 = mPlaneIntersections[i].first.first;
         unsigned int index2 = mPlaneIntersections[i].first.second;
         
+        
         mSplittingPlanes[index1]->resolveIntersection(mPlaneIntersections[i].second, voronoiMassCenter);
+
         mSplittingPlanes[index2]->resolveIntersection(mPlaneIntersections[i].second, voronoiMassCenter);
+
+        std::cout << "TESTAR mSplittingplanes[" << index1 << "] & mSplittingplanes[" << index2 << "]   - convex: " << i <<  std::endl;
+        calculateConvexShape(index1, index2, i);
     }
+}
+
+void Compound::calculateConvexShape(unsigned int index1, unsigned int index2, unsigned int currentConvex) {
+
+    std::vector<Vector3<float> > v1 = mSplittingPlanes[index1]->getVertexList();
+    std::vector<Vector3<float> > v2 = mSplittingPlanes[index2]->getVertexList();
+    
+    std::vector<Vector3<float> > uniqueVerticesToAdd; //All the uniqueVertices in a cell
+    std::vector<unsigned int> verticesIndex;          //The index list to the cell of all vertices, probably used for drawing
+
+    //Bygg upp uniqueVerticesToAdd and verticesIndex
+    for(unsigned int i = 0; i < v1.size() ; i++){
+        auto it = std::find(uniqueVerticesToAdd.begin(), uniqueVerticesToAdd.end(), v1[i]);
+        
+        //if the current vertices does not already exists in the unique list add it else just add a index to the indexlist.
+        if(it == uniqueVerticesToAdd.end()) {
+            uniqueVerticesToAdd.push_back(v1[i]);
+            verticesIndex.push_back(uniqueVerticesToAdd.size() - 1);
+        } else {
+            verticesIndex.push_back(it - uniqueVerticesToAdd.begin());
+        }
+    }
+    
+    for(unsigned int i = 0; i < v2.size() ; i++){
+
+        auto it2 = std::find(uniqueVerticesToAdd.begin(), uniqueVerticesToAdd.end(), v2[i]);
+        //if the current vertices does not already exists in the unique list add it else just add a index to the indexlist.
+        if(it2 == uniqueVerticesToAdd.end()) {
+            uniqueVerticesToAdd.push_back(v2[i]);
+            verticesIndex.push_back(uniqueVerticesToAdd.size() - 1);
+        } else {
+            verticesIndex.push_back(it2 - uniqueVerticesToAdd.begin());
+        }
+    }
+    
+    //compute the center of our cell
+    Vector3<float> cellCenter;
+    for(unsigned int i = 0; i < uniqueVerticesToAdd.size(); i++) 
+        cellCenter += uniqueVerticesToAdd[i];
+
+    cellCenter /= uniqueVerticesToAdd.size();
+
+    // calculate all distances from the current cellCenter to all the voronoi points
+    std::vector<std::pair<float, Vector3<float> > >voronoiDistances;
+    for(unsigned int i = 0; i < mVoronoiPoints.size(); i++)
+        voronoiDistances.push_back(std::make_pair((cellCenter - mVoronoiPoints[i]).Length(), mVoronoiPoints[i]));
+
+    //sort so we always have the shortes distance first in our vector, this is our cells voronoiPoint
+    std::sort(voronoiDistances.begin(), voronoiDistances.end(), [](const std::pair<float, Vector3<float> > p1,
+                                                                    const std::pair<float, Vector3<float> > p2)
+                                                                    {
+                                                                        return p1.first < p2.first;
+                                                                    });
+
+
+    //OTROLIGT HÅRDKODAD SKA FAN INTE VA SÅHÄR!
+    float distance1, distance2, distance3;
+    
+    //calculate if a corner point should be added or not.
+    for(unsigned int i = 0; i < mBoundingPoints.size(); i++) {
+        
+        distance1 = (mBoundingPoints[i] - voronoiDistances[0].second).Length();
+        distance2 = (mBoundingPoints[i] - voronoiDistances[1].second).Length();
+        distance3 = (mBoundingPoints[i] - voronoiDistances[2].second).Length();
+
+        if(distance1 < distance2 && distance1 < distance3) {
+            uniqueVerticesToAdd.push_back(mBoundingPoints[i]);
+            verticesIndex.push_back(verticesIndex.back() + 1);
+        }
+    }
+
+    //add our newly created uniquelist and indexlist to our private vectors
+    mUniqueConvexList.push_back(uniqueVerticesToAdd);
+    mConvexList.push_back(verticesIndex);
 }
 
 void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::pair<Vector3<float>, Vector3<float> > voronoiPoints, unsigned int planeIndex) {
@@ -133,6 +214,7 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::pair<Vecto
     mBoundingValues.shrink_to_fit();
 
     mBoundingValues = boundingBox->getBoundingValues();
+    
 
     Vector3<float> mittPunkt = voronoiPoints.first + (voronoiPoints.second - voronoiPoints.first) / 2.0f;  
     Vector3<float> normal = (voronoiPoints.second - voronoiPoints.first).Normalize();
@@ -225,6 +307,7 @@ bool Compound::calculatePlaneIntersection( std::vector<Vector3<float> > plane1, 
                 
                 // Check if an intersection is found between the two edges
                 if(calculateLineIntersectionPoint(pair1, pair2, tempPoint)) {
+                    std::cout << "tempPoint" <<tempPoint << std::endl;
                     iPoints.push_back(tempPoint);
                     break;
                 }
@@ -265,6 +348,25 @@ bool Compound::calculateLineIntersectionPoint(  std::pair<Vector3<float>, Vector
     }
 
     return false;
+}
+
+void Compound::calculateBoundingBoxPoints() {
+
+    mBoundingPoints.push_back(Vector3<float>(mBoundingValues[XMIN][0], mBoundingValues[YMIN][1], mBoundingValues[ZMIN][2]) );
+    mBoundingPoints.push_back(Vector3<float>(mBoundingValues[XMAX][0], mBoundingValues[YMIN][1], mBoundingValues[ZMIN][2]) );
+    mBoundingPoints.push_back(Vector3<float>(mBoundingValues[XMAX][0], mBoundingValues[YMIN][1], mBoundingValues[ZMAX][2]) );
+    mBoundingPoints.push_back(Vector3<float>(mBoundingValues[XMIN][0], mBoundingValues[YMIN][1], mBoundingValues[ZMAX][2]) );
+
+    mBoundingPoints.push_back(Vector3<float>(mBoundingValues[XMIN][0], mBoundingValues[YMAX][1], mBoundingValues[ZMIN][2]) );
+    mBoundingPoints.push_back(Vector3<float>(mBoundingValues[XMAX][0], mBoundingValues[YMAX][1], mBoundingValues[ZMIN][2]) );
+    mBoundingPoints.push_back(Vector3<float>(mBoundingValues[XMAX][0], mBoundingValues[YMAX][1], mBoundingValues[ZMAX][2]) );
+    mBoundingPoints.push_back(Vector3<float>(mBoundingValues[XMIN][0], mBoundingValues[YMAX][1], mBoundingValues[ZMAX][2]) );
+
+    std::cout << "---- boundingpoints ---" << std::endl;
+    for(unsigned int i = 0; i < mBoundingPoints.size(); i++) {
+        std::cout << mBoundingPoints[i] << std::endl;
+        //  mDebugpoints.push_back(new Debugpoint(mBoundingPoints[i]));
+    }
 }
 
 std::vector<Vector3<float> > Compound::sortVertices(std::vector<Vector3<float> > plane, Vector3<float> normal) {
@@ -318,6 +420,3 @@ std::vector<Vector3<float> > Compound::sortVertices(std::vector<Vector3<float> >
 
     return sortedVertices;
 }
-
-
-

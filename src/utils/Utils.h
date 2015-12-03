@@ -31,8 +31,6 @@
 const int WIDTH = 1024;
 const int HEIGHT = 768;
 
-//class LoadObj;
-
 class Utils {
 
 public:

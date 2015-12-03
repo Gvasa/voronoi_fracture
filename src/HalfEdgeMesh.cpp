@@ -82,7 +82,6 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     /*for(unsigned int i = 0; i < mDebugPoints.size(); i++)
         mDebugPoints[i]->initialize(lightPosition);*/
-
     std::cout << "Volume: " << volume() << std::endl << std::endl;
 
     buildRenderData();
