@@ -88,6 +88,10 @@ private:
     std::vector<Polygon> mClippedPolygons;
 
     int clipFace(Polygon &, Vector3<float>, Vector3<float>);
+
+    bool sortPolygonCounterClockWise(Polygon &);
+
+    bool triangulate(Polygon &, Polygon &);
 };
 
 #endif // CLIPPINGMESH_H

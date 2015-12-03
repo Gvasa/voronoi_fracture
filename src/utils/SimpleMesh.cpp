@@ -17,6 +17,8 @@ SimpleMesh::SimpleMesh() {
 
 SimpleMesh::~SimpleMesh() {
 
+    mVerts.clear();
+    mVerts.shrink_to_fit();
 }
 
 
@@ -26,5 +28,13 @@ void SimpleMesh::initialize(Vector3<float> lightPosition) {
 
 
 void SimpleMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
+
+}
+
+
+bool SimpleMesh::addFace(const std::vector<Vector3<float> >verts) {
+
+    for(unsigned int i = 0; i < verts.size(); i++)
+        mVerts.push_back(verts[i]);
 
 }

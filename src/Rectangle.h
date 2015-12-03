@@ -27,12 +27,6 @@ public:
 
     void render(std::vector<Matrix4x4<float> >);
 
-    void addVertex(Vector3<float> v) { mVerts.push_back(v); };
-    
-    void addNormal(Vector3<float> n) { mNormals.push_back(n); };
-    
-    void createVertices(float, float);
-
     void rotate(Vector3<float>, float);
     
     void translate(Vector3<float>);
@@ -48,6 +42,12 @@ private:
     std::vector<Vector3<float> > mVerts;
     
     std::vector<Vector3<float> > mNormals;
+
+    void addVertex(Vector3<float> v) { mVerts.push_back(v); }
+    
+    void addNormal(Vector3<float> n) { mNormals.push_back(n); }
+
+    void createVertices(float, float);
 
     // Shader data
     GLuint vertexArrayID;

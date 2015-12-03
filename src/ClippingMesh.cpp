@@ -31,23 +31,24 @@ bool ClippingMesh::clipMesh() {
     // Loop over all faces of our mesh
     for(unsigned int i = 0; i < mHalfEdgeMesh->getNumFaces(); i++) {
 
+        Polygon polygon;
+
+        // Collect all vertics from the face that we want to clip
+        polygon.v0 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).vert).pos;
+        polygon.v1 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).next).vert).pos;
+        polygon.v2 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).prev).vert).pos;
+
+        // For now the polygon contains 3 vertices
+        polygon.numVerts = 3;
+
         // Loop over all splitting planes for our mesh
         for(unsigned int j = 0; j < numSplittingPlanes; j++) {
 
-            //std::cout << "clip face: " << i << ", with plane: " << j << std::endl;
+            std::pair<Vector3<float>, Vector3<float> > voronoiPair = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getVoronoiPoints();
 
-            Polygon polygon;
-
-            // Collect all vertics from the face that we want to clip
-            polygon.v0 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).vert).pos;
-            polygon.v1 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).next).vert).pos;
-            polygon.v2 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).prev).vert).pos;
-
-            // For now the polygon contains 3 vertices
-            polygon.numVerts = 3;
-
-            // Normal of the splitting plane
-            Vector3<float> normal = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getNormal();
+            // Normal of the splitting plane, we can get it from SplittingPlane object,
+            // but then it might point in the wrong direction so computing it should be faster
+            Vector3<float> normal = (voronoiPair.first - voronoiPair.second).Normalize();
 
             // Arbitrary point on the splitting plane (any vertex), in this case the first vertex
             Vector3<float> P = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getVertex(0);
@@ -55,8 +56,6 @@ bool ClippingMesh::clipMesh() {
             //std::cout << "numverts: " << polygon.numVerts << std::endl;
 
             polygon.numVerts = clipFace(polygon, normal, P);
-
-            std::cout << "numverts: " << polygon.numVerts << std::endl;
 
             /*************************************************************************
     
@@ -68,6 +67,24 @@ bool ClippingMesh::clipMesh() {
 
             *************************************************************************/
         }
+
+        if(polygon.numVerts == 4) {
+            std::cout << "\nPolygon " << i << " :\n";
+            std::cout << "\nv0: " << polygon.v0 << "\nv1: " << polygon.v1 << "\nv2: " << polygon.v2 << "\nv3: " << polygon.v3 << std::endl;
+        } else if(polygon.numVerts == 3) {
+            std::cout << "\nPolygon " << i << " :\n";
+            std::cout << "\nv0: " << polygon.v0 << "\nv1: " << polygon.v1 << "\nv2: " << polygon.v2 << std::endl;
+        }
+
+        sortPolygonCounterClockWise(polygon);
+
+        if(polygon.numVerts == 4) {
+            Polygon P2;
+            triangulate(polygon, P2);
+        }
+
+
+        //std::cout << "numverts: " << polygon.numVerts << std::endl;
     }
 }
 
@@ -184,7 +201,96 @@ int ClippingMesh::clipFace(Polygon &p, Vector3<float> n, Vector3<float> p0) {
        return(3);
     }
 
-    //std::cout << "\nmesh is clipped" << std::endl;
     // Shouldn't get here
     return(-1);
 }
+
+
+bool ClippingMesh::sortPolygonCounterClockWise(Polygon &P) {
+
+    // If the polygon has no vertices, then return it as sorted
+    if(P.numVerts == 0)
+        return true;
+
+    Vector3<float> centerOfMass;
+
+    if(P.numVerts == 3) {
+        centerOfMass = P.v0 + P.v1 + P.v2;
+    } else if(P.numVerts == 4) {
+        centerOfMass = P.v0 + P.v1 + P.v2 + P.v3;
+    }
+
+    centerOfMass /= static_cast<float>(P.numVerts);
+
+    unsigned int s, t;
+
+    if(P.numVerts == 3 || P.numVerts == 4) {
+
+        // Determine projection plane
+        if((P.v0[0] > P.v1[0] - EPSILON_2 && P.v0[0] < P.v1[0] + EPSILON_2) && (P.v0[0] > P.v2[0] - EPSILON_2 && P.v0[0] < P.v2[0] + EPSILON_2)) {
+            s = 1;
+            t = 2;
+        } else if((P.v0[1] > P.v1[1] - EPSILON_2 && P.v0[1] < P.v1[1] + EPSILON_2) && (P.v0[1] > P.v2[1] - EPSILON_2 && P.v0[1] < P.v2[1] + EPSILON_2)) {
+            s = 0;
+            t = 2;
+        } else {
+            s = 0;
+            t = 1;
+        }
+
+        std::vector<std::pair<float, Vector3<float> > > verts;
+
+        // Compute angles for each vertex, the static_cast call is just 
+        // to ensure that we get a float back from the angle computation
+        Vector3<float> v = P.v0 - centerOfMass;
+        verts.push_back(std::make_pair(static_cast<float>(atan2(v[s], v[t])), P.v0));
+
+        v = P.v1 - centerOfMass;
+        verts.push_back(std::make_pair(static_cast<float>(atan2(v[s], v[t])), P.v1));
+
+        v = P.v2 - centerOfMass;
+        verts.push_back(std::make_pair(static_cast<float>(atan2(v[s], v[t])), P.v2));
+
+        if(P.numVerts == 4) {
+            v = P.v3 - centerOfMass;
+            verts.push_back(std::make_pair(static_cast<float>(atan2(v[s], v[t])), P.v3));
+        }
+
+        // Sort verts by angle
+        std::sort(
+        verts.begin(), 
+        verts.end(), 
+        [](const std::pair<float, Vector3<float> > p1, const std::pair<float, Vector3<float> > p2) { 
+            return p1.first < p2.first; 
+        } );
+
+        /*for(unsigned int i = 0; i < verts.size(); i++) {
+            std::cout << "\nangle: " << verts[i].first << std::endl;
+            std::cout << "v0: " << verts[i].second << std::endl;
+        }*/
+
+        P.v0 = verts[0].second;
+        P.v1 = verts[1].second;
+        P.v2 = verts[2].second;
+
+        if(P.numVerts == 4)
+            P.v3 = verts[3].second;
+
+        return true;
+    }
+
+    // It's impossible to get here
+    return false;
+}
+
+
+bool ClippingMesh::triangulate(Polygon &P1, Polygon &P2) {
+
+    P2.v0 = P1.v0;
+    P2.v1 = P1.v2;
+    P2.v2 = P1.v3;
+
+    P1.numVerts = 3;
+    P2.numVerts = 3;
+}
+

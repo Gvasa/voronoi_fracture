@@ -28,10 +28,24 @@ public:
 
     unsigned int getType() { return HALFEDGEMESH; }
 
+    bool addFace(const std::vector<Vector3<float> >);
+
 private:
+
+    std::vector<Vector3<float> > mVerts;
+
+    bool computeNormal(const std::vector<Vector3<float> >);
 
     struct Material : public Geometry::Material {   
     } mMaterial;
+
+    // Shader data
+    GLuint vertexArrayID;
+    GLuint vertexBuffer;
+    GLuint shaderProgram;
+
+    // Shader indices for uniforms, i.e. data that we upload to the GPU
+    GLint MVPLoc;           // MVP matrix
 
 };
 

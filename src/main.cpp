@@ -286,7 +286,7 @@ void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mo
                 break;
 
             case GLFW_KEY_C:
-                    if(currentNumberOfVoronoiPoints <= maximumVoronoiPoints) {
+                    if(currentNumberOfVoronoiPoints < maximumVoronoiPoints) {
                         currentNumberOfVoronoiPoints++;
                         mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
                         currentVoronoiIndex = currentNumberOfVoronoiPoints-1;
