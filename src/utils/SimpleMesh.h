@@ -22,7 +22,7 @@ public:
 
     ~SimpleMesh();
 
-    void initialize(Vector3<float>);
+    void initialize(Vector3<float> l = Vector3<float>(0.0f, 0.0f, 0.0f));
     
     void render(std::vector<Matrix4x4<float> >);
 
@@ -46,6 +46,7 @@ private:
 
     // Shader indices for uniforms, i.e. data that we upload to the GPU
     GLint MVPLoc;           // MVP matrix
+    GLint ColorLoc;         // Color
 
 };
 

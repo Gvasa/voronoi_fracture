@@ -25,7 +25,7 @@ class ClippingMesh {
 
 public:
 
-    ClippingMesh(HalfEdgeMesh *h) : mHalfEdgeMesh(h) {  }
+    ClippingMesh(HalfEdgeMesh *h) : mHalfEdgeMesh(h) {}
 
     ~ClippingMesh();
 
@@ -33,7 +33,7 @@ public:
 
     void initialize();
 
-    bool clipMesh();
+    bool clipMesh(SimpleMesh *);
 
 private:
 
@@ -75,6 +75,7 @@ private:
         Vector3<float> v2;
         Vector3<float> v3;
         unsigned int numVerts;
+        Vector3<float> normal;
     };
 
     HalfEdgeMesh * mHalfEdgeMesh = nullptr;
@@ -91,7 +92,9 @@ private:
 
     bool sortPolygonCounterClockWise(Polygon &);
 
-    bool triangulate(Polygon &, Polygon &);
+    bool triangulateQuad(Polygon &, Polygon &);
+
+    bool checkTriangleOrientation(Polygon &);
 };
 
 #endif // CLIPPINGMESH_H

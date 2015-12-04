@@ -24,6 +24,7 @@
 
 #include "Geometry.h"
 #include "ClippingMesh.h"
+#include "utils/SimpleMesh.h"
 #include "math/Matrix4x4.h"
 #include "math/Vector3.h"
 #include "Controls.h"
@@ -71,7 +72,7 @@ private:
         Vector4<float> color;
         Vector3<float> position;
     } mPointLight;
-    
+
     Controls *control;
 };
 

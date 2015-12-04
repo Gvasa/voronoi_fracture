@@ -139,7 +139,7 @@ void Scene::updateCameraPosition(double x, double y) {
     control->dragUpdate(x, y);
 }
 
-void Scene::updateCameraZoom(double x, double y) { 
+void Scene::updateCameraZoom(double x, double y) {
     
     if((3.0 + (camera.zoom - y / 5.0f)) > 0.1f)  
         camera.zoom -= y / 5.0f;
@@ -154,8 +154,11 @@ void Scene::resetCamera() {
 void Scene::splitMesh(HalfEdgeMesh *he) {
 
     if(he->isCompoundComputed()) {
+        SimpleMesh * sm = new SimpleMesh();
+        addGeometry(sm);
         ClippingMesh * cm = new ClippingMesh(he);
         cm->print();
-        cm->clipMesh();
+        cm->clipMesh(sm);
+        sm->initialize();
     }
 }

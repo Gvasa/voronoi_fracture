@@ -71,6 +71,7 @@ int main (int argc, char* argv[]) {
     //mesh->createMesh("sphere1.0");
     //mesh->createMesh("bunnySmall");
     mesh->createMesh("cube");
+    //mesh->translate(Vector3<float>(0.0f, 0.0f, 1.0f));
     //mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
     //mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
 

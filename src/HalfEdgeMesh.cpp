@@ -577,3 +577,8 @@ std::vector<unsigned int> HalfEdgeMesh::findNeighborFaces(unsigned int vertIndex
     return foundFaces;
 }
 
+
+void HalfEdgeMesh::printMesh() {
+
+}
+

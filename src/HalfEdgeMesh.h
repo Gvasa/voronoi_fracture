@@ -66,6 +66,8 @@ public:
 
     Compound* getCompound() { return mCompound; }
 
+    void printMesh();
+
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
      */ 
