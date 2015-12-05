@@ -25,7 +25,11 @@ void ClippingMesh::initialize() {
 
 bool ClippingMesh::clipMesh(SimpleMesh *sm) {
 
+    mHalfEdgeMesh->printMesh();
+
     unsigned int numSplittingPlanes = mHalfEdgeMesh->getCompound()->getNumberOfSplittingPlanes();
+
+    Vector3<float> refVoronoiPoint = mHalfEdgeMesh->getVoronoiPoint(0);
 
     // Loop over all faces of our mesh
     for(unsigned int i = 0; i < mHalfEdgeMesh->getNumFaces(); i++) {
@@ -33,11 +37,13 @@ bool ClippingMesh::clipMesh(SimpleMesh *sm) {
         Polygon polygon;
 
         // Collect all vertices from the face that we want to clip
-        polygon.v1 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).vert).pos;
-        polygon.v2 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).next).vert).pos;
-        polygon.v0 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).prev).vert).pos;
+        polygon.v0 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).vert).pos;
+        polygon.v1 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).next).vert).pos;
+        polygon.v2 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).next).next).vert).pos;
 
-        polygon.normal = Cross(polygon.v1 - polygon.v0, polygon.v2 - polygon.v0).Normalize();
+        Vector3<float> correctNormal = Cross(polygon.v1 - polygon.v0, polygon.v2 - polygon.v0).Normalize();
+
+        polygon.normal = correctNormal;
 
         std::cout << "\nPolygon verts: " << polygon.v0 << ", " << polygon.v1 << ", " << polygon.v2 << std::endl;
 
@@ -51,36 +57,29 @@ bool ClippingMesh::clipMesh(SimpleMesh *sm) {
 
             // Normal of the splitting plane, we can get it from SplittingPlane object,
             // but then it might point in the wrong direction so computing it should be faster
-            Vector3<float> normal = (voronoiPair.first - voronoiPair.second).Normalize();
+            Vector3<float> normal;
+            if(voronoiPair.first == refVoronoiPoint)
+                normal = (voronoiPair.second - voronoiPair.first).Normalize();
+            else
+                normal = (voronoiPair.first - voronoiPair.second).Normalize();
 
             // Arbitrary point on the splitting plane (any vertex), in this case the first vertex
             Vector3<float> P = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getVertex(0);
 
-            //std::cout << "numverts: " << polygon.numVerts << std::endl;
-
+            // Clip the polygon and set the number of vertices
             polygon.numVerts = clipFace(polygon, normal, P);
 
             /*************************************************************************
     
-            Polygons fetched from halfedgemesh are sometimes wrong it seems, fix it!
-            Some polygons that are computed here have wrong orientation, fix it!
+            Determine which vertices that form the new polygon along the splitting plane.
+            This polygon needs to be triangulated and have the correct orientation.
+            Fix so we can loop over all splitting planes and only compute the splitting for
+            planes that are created from the voronoipoint that corresponds to the current cell.
 
             *************************************************************************/
         }
 
-        /*if(polygon.numVerts == 4) {
-            std::cout << "\nPolygon " << i << " :\n";
-            std::cout << "\nv0: " << polygon.v0 << "\nv1: " << polygon.v1 << "\nv2: " << polygon.v2 << "\nv3: " << polygon.v3 << std::endl;
-        } else if(polygon.numVerts == 3) {
-            std::cout << "\nPolygon " << i << " :\n";
-            std::cout << "\nv0: " << polygon.v0 << "\nv1: " << polygon.v1 << "\nv2: " << polygon.v2 << std::endl;
-        }*/
-
-
         sortPolygonCounterClockWise(polygon);
-        
-        /*if(polygon.numVerts != 0 && polygon.numVerts != -1)
-            checkTriangleOrientation(polygon, mHalfEdgeMesh->getFace(i).normal);*/
 
         std::cout << "\n----- NEW FACE -----\n" << std::endl;
 
@@ -92,7 +91,7 @@ bool ClippingMesh::clipMesh(SimpleMesh *sm) {
             Polygon P2;
             triangulateQuad(polygon, P2);
             P2.normal = Cross(polygon.v2 - polygon.v0, polygon.v1 - polygon.v0).Normalize();
-            checkTriangleOrientation(P2);
+            checkTriangleOrientation(P2, correctNormal);
             face1.push_back(P2.v0);
             face1.push_back(P2.v1);
             face1.push_back(P2.v2);
@@ -106,7 +105,7 @@ bool ClippingMesh::clipMesh(SimpleMesh *sm) {
 
         if(polygon.numVerts != 0 && polygon.numVerts != -1) {
          
-            checkTriangleOrientation(polygon);
+            checkTriangleOrientation(polygon, correctNormal);
             face2.push_back(polygon.v0);
             face2.push_back(polygon.v1);
             face2.push_back(polygon.v2);
@@ -132,7 +131,6 @@ int ClippingMesh::clipFace(Polygon &p, Vector3<float> n, Vector3<float> p0) {
     double side[3];
     Vector3<float> q;
 
-   
     //Determine the equation of the plane as
     //Ax + By + Cz + D = 0
   
@@ -322,11 +320,6 @@ bool ClippingMesh::sortPolygonCounterClockWise(Polygon &P) {
             return p1.first < p2.first; 
         } );
 
-        /*for(unsigned int i = 0; i < verts.size(); i++) {
-            std::cout << "\nangle: " << verts[i].first << std::endl;
-            std::cout << "v0: " << verts[i].second << std::endl;
-        }*/
-
         P.v0 = verts[0].second;
         P.v1 = verts[1].second;
         P.v2 = verts[2].second;
@@ -350,25 +343,17 @@ bool ClippingMesh::triangulateQuad(Polygon &P1, Polygon &P2) {
 
     P1.numVerts = 3;
     P2.numVerts = 3;
-
-    /*std::cout << "\nPolygon " << 1 << " :\n";
-    std::cout << "\nv0: " << P1.v0 << "\nv1: " << P1.v1 << "\nv2: " << P1.v2 << std::endl;
-    std::cout << "numverts: " << P1.numVerts << std::endl;
-
-    std::cout << "\nPolygon " << 2 << " :\n";
-    std::cout << "\nv0: " << P2.v0 << "\nv1: " << P2.v1 << "\nv2: " << P2.v2 << std::endl;
-    std::cout << "numverts: " << P2.numVerts << std::endl;*/
 }
 
 
-bool ClippingMesh::checkTriangleOrientation(Polygon &P) {
+bool ClippingMesh::checkTriangleOrientation(Polygon &P, Vector3<float> normal) {
 
-    Vector3<float> edge1 = P.v0 - P.v1;
-    Vector3<float> edge2 = P.v2 - P.v1;
+    Vector3<float> edge1 = P.v1 - P.v0;
+    Vector3<float> edge2 = P.v2 - P.v0;
 
     Vector3<float> polygonNormal = Cross(edge1, edge2).Normalize();
 
-    if(P.normal == polygonNormal) {
+    if(normal == polygonNormal) {
         std::cout << "\nSAMMA NORMAL" << std::endl;
         std::cout << "correct normal: " << P.normal << std::endl;
         std::cout << "this normal: " << polygonNormal << std::endl;
@@ -380,9 +365,8 @@ bool ClippingMesh::checkTriangleOrientation(Polygon &P) {
         Vector3<float> tmp = P.v1;
         P.v1 = P.v2;
         P.v2 = tmp;
-        P.normal = Cross(P.v0 - P.v1, P.v2 - P.v1).Normalize();
+        P.normal = Cross(P.v1 - P.v0, P.v2 - P.v0).Normalize();
         std::cout << "fixed normal: " << P.normal << std::endl;
     }
-
 }
 

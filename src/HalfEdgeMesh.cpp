@@ -208,6 +208,14 @@ bool HalfEdgeMesh::addFace(const std::vector<Vector3 <float> > verts) {
     addVertex(verts.at(1), vertIndex2);
     addVertex(verts.at(2), vertIndex3);
 
+    std::cout << "--- Face ---" << std::endl;
+
+    std::cout << "vert 0: " << verts[0] << std::endl;
+    std::cout << "vert 1: " << verts[1] << std::endl;
+    std::cout << "vert 2: " << verts[2] << std::endl;
+
+    std::cout << "------------\n\n";
+
    // add all half-edge pairs
    unsigned int innerHalfEdgeIndex1 = 0,
                 innerHalfEdgeIndex2 = 0,
@@ -475,18 +483,25 @@ std::vector<Vector3<float> > HalfEdgeMesh::buildVertexData() {
 
 void HalfEdgeMesh::buildRenderData() {
 
+    std::cout << "\n--------- buildRenderData ---------" << std::endl;
+
     for(int i = 0; i < mFaces.size(); i++ ){
-        Face &face = getFace(i);
+        Face face = getFace(i);
 
-        HalfEdge* edge = &getEdge(face.edge);
+        HalfEdge edge = getEdge(face.edge);
 
-        Vertex &v1 = getVert(edge->vert);
-        edge = &getEdge(edge->next);
+        Vertex v1 = getVert(edge.vert);
+        edge = getEdge(edge.next);
 
-        Vertex &v2 = getVert(edge->vert);
-        edge = &getEdge(edge->next);
+        Vertex v2 = getVert(edge.vert);
+        edge = getEdge(edge.next);
 
-        Vertex &v3 = getVert(edge->vert);
+        Vertex v3 = getVert(edge.vert);
+
+        std::cout << "\n--- face " << i << "---" << std::endl;
+        std::cout << "v0: " << v1.pos << std::endl;
+        std::cout << "v1: " << v2.pos << std::endl;
+        std::cout << "v2: " << v3.pos << std::endl;
         
         // Add vertices to our drawing list
         mOrderedVertexList.push_back(v1.pos);    
@@ -580,5 +595,11 @@ std::vector<unsigned int> HalfEdgeMesh::findNeighborFaces(unsigned int vertIndex
 
 void HalfEdgeMesh::printMesh() {
 
+    for(unsigned int i = 0; i < mFaces.size(); i++) {
+        std::cout << "\n--- face " << i << " ---" << std::endl;
+        std::cout << "v0: " << getVert(getEdge(getFace(i).edge).vert).pos << std::endl;
+        std::cout << "v1: " << getVert(getEdge(getEdge(getFace(i).edge).next).vert).pos << std::endl;
+        std::cout << "v2: " << getVert(getEdge(getEdge(getEdge(getFace(i).edge).next).next).vert).pos << std::endl;
+    }
 }
 

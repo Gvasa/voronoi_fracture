@@ -66,6 +66,10 @@ public:
 
     Compound* getCompound() { return mCompound; }
 
+    Vector3<float> getVoronoiPoint(unsigned int i) { return mVoronoiPoints[i]; }
+
+    unsigned int getNumVoronoiPoints() { return mVoronoiPoints.size(); }
+
     void printMesh();
 
     /*

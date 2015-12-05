@@ -94,7 +94,7 @@ private:
 
     bool triangulateQuad(Polygon &, Polygon &);
 
-    bool checkTriangleOrientation(Polygon &);
+    bool checkTriangleOrientation(Polygon &, Vector3<float>);
 };
 
 #endif // CLIPPINGMESH_H
