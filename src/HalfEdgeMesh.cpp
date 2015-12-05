@@ -289,6 +289,7 @@ void HalfEdgeMesh::rotate(Vector3<float> axis, float angle) {
 void HalfEdgeMesh::translate(Vector3<float> p){
     
     // Compute the translation matrix
+    //std::cout << p << std::endl;
     Matrix4x4<float> translationMatrix = Matrix4x4<float>::Translation(p[0], p[1], p[2]);
 
     for(unsigned int i = 0; i < mVerts.size(); i++) {
@@ -297,6 +298,10 @@ void HalfEdgeMesh::translate(Vector3<float> p){
         v = translationMatrix * v;
         mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
     }
+
+    if(mOrderedVertexList.size() > 0)
+        updateRenderData();
+
 }
 
 // Scale the Mesh 

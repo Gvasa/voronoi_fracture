@@ -93,17 +93,19 @@ int main (int argc, char* argv[]) {
     mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
     mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
 
-    scene->addGeometry(floor_rect);
-    scene->addGeometry(wall_rect);
-    scene->addGeometry(mesh);
+    scene->addGeometry(floor_rect, STATIC);
+//    scene->addGeometry(wall_rect, STATIC);
+    scene->addGeometry(mesh, DYNAMIC);
 
     initializeScene();
+    
 
     //Set functions to handle mouse input
     glfwSetMouseButtonCallback(window, mouseButton);
     glfwSetCursorPosCallback(window, mouseMotion);
     glfwSetScrollCallback(window, mouseScroll);
     glfwSetKeyCallback(window, keyboardInput);
+
 
     // render-loop
     do{
@@ -113,6 +115,7 @@ int main (int argc, char* argv[]) {
 
         // render all geometries
         scene->render();
+        scene->stepSimulation();
 
         // Swap buffers
         glfwSwapBuffers(window);

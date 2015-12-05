@@ -60,6 +60,10 @@ public:
 
     void markCurrentVoronoiPoint(unsigned int i, Vector4<float> c) { mDebugPoints[i]->setColor(c); }
 
+    unsigned int getType() { return HALFEDGEMESH; }
+
+    Vector3<float> getPrevPos() { return mPrevPos; }
+    void setPrevPos(Vector3<float> v) { mPrevPos = v; }
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
      */ 
@@ -201,6 +205,8 @@ private:
     std::vector< Vector3<float> > mVoronoiPoints;
 
     std::vector<Debugpoint *> mDebugPoints;
+
+    Vector3<float> mPrevPos = Vector3<float>(0.0, 0.0, 0.0);
 
     bool mDebugMode = false;
 

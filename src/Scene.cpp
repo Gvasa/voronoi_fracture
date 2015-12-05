@@ -15,6 +15,7 @@ cameraHandler camera;
 Scene::Scene() {
 
     control = new Controls(300.f);
+    physicsWorld = new Physics();
 }
 
 
@@ -59,7 +60,6 @@ void Scene::render() {
     glEnable(GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
     camera.projectionMatrix = glm::perspective(
         camera.fov,          // field of view, 45.0
         camera.aspectRatio,  // 4/3 atm
@@ -96,8 +96,11 @@ void Scene::render() {
     glDisable(GL_CULL_FACE);
 }
 
-void Scene::addGeometry(Geometry *G) {
+
+void Scene::addGeometry(Geometry *G, unsigned int type) {
     mGeometries.push_back(G);
+    physicsWorld->addGeometry(G, type);
+    //std::cout << "mGeometries: " << mGeometries.size() << std::endl; 
 }
 
 Matrix4x4<float> Scene::toMatrix4x4(glm::mat4 m) {
@@ -140,4 +143,28 @@ void Scene::resetCamera() {
     glm::quat identityQuat;
     camera.orientation = identityQuat;
     camera.zoom = 0;
+}
+
+void Scene::stepSimulation() { 
+    physicsWorld->stepSimulation(); 
+    btTransform trans;
+    Vector3<float> prevPos;
+    
+    for(unsigned int i = 0; i < mGeometries.size(); i++) {
+        if(mGeometries[i]->getType() == HALFEDGEMESH) {
+                physicsWorld->getRigidBodyAt(i)->getMotionState()->getWorldTransform(trans);
+                HalfEdgeMesh* tmpHem = dynamic_cast<HalfEdgeMesh*>(mGeometries[i]);
+                prevPos = tmpHem->getPrevPos();
+
+                tmpHem->translate(Vector3<float>((float)trans.getOrigin().getX() - prevPos[0], (float)trans.getOrigin().getY() - prevPos[1], (float)trans.getOrigin().getZ() - prevPos[2]));
+                tmpHem->setPrevPos(Vector3<float>(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ()));
+        }
+    }
+
+   // std::cout << "sphere height:" << trans.getOrigin().getX() << " " << trans.getOrigin().getY() << " " << trans.getOrigin().getZ() << std::endl;
+    
+
+    // std::cout << "sphere heigh:" << trans.getOrigin().getX() << " " << trans.getOrigin().getY() << " " << trans.getOrigin().getZ() << std::endl;
+    
+    //mGeometries(2)->translate()
 }

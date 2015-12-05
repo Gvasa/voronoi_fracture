@@ -30,6 +30,8 @@ public:
     
     virtual void render(std::vector<Matrix4x4<float> >) = 0;
 
+    virtual unsigned int getType() = 0;
+
 
     /* 
      * A Geometry might have the following: 
@@ -68,7 +70,9 @@ public:
     virtual void markCurrentVoronoiPoint(unsigned int, Vector4<float>) {
         std::cout << "\nGeometry does not have markCurrentVoronoiPoint implemented!\n";
     }
-
+    virtual Vector3<float> getPrevPos(Vector3<float>) {
+        std::cout << "\nGeometry does not have getPrevPos implemented!\n";
+    }
 protected:
 
     //! Compute and return the normal at face at faceIndex

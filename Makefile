@@ -9,7 +9,7 @@ UNAME := $(shell uname)
 
 # Libs and Frameworks:
 ifeq ($(UNAME), Linux)
-	FRAMEWORKS = -lGLEW -lglfw3 -lGL -lX11 -lXi -lXrandr -lXxf86vm -lXinerama -lXcursor -lrt -lm -pthread -ldl -std=c++11
+	FRAMEWORKS = -lGLEW -lglfw3 -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath -lGL -lX11 -lXi -lXrandr -lXxf86vm -lXinerama -lXcursor -lrt -lm -pthread -ldl -std=c++11
 else
 	FRAMEWORKS = -lglew -lglfw3 -framework Opengl -framework Cocoa -framework IOKit -framework CoreVideo -std=c++11	
 endif
@@ -19,7 +19,7 @@ endif
 # Location for libs:
 LIBFOLD = -L"/usr/local/lib"
 # Location for includes:
-INCFOLD = -I"/usr/local/include"
+INCFOLD = -I"/usr/local/include" -I"/usr/local/include/bullet" 
 
 # Files:
 FILES = $(wildcard src/*.cpp) $(wildcard src/tools/*.cpp) $(wildcard src/utils/*.cpp)

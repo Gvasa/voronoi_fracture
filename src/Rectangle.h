@@ -13,6 +13,7 @@
 // Classes
 #include "Geometry.h"
 #include "tools/shader.hpp"
+#include "utils/Utils.h"
 
 class Rectangle : public Geometry {
 
@@ -31,6 +32,8 @@ public:
     void rotate(Vector3<float>, float);
     void translate(Vector3<float>);
     void scale(Vector3<float>);
+
+    unsigned int getType() { return RECTANGLE; }
 
 private:
 
