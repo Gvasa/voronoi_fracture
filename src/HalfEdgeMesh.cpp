@@ -476,7 +476,6 @@ std::vector<Vector3<float> > HalfEdgeMesh::buildVertexData() {
     for(unsigned int i = 0; i < mVerts.size(); i++) {
         vertexData.push_back(mVerts[i].pos);
     }
-    std::cout << "vertexdata: " << vertexData.size() << std::endl;
     return vertexData;
 }
 
@@ -537,6 +536,9 @@ void HalfEdgeMesh::updateRenderData() {
 
         vertIndex += 3;
     }
+
+    mBoundingbox->updateBoundingBox(buildVertexData());
+
 }
 
 

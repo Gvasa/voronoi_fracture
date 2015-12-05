@@ -79,6 +79,8 @@ void Physics::addGeometry(Geometry *G, unsigned int type) {
     btRigidBody::btRigidBodyConstructionInfo shapeRigidBodyCI(mass, motionState, shape, inertia);
     btRigidBody *shapeRigidBody = new btRigidBody(shapeRigidBodyCI);
     
+    shapeRigidBody->setRestitution(0.7);
+
     mDynamicsWorld->addRigidBody(shapeRigidBody);
 
     mRigidBodies.push_back(shapeRigidBody);

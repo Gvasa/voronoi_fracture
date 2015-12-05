@@ -121,9 +121,9 @@ void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts)
     }  
 
     for(std::map<std::string, unsigned int>::iterator it = mBoundingValuesIndex.begin(); it != mBoundingValuesIndex.end(); ++it) {
-        std::cout << (*it).first << "  " << uniqueVerts.at((*it).second) << std::endl;
+       // std::cout << (*it).first << "  " << uniqueVerts.at((*it).second) << std::endl;
         mBoundingValues.push_back(uniqueVerts[(*it).second]);
-        std::cout << "pushat: " << uniqueVerts[(*it).second] << std::endl;
+       // std::cout << "pushat: " << uniqueVerts[(*it).second] << std::endl;
     }
 
     // xMin Plane
@@ -181,6 +181,13 @@ void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts)
     mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
 
 }
+
+void Boundingbox::updateBoundingBox(std::vector<Vector3<float> > uniqueVerts) {
+    mVerts.clear();
+    mVerts.shrink_to_fit();
+    calculateBoundingbox(uniqueVerts);
+}
+
 
 void Boundingbox::calculateConvexHull(std::vector<Vector3<float> > points) {
 

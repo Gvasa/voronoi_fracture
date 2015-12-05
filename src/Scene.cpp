@@ -3,7 +3,7 @@
 struct cameraHandler {
     float fov = 45.0f;
     float aspectRatio = 4.0f / 3.0f;
-    float zoom = 0.0f;
+    float zoom = 2.0f;
     glm::quat orientation;
 
     glm::mat4 projectionMatrix;
