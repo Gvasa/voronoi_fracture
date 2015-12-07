@@ -68,7 +68,7 @@ int main (int argc, char* argv[]) {
     mesh = new HalfEdgeMesh();
     mesh->setDebugMode(true);
 
-    //mesh->createMesh("sphere1.0");
+    //mesh->createMesh("lowPolySphere1.0");
     //mesh->createMesh("bunnySmall");
     mesh->createMesh("cube");
     //mesh->translate(Vector3<float>(0.0f, 0.0f, 1.0f));

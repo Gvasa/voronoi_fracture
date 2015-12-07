@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <limits>
+#include <algorithm>
 
 // Classes
 #include "HalfEdgeMesh.h"
@@ -88,13 +89,23 @@ private:
 
     std::vector<Polygon> mClippedPolygons;
 
-    int clipFace(Polygon &, Vector3<float>, Vector3<float>);
+    int clipFace(Polygon &, Vector3<float>, Vector3<float>, std::vector<Vector3<float> > &);
 
     bool sortPolygonCounterClockWise(Polygon &);
 
+    bool sortPolygonCounterClockWise(std::vector<Vector3<float> > &V);
+
     bool triangulateQuad(Polygon &, Polygon &);
 
+    bool triangulate(std::vector<Vector3<float> > &, SimpleMesh *);
+
+    bool isInsidePolygon(const std::vector<Vector3<float> > &, const Vector3<float> &);
+
+    bool sameSide(Vector3<float>, Vector3<float>, Vector3<float>, Vector3<float>);
+
     bool checkTriangleOrientation(Polygon &, Vector3<float>);
+
+    bool findVertex(std::vector<Vector3<float> > &, Vector3<float>);
 };
 
 #endif // CLIPPINGMESH_H

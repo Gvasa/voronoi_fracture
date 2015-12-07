@@ -208,13 +208,13 @@ bool HalfEdgeMesh::addFace(const std::vector<Vector3 <float> > verts) {
     addVertex(verts.at(1), vertIndex2);
     addVertex(verts.at(2), vertIndex3);
 
-    std::cout << "--- Face ---" << std::endl;
+    /*std::cout << "--- Face ---" << std::endl;
 
     std::cout << "vert 0: " << verts[0] << std::endl;
     std::cout << "vert 1: " << verts[1] << std::endl;
     std::cout << "vert 2: " << verts[2] << std::endl;
 
-    std::cout << "------------\n\n";
+    std::cout << "------------\n\n";*/
 
    // add all half-edge pairs
    unsigned int innerHalfEdgeIndex1 = 0,
@@ -498,11 +498,11 @@ void HalfEdgeMesh::buildRenderData() {
 
         Vertex v3 = getVert(edge.vert);
 
-        std::cout << "\n--- face " << i << "---" << std::endl;
+        /*std::cout << "\n--- face " << i << "---" << std::endl;
         std::cout << "v0: " << v1.pos << std::endl;
         std::cout << "v1: " << v2.pos << std::endl;
         std::cout << "v2: " << v3.pos << std::endl;
-        
+        */
         // Add vertices to our drawing list
         mOrderedVertexList.push_back(v1.pos);    
         mOrderedVertexList.push_back(v2.pos);

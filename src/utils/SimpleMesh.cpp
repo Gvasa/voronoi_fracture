@@ -85,7 +85,14 @@ void SimpleMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
 
 bool SimpleMesh::addFace(const std::vector<Vector3<float> >verts) {
 
+    if(verts.size() != 3) {
+        std::cout << "\nInvalid amount of vertices in the polygon, please pass 3!\n";
+        std::cout << "Passed " << verts.size() << " vertices" << std::endl;
+        return false;
+    }
+
     for(unsigned int i = 0; i < verts.size(); i++)
         mVerts.push_back(verts[i]);
 
+    return true;
 }
