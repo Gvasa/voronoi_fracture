@@ -7,6 +7,10 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
+#define GLM_FORCE_RADIANS
+
+#define GLM_FORCE_RADIANS
+
 #define I_MVP 0
 #define I_MV 1
 #define I_MV_LIGHT 2
@@ -16,6 +20,8 @@
 #include "math/Vector4.h"
 #include "math/Matrix4x4.h"
 #include "utils/LoadObj.h"
+#include <glm/gtc/matrix_transform.hpp>
+
 
 class Geometry {
 
@@ -69,9 +75,16 @@ public:
     };
     virtual void markCurrentVoronoiPoint(unsigned int, Vector4<float>) {
         std::cout << "\nGeometry does not have markCurrentVoronoiPoint implemented!\n";
-    }
+    };
+    virtual std::vector<Vector3<float> > getVertexList() {
+        std::cout << "\nGeometry does not have getVertexList implemented!\n";
+    };
     virtual Vector3<float> getPrevPos(Vector3<float>) {
         std::cout << "\nGeometry does not have getPrevPos implemented!\n";
+    };
+
+    virtual glm::mat4 getTransMat() {
+        std::cout << "\nGeometry does not have getPrevPos implemented!\n";  
     }
 protected:
 

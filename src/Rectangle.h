@@ -33,6 +33,9 @@ public:
     void translate(Vector3<float>);
     void scale(Vector3<float>);
 
+    std::vector<Vector3<float> > getVertexList() { return mVerts; }
+    glm::mat4 getTransMat() { return mTransMat; }
+
     unsigned int getType() { return RECTANGLE; }
 
 private:
@@ -60,6 +63,8 @@ private:
     GLint lightSpeLoc;      // Specular light
     GLint specularityLoc;   // Specular constant
     GLint shinynessLoc;     // How much specularity (magnitude)
+
+    glm::mat4 mTransMat;
 
     struct Material : public Geometry::Material {   
     } mMaterial;

@@ -72,11 +72,12 @@ void Scene::render() {
         glm::vec3(0.0f, 1.0f, 0.0f)) *          // Up-vector                            
         glm::mat4_cast(camera.orientation);     // multiplies the veiw matrix with current rotation
 
+
     // The scene modelmatrix is nothing atm, the geometries will have their own model transforms
-    glm::mat4 modelMatrix = glm::mat4(1.0f);
+/*    //glm::mat4 modelMatrix; = glm::mat4(1.0f);
 
     // Construct MVP matrix
-    mSceneMatrices[I_MVP] = toMatrix4x4(camera.projectionMatrix * camera.viewMatrix * modelMatrix);
+    mSceneMatrices[I_MVP] = toMatrix4x4(camera.projectionMatrix * camera.viewMatrix) * modelMatrix);
 
     // Modelview Matrix, apply camera transforms here as well
     mSceneMatrices[I_MV] = toMatrix4x4(camera.viewMatrix * modelMatrix);
@@ -87,9 +88,31 @@ void Scene::render() {
     // Normal Matrix, used for normals in our shading
     mSceneMatrices[I_NM] = toMatrix4x4(glm::inverseTranspose(glm::mat4(camera.viewMatrix * modelMatrix)));
 
+    (*it)->render(mSceneMatrices);
+*/
+
+
+    glm::mat4 modelMatrix;
     // render Geometries in scene
-    for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
+    for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it) {
+
+        // The scene modelmatrix is nothing atm, the geometries will have their own model transforms
+        modelMatrix = (*it)->getTransMat();
+
+        // Construct MVP matrix
+        mSceneMatrices[I_MVP] = toMatrix4x4(camera.projectionMatrix * camera.viewMatrix * modelMatrix);
+
+        // Modelview Matrix, apply camera transforms here as well
+        mSceneMatrices[I_MV] = toMatrix4x4(camera.viewMatrix * modelMatrix);
+
+        // Modelview Matrix for our light
+        mSceneMatrices[I_MV_LIGHT] = toMatrix4x4(camera.viewMatrix * modelMatrix);
+
+        // Normal Matrix, used for normals in our shading
+        mSceneMatrices[I_NM] = toMatrix4x4(glm::inverseTranspose(glm::mat4(camera.viewMatrix * modelMatrix)));
+
         (*it)->render(mSceneMatrices);
+    }
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
@@ -99,8 +122,8 @@ void Scene::render() {
 
 void Scene::addGeometry(Geometry *G, unsigned int type) {
     mGeometries.push_back(G);
-    physicsWorld->addGeometry(G, type);
-    //std::cout << "mGeometries: " << mGeometries.size() << std::endl; 
+    physicsWorld->addGeometry(G->getVertexList(), type);
+
 }
 
 Matrix4x4<float> Scene::toMatrix4x4(glm::mat4 m) {
@@ -142,22 +165,42 @@ void Scene::updateCameraZoom(double x, double y) {
 void Scene::resetCamera() {
     glm::quat identityQuat;
     camera.orientation = identityQuat;
-    camera.zoom = 0;
+    camera.zoom = 2.0;
 }
 
 void Scene::stepSimulation() { 
     physicsWorld->stepSimulation(); 
-    btTransform trans;
-    Vector3<float> prevPos;
     
+    btTransform worldTrans;
+    btQuaternion rotation;
+    btScalar rotAngle;
+    btVector3 rotAxis;
+
+    Vector3<float> prevPos;
+    float prevAngle;
+
     for(unsigned int i = 0; i < mGeometries.size(); i++) {
         if(mGeometries[i]->getType() == HALFEDGEMESH) {
-                physicsWorld->getRigidBodyAt(i)->getMotionState()->getWorldTransform(trans);
+                physicsWorld->getRigidBodyAt(i)->getMotionState()->getWorldTransform(worldTrans);
                 HalfEdgeMesh* tmpHem = dynamic_cast<HalfEdgeMesh*>(mGeometries[i]);
+                
                 prevPos = tmpHem->getPrevPos();
+                prevAngle = tmpHem->getPrevRot();
 
-                tmpHem->translate(Vector3<float>((float)trans.getOrigin().getX() - prevPos[0], (float)trans.getOrigin().getY() - prevPos[1], (float)trans.getOrigin().getZ() - prevPos[2]));
-                tmpHem->setPrevPos(Vector3<float>(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ()));
+                rotation = worldTrans.getRotation();
+                rotAxis = rotation.getAxis();
+                rotAngle = rotation.getAngle();
+
+                if((float)rotAngle - prevAngle < -EPSILON || (float)rotAngle - prevAngle > EPSILON ) {
+                    tmpHem->translate(-prevPos);
+                    tmpHem->rotate(Vector3<float>((float)rotAxis.getX(), (float)rotAxis.getY(), (float)rotAxis.getZ() ), (float)rotAngle * M_PI / 180.0);
+                    tmpHem->translate(prevPos);
+                    tmpHem->setPrevRot((float)rotAngle);
+                }
+
+                tmpHem->translate(Vector3<float>((float)worldTrans.getOrigin().getX() - prevPos[0], (float)worldTrans.getOrigin().getY() - prevPos[1], (float)worldTrans.getOrigin().getZ() - prevPos[2]));
+                tmpHem->setPrevPos(Vector3<float>(worldTrans.getOrigin().getX(), worldTrans.getOrigin().getY(), worldTrans.getOrigin().getZ()));
+                //mpHem->setPrevRot((float)rotAngle);
         }
     }
 

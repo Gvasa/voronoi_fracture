@@ -13,6 +13,12 @@ HalfEdgeMesh::HalfEdgeMesh() {
     mMaterial.specular      = Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
     mMaterial.specularity   = 50.0f;
     mMaterial.shinyness     = 0.6f;
+
+    mPrevPos = Vector3<float>(0.0, 0.0, 0.0);
+    mPrevRotAngle = 0.0;
+
+    mTransMat = glm::mat4(1.0f);
+    //mPrevRot = std::make_pair(Vector3<float>(0.0, 0.0, 0.0), 0.0);
 }
 
 
@@ -158,7 +164,7 @@ void HalfEdgeMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     // Use shader
     glUseProgram(shaderProgram);
     glEnable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );  
     
     glUniformMatrix4fv(MVPLoc, 1, GL_FALSE, &sceneMatrices[I_MVP](0, 0));
     glUniformMatrix4fv(MVLoc, 1, GL_FALSE, &sceneMatrices[I_MV](0, 0));
@@ -199,6 +205,8 @@ void HalfEdgeMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
         for(unsigned int i = 0; i < mDebugPoints.size(); i++)
             mDebugPoints[i]->render(sceneMatrices);
     }
+
+    //mTransMat = Matrix4x4<float>();
 
 }
 
@@ -261,61 +269,22 @@ void HalfEdgeMesh::createMesh(std::string objName) {
 
 // Rotate the mesh
 void HalfEdgeMesh::rotate(Vector3<float> axis, float angle) {
-    
-    //Compute the rotational matrix
-    std::cout << std::endl << "Rotating..." << std::endl;
 
-    Matrix4x4<float>  rotationMatrix = Matrix4x4<float>::RotationXYZ(
-        axis[0] * (angle * M_PI / 180.0f),
-        axis[1] * (angle * M_PI / 180.0f),
-        axis[2] * (angle * M_PI / 180.0f)  
-    );
-
-    for(unsigned int i = 0; i < mVerts.size(); i++){
-        // Apply the rotation to the vertices
-        Vector4<float> v = Vector4<float>(mVerts[i].pos[0], mVerts[i].pos[1], mVerts[i].pos[2], 1.0f);
-        v = rotationMatrix * v;
-        mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
-
-        //Apply the rotation to the normals
-        Vector4<float> n = Vector4<float>(mVerts[i].normal[0], mVerts[i].normal[1], mVerts[i].normal[2], 1.0f);
-        n = rotationMatrix * n;
-        mVerts[i].normal = Vector3<float>(n[0], n[1], n[2]).Normalize();
-    }
-
+    mTransMat = mTransMat * glm::rotate(glm::mat4(1.f), angle, glm::vec3(axis[0], axis[1], axis[2]));
 }
 
 // Translate the Mesh
 void HalfEdgeMesh::translate(Vector3<float> p){
-    
-    // Compute the translation matrix
-    //std::cout << p << std::endl;
-    Matrix4x4<float> translationMatrix = Matrix4x4<float>::Translation(p[0], p[1], p[2]);
 
-    for(unsigned int i = 0; i < mVerts.size(); i++) {
-        // Apply the rotation to the vertices
-        Vector4<float> v = Vector4<float>(mVerts[i].pos[0], mVerts[i].pos[1], mVerts[i].pos[2], 1.0f);
-        v = translationMatrix * v;
-        mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
-    }
-
-    if(mOrderedVertexList.size() > 0)
-        updateRenderData();
+    mTransMat = mTransMat * glm::translate(glm::mat4(1.f),  glm::vec3(p[0], p[1], p[2]));
 
 }
 
 // Scale the Mesh 
 void HalfEdgeMesh::scale(Vector3<float> s){
 
-    // Compute the scaling matrix
-    Matrix4x4<float> scalingMatrix = Matrix4x4<float>::Scale(s[0], s[1], s[2]);
+    mTransMat = mTransMat * glm::scale(glm::mat4(1.0f), glm::vec3(s[0], s[1], s[2]));
 
-    for(unsigned int i = 0; i < mVerts.size(); i++) {
-        // Apply the scaling matrix
-        Vector4<float> v = Vector4<float>(mVerts[i].pos[0], mVerts[i].pos[1], mVerts[i].pos[2], 1.0f);
-        v = scalingMatrix * v;
-        mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
-    }
 }
 
 
@@ -359,6 +328,18 @@ void HalfEdgeMesh::computeVoronoiPattern() {
 
     mCompoundIsComputed = true;
 }
+
+std::vector<Vector3<float> > HalfEdgeMesh::getVertexList() {
+
+    std::vector<Vector3<float> > vertexList;
+
+    for(unsigned int i = 0; i < mVerts.size(); i++) {
+        vertexList.push_back(mVerts[i].pos);
+    }
+
+    return vertexList;
+}
+
 
 // This is where we add a vertex to the half-edge structure
 bool HalfEdgeMesh::addVertex(const Vector3<float> &v, unsigned int &index) {

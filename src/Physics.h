@@ -13,7 +13,9 @@
 #include "tools/shader.hpp"
 #include "utils/Utils.h"
 #include "btBulletDynamicsCommon.h"
+#include "BulletCollision/CollisionShapes/btShapeHull.h"
 #include "Geometry.h"
+#include "utils/GLDebugDrawer.h"
 
 class Physics {
 
@@ -23,8 +25,7 @@ public:
     
     ~Physics(); 
     
-    void initExampleWorld();
-    void addGeometry(Geometry *, unsigned int);
+    void addGeometry(std::vector<Vector3<float> >, unsigned int);
     void stepSimulation();
     void setWireFrame(bool w) { mWireframe = w; };
     btRigidBody* getRigidBodyAt(int i) { return mRigidBodies[i]; }
@@ -59,6 +60,10 @@ private:
 
 
     std::vector<btRigidBody* > mRigidBodies;
+
+    GLDebugDrawer debugDrawer;
+
+
 
 };
 

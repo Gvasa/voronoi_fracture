@@ -27,7 +27,6 @@ unsigned int currentNumberOfVoronoiPoints = 1;
 int currentVoronoiIndex = 0;
 float stepSize = 0.05f;
 
-
 int initializeOpenGL();
 void initializeScene();
 void mouseButton(GLFWwindow* window, int button, int action, int mods);
@@ -35,8 +34,6 @@ void mouseMotion(GLFWwindow* window, double x, double y);
 void mouseScroll(GLFWwindow* window, double x, double y);
 void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mods);
 double calcFPS(double, std::string);
-
-
 
 int main (int argc, char* argv[]) {
 
@@ -55,14 +52,14 @@ int main (int argc, char* argv[]) {
 
     // Floor
     floor_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
-    floor_rect->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), 90.0f);
     floor_rect->translate(Vector3<float>(0.0f, -1.0f, 0.0f));
+    floor_rect->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), -90.0f * M_PI / 180.0);
     floor_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
 
     // Wall
     wall_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
     wall_rect->translate(Vector3<float>(0.0f, 0.0f, -1.0f));
-    wall_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
+    wall_rect->scale(Vector3<float>(1.5f, 1.0f, 0.0f));
 
     // HalfEdge mesh
     mesh = new HalfEdgeMesh();
@@ -72,6 +69,7 @@ int main (int argc, char* argv[]) {
     mesh->createMesh("bunnySmall");
     mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
     mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
+   // mesh->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), M_PI/2.0);
 
    /* mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.0f));
     mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.6f, 0.0f));
@@ -94,7 +92,7 @@ int main (int argc, char* argv[]) {
     mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
 
     scene->addGeometry(floor_rect, STATIC);
-//    scene->addGeometry(wall_rect, STATIC);
+    scene->addGeometry(wall_rect, STATIC);
     scene->addGeometry(mesh, DYNAMIC);
 
     initializeScene();

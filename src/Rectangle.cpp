@@ -1,4 +1,4 @@
-#include "Rectangle.h"
+    #include "Rectangle.h"
 
 Rectangle::Rectangle(float w, float h, Vector3<float> p) 
 : mPosition(p) {
@@ -13,6 +13,8 @@ Rectangle::Rectangle(float w, float h, Vector3<float> p)
     mMaterial.specular      = Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
     mMaterial.specularity   = 50.0f;
     mMaterial.shinyness     = 0.6f;
+
+    mTransMat = glm::mat4(1.0f);
 
     std::cout << "\nPlane created!\n";
 }
@@ -147,50 +149,20 @@ void Rectangle::createVertices(float width, float height) {
 void Rectangle::rotate(Vector3<float> axis, float angle) {
 
     // Compute rotation matrix
-    Matrix4x4<float> rotationMatrix = Matrix4x4<float>::RotationXYZ(
-        axis[0] * (angle * M_PI / 180.0f),
-        axis[1] * (angle * M_PI / 180.0f),
-        axis[2] * (angle * M_PI / 180.0f)
-    );
-
-    for(unsigned int i = 0; i < mVerts.size(); i++) {
-        // Apply rotation to vertices
-        Vector4<float> v = Vector4<float>(mVerts[i][0], mVerts[i][1], mVerts[i][2], 1.0f);
-        v = rotationMatrix * v;
-        mVerts[i] = Vector3<float>(v[0], v[1], v[2]);
-
-        // Apply rotation to normals
-        Vector4<float> n = Vector4<float>(mNormals[i][0], mNormals[i][1], mNormals[i][2], 1.0f);
-        n = rotationMatrix * n;
-        mNormals[i] = Vector3<float>(n[0], n[1], n[2]).Normalize();
-    }
+    mTransMat = mTransMat * glm::rotate(glm::mat4(1.f), angle, glm::vec3(axis[0], axis[1], axis[2]));
 }
 
 
 void Rectangle::translate(Vector3<float> p) {
     
     // Compute translation matrix
-    Matrix4x4<float> translationMatrix = Matrix4x4<float>::Translation(p[0], p[1], p[2]);
-
-    for(unsigned int i = 0; i < mVerts.size(); i++) {
-        // Apply rotation to vertices
-        Vector4<float> v = Vector4<float>(mVerts[i][0], mVerts[i][1], mVerts[i][2], 1.0f);
-        v = translationMatrix * v;
-        mVerts[i] = Vector3<float>(v[0], v[1], v[2]);
-    }
+    mTransMat = mTransMat * glm::translate(glm::mat4(1.f), glm::vec3(p[0], p[1], p[2]));
 }
 
 
 void Rectangle::scale(Vector3<float> s) {
 
     // Compute scaling matrix
-    Matrix4x4<float> scalingMatrix = Matrix4x4<float>::Scale(s[0], s[1], s[2]);
-
-    for(unsigned int i = 0; i < mVerts.size(); i++) {
-        // Apply scaling matrix
-        Vector4<float> v = Vector4<float>(mVerts[i][0], mVerts[i][1], mVerts[i][2], 1.0f);
-        v = scalingMatrix * v;
-        mVerts[i] = Vector3<float>(v[0], v[1], v[2]);
-    }
+    mTransMat = mTransMat * glm::scale(glm::mat4(1.0f), glm::vec3(s[0], s[1], s[2]));
 }
 
