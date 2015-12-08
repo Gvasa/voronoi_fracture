@@ -65,15 +65,18 @@ int main (int argc, char* argv[]) {
     wall_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
 
     // HalfEdge mesh
-    mesh = new HalfEdgeMesh();
+    mesh = new HalfEdgeMesh(Vector4<float>(0.2f, 0.8f, 0.2f, 0.4f));
     mesh->setDebugMode(true);
 
     //mesh->createMesh("lowPolySphere1.0");
-    //mesh->createMesh("bunnySmall");
-    mesh->createMesh("cube");
+    //mesh->createMesh("Sphere1.0");
+    //mesh->createMesh("Sphere1.0_hole");
+    mesh->createMesh("bunnySmall");
+    //mesh->createMesh("cube");
+    //mesh->createMesh("cube_hole");
     //mesh->translate(Vector3<float>(0.0f, 0.0f, 1.0f));
-    //mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
-    //mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
+    mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
+    mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
 
    /* mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.0f));
     mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.6f, 0.0f));

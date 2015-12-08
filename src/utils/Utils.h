@@ -35,6 +35,15 @@
 const int WIDTH = 1024;
 const int HEIGHT = 768;
 
+// Set constants for flaging of edges that are not valid half-edges
+const static unsigned int BORDER = (std::numeric_limits<unsigned int>::max)();
+const static unsigned int UNINITIALIZED = (std::numeric_limits<unsigned int>::max)()-1;
+
+// Denotes a reference to a border, only for face pointers
+    //const static unsigned int BORDER;
+    // Denotes a reference to a non-existing object
+    //const static unsigned int UNINITIALIZED;
+
 //class LoadObj;
 
 class Utils {

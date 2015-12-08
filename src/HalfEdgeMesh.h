@@ -32,7 +32,7 @@ class HalfEdgeMesh : public Geometry {
 
 public:
 
-    HalfEdgeMesh();
+    HalfEdgeMesh(Vector4<float>);
 
     ~HalfEdgeMesh();
 
@@ -138,13 +138,6 @@ private:
 
     
     // Halfedge data
-
-    // Denotes a reference to a border, only for face pointers
-    const static unsigned int BORDER;
-    // Denotes a reference to a non-existing object
-    const static unsigned int UNINITIALIZED;
-
-
     /*
      * STRUCTS
      */
@@ -228,6 +221,9 @@ private:
     //Add a half edge pair, from vertex 1 to vertex2, to the mesh.
     bool addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsigned int &index1, unsigned int &index2);
 
+    // Merges the outer (uninitialized) edge for a newly created triangle
+    void MergeOuterBoundaryEdge(unsigned int innerEdge);
+
     //add a voronoiPoint to the mesh, if debugmode = true it will add a debugpoint
     void addVoronoiPoint(Vector3<float> v);
 
@@ -261,12 +257,14 @@ public:
     //! Return the edge at index i
     HalfEdge& getEdge(unsigned int i) { return mEdges.at(i); }
     const HalfEdge& getEdge(unsigned int i) const { return mEdges.at(i); }
+    unsigned int getEdge(Vector3<float>);
     //! Return the face at index i
     Face& getFace(unsigned int i) { return mFaces.at(i); }
     const Face& getFace(unsigned int i) const { return mFaces.at(i); }
     //! Return the Vertex at index i
     Vertex& getVert(unsigned int i) { return mVerts.at(i); }
     const Vertex getVert(unsigned int i) const { return mVerts.at(i); }
+
     //Return number of vertices
     unsigned int getNumVerts() const {  return mVerts.size(); }
     //Return number of faces

@@ -34,7 +34,7 @@ public:
 
     void initialize();
 
-    bool clipMesh(SimpleMesh *);
+    HalfEdgeMesh * clipMesh();
 
 private:
 
@@ -93,11 +93,11 @@ private:
 
     bool sortPolygonCounterClockWise(Polygon &);
 
-    bool sortPolygonCounterClockWise(std::vector<Vector3<float> > &V);
+    bool sortPolygonCounterClockWise(std::vector<Vector3<float> > &V, HalfEdgeMesh *);
 
     bool triangulateQuad(Polygon &, Polygon &);
 
-    bool triangulate(std::vector<Vector3<float> > &, SimpleMesh *);
+    bool triangulate(std::vector<Vector3<float> > &, HalfEdgeMesh *);
 
     bool isInsidePolygon(const std::vector<Vector3<float> > &, const Vector3<float> &);
 
