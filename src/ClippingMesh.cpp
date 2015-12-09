@@ -5,12 +5,6 @@ ClippingMesh::~ClippingMesh() {
 
     mVerts.clear();
     mVerts.shrink_to_fit();
-
-    mEdges.clear();
-    mEdges.shrink_to_fit();
-
-    mFaces.clear();
-    mFaces.shrink_to_fit();
 }
 
 
@@ -22,58 +16,61 @@ void ClippingMesh::initialize() {
 }
 
 
-HalfEdgeMesh * ClippingMesh::clipMesh() {
+HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
 
-    HalfEdgeMesh * hm = new HalfEdgeMesh(Vector4<float>(0.8f, 0.2f, 0.2f, 1.0f));
+    float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    float g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
-    unsigned int numSplittingPlanes = mHalfEdgeMesh->getCompound()->getNumberOfSplittingPlanes();
+    HalfEdgeMesh * hm = new HalfEdgeMesh(Vector4<float>(r, g, b, 1.0f));
 
-    Vector3<float> refVoronoiPoint = mHalfEdgeMesh->getVoronoiPoint(0);
+    mVerts = mHalfEdgeMesh->getVertexList();
+
+    std::vector<Vector3<float> > clippedVerts;
 
     std::vector<Vector3<float> > createdVertices;
 
-    unsigned int e1 = mHalfEdgeMesh->getFace(10).edge;
-    unsigned int e2 = mHalfEdgeMesh->getEdge(e1).next;
-    unsigned int e3 = mHalfEdgeMesh->getEdge(e1).pair;
+    unsigned int numSplittingPlanes = mHalfEdgeMesh->getCompound()->getNumberOfSplittingPlanes();
 
-    std::cout << "\ne1.vert: " << mHalfEdgeMesh->getEdge(e1).vert << std::endl;
-    std::cout << "e2.vert: " << mHalfEdgeMesh->getEdge(e2).vert << std::endl;
-    std::cout << "e3.vert: " << mHalfEdgeMesh->getEdge(e3).vert << std::endl;
+    unsigned int vertCounter = 0;
 
-    // Loop over all faces of our mesh
-    for(unsigned int i = 0; i < mHalfEdgeMesh->getNumFaces(); i++) {
+    // Loop over all splitting planes for our mesh
+    for(unsigned int j = 0; j < mHalfEdgeMesh->getCompound()->getNumberOfSplittingPlanes(); j++) {
 
-        Polygon polygon;
+        std::pair<Vector3<float>, Vector3<float> > voronoiPair = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getVoronoiPoints();
 
-        // Collect all vertices from the face that we want to clip
-        polygon.v0 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).vert).pos;
-        polygon.v1 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).next).vert).pos;
-        polygon.v2 = mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).next).next).vert).pos;
+        if(refVoronoiPoint != voronoiPair.first && refVoronoiPoint != voronoiPair.second)
+            continue;
 
-        Vector3<float> correctNormal = mHalfEdgeMesh->getFace(i).normal; //Cross(polygon.v1 - polygon.v0, polygon.v2 - polygon.v0).Normalize();
+        // Normal of the splitting plane, we can get it from SplittingPlane object,
+        // but then it might point in the wrong direction so computing it should be faster
+        Vector3<float> normal;
+        if(voronoiPair.first == refVoronoiPoint)
+            normal = (voronoiPair.second - voronoiPair.first).Normalize();
+        else
+            normal = (voronoiPair.first - voronoiPair.second).Normalize();
 
-        polygon.normal = correctNormal;
+        // Arbitrary point on the splitting plane (any vertex), in this case the first vertex
+        Vector3<float> P = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getVertex(0);
 
-        //std::cout << "\nPolygon verts: " << polygon.v0 << ", " << polygon.v1 << ", " << polygon.v2 << std::endl;
+        vertCounter = 0;
 
-        // For now the polygon contains 3 vertices
-        polygon.numVerts = 3;
+        // Loop over all faces of our mesh
+        for(unsigned int i = 0; i < (mVerts.size() / 3); i++) {
 
-        // Loop over all splitting planes for our mesh
-        for(unsigned int j = 0; j < 1; j++) {
+            Polygon polygon;
 
-            std::pair<Vector3<float>, Vector3<float> > voronoiPair = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getVoronoiPoints();
+            // Collect all vertices from the face that we want to clip
+            polygon.v0 = mVerts[vertCounter];
+            polygon.v1 = mVerts[vertCounter + 1];
+            polygon.v2 = mVerts[vertCounter + 2];
 
-            // Normal of the splitting plane, we can get it from SplittingPlane object,
-            // but then it might point in the wrong direction so computing it should be faster
-            Vector3<float> normal;
-            if(voronoiPair.first == refVoronoiPoint)
-                normal = (voronoiPair.second - voronoiPair.first).Normalize();
-            else
-                normal = (voronoiPair.first - voronoiPair.second).Normalize();
+            Vector3<float> correctNormal = Cross(polygon.v1 - polygon.v0, polygon.v2 - polygon.v0).Normalize();
 
-            // Arbitrary point on the splitting plane (any vertex), in this case the first vertex
-            Vector3<float> P = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getVertex(0);
+            polygon.normal = correctNormal;
+
+            // For now the polygon contains 3 vertices
+            polygon.numVerts = 3;
 
             // Clip the polygon and set the number of vertices
             polygon.numVerts = clipFace(polygon, normal, P, createdVertices);
@@ -87,97 +84,87 @@ HalfEdgeMesh * ClippingMesh::clipMesh() {
             current cell.
 
             1. Loop over all cells outside this class, i.e. in the scene.
-            2. Determine with planes that are created by this point.
+            2. Determine which planes that are created by this point.
             3. Cut the mesh against every plane.
             4. return a new half-edge mesh.
 
             *************************************************************************/
+
+            sortPolygonCounterClockWise(polygon);
+
+            if(polygon.numVerts == 4) {
+                
+                Polygon P2;
+                triangulateQuad(polygon, P2);
+                P2.normal = Cross(polygon.v2 - polygon.v0, polygon.v1 - polygon.v0).Normalize();
+
+                checkTriangleOrientation(P2, correctNormal);
+
+                clippedVerts.push_back(P2.v0);
+                clippedVerts.push_back(P2.v1);
+                clippedVerts.push_back(P2.v2);
+            }
+
+            if(polygon.numVerts == 3) {
+                
+                checkTriangleOrientation(polygon, correctNormal);
+
+                clippedVerts.push_back(polygon.v0);
+                clippedVerts.push_back(polygon.v1);
+                clippedVerts.push_back(polygon.v2);
+            }
+
+            vertCounter += 3;
+        }
+        sortPolygonCounterClockWise(createdVertices);
+
+        unsigned int i1 = createdVertices.size() / 3;
+        unsigned int i2 = (2 * createdVertices.size()) / 3;
+
+        Vector3<float> pNormal = Cross(createdVertices[i1] - createdVertices[0], createdVertices[i2] - createdVertices[0]).Normalize();
+        pNormal[0] = -pNormal[0];
+        pNormal[1] = -pNormal[1];
+        pNormal[2] = -pNormal[2];
+
+        if(pNormal != normal ){
+            std::reverse(createdVertices.begin(), createdVertices.end());
         }
 
-        sortPolygonCounterClockWise(polygon);
+        //triangulateArbPolygon(createdVertices, clippedVerts);
+        triangulateConvexPolygon(createdVertices, clippedVerts);
+        mVerts.clear();
+        mVerts.shrink_to_fit();
+        mVerts = clippedVerts;
+        clippedVerts.clear();
+        clippedVerts.shrink_to_fit();
 
-        //std::cout << "\n----- NEW FACE -----\n" << std::endl;
+        createdVertices.clear();
+        createdVertices.shrink_to_fit();
 
-        std::vector<Vector3<float> > face1;
-        std::vector<Vector3<float> > face2;
+        std::cout << "DONE WITH PLANE" << j << std::endl;
 
-        if(polygon.numVerts == 4) {
-            
-            Polygon P2;
-            triangulateQuad(polygon, P2);
-            P2.normal = Cross(polygon.v2 - polygon.v0, polygon.v1 - polygon.v0).Normalize();
-            //if(!checkTriangleOrientation(P2, correctNormal)) {
-
-            checkTriangleOrientation(P2, correctNormal);
-
-            face1.push_back(P2.v0);
-            face1.push_back(P2.v1);
-            face1.push_back(P2.v2);
-            hm->addFace(face1);
-
-
-            /*std::cout << "\nPolygon " << i << " :\n";
-            std::cout << "\nv0: " << P2.v0 << "\nv1: " << P2.v1 << "\nv2: " << P2.v2 << std::endl;
-            std::cout << "numverts: " << P2.numVerts << std::endl;*/
-            //}
-
-        }
-
-        if(polygon.numVerts == 3) {
-         
-            //if(!checkTriangleOrientation(polygon, correctNormal)){
-            
-            checkTriangleOrientation(polygon, correctNormal);
-
-            face2.push_back(polygon.v0);
-            face2.push_back(polygon.v1);
-            face2.push_back(polygon.v2);
-            hm->addFace(face2);
-
-            /*std::cout << "\nPolygon " << i << " :\n";
-            std::cout << "\nv0: " << polygon.v0 << "\nv1: " << polygon.v1 << "\nv2: " << polygon.v2 << std::endl;
-            std::cout << "numverts: " << polygon.numVerts << std::endl;*/
-            //}
-        }
-
-        face1.clear();
-        face2.clear();
-        face1.shrink_to_fit();
-        face2.shrink_to_fit();
     }
 
-    sortPolygonCounterClockWise(createdVertices, hm);
+    std::vector<Vector3<float> > Face;
+    Face.resize(3);
+    unsigned int counter = 0;
 
-    std::cout << "\n--- Created vertices ---\n";
+    std::cout << "\nclippedVerts.size(): " << mVerts.size() << std::endl;
 
-    for(unsigned int i = 0; i < createdVertices.size(); i++) {
-        std::cout << "\nv" << i << ": " << createdVertices[i] << std::endl;
+    for(unsigned int i = 0; i < mVerts.size(); i+=3){
+
+        Face.resize(3);
+
+        Face[0] = mVerts[i];
+        Face[1] = mVerts[i+1];
+        Face[2] = mVerts[i+2];
+        
+        hm->addFace(Face);
+
+        Face.clear();
+        Face.shrink_to_fit();
+        counter++;
     }
-
-   /* std::vector<Vector3<float> > TMP;
-    TMP.resize(9);
-    TMP[0] = Vector3<float>(0.1f, 0.2f, 2.0f);
-    TMP[1] = Vector3<float>(0.0f, 0.6f, 2.0f);
-    TMP[2] = Vector3<float>(0.2f, 0.9f, 2.0f);
-    TMP[3] = Vector3<float>(0.5f, 1.1f, 2.0f);
-    TMP[4] = Vector3<float>(0.8f, 1.0f, 2.0f);
-    TMP[5] = Vector3<float>(1.1f, 0.8f, 2.0f);
-    TMP[6] = Vector3<float>(1.1f, 0.4f, 2.0f);
-    TMP[7] = Vector3<float>(0.9f, 0.1f, 2.0f);
-    TMP[8] = Vector3<float>(0.5f, 0.0f, 2.0f);
-
-    sortPolygonCounterClockWise(TMP);
-
-    std::vector<Vector3<float> > tmp;
-    tmp.resize(5);
-
-    for(unsigned int i = 0; i < tmp.size(); i++)
-        tmp[i] = createdVertices[i];
-*/
-    triangulate(createdVertices, hm);
-
-    createdVertices.clear();
-    createdVertices.shrink_to_fit();
 
     return hm;
 }
@@ -400,20 +387,20 @@ bool ClippingMesh::sortPolygonCounterClockWise(Polygon &P) {
         verts.begin(), 
         verts.end(), 
         [](const std::pair<float, Vector3<float> > p1, const std::pair<float, Vector3<float> > p2) { 
-            return p1.first < p2.first; 
+            return p1.first < p2.first;
         } );
 
         if(P.numVerts == 3) {
-            P.v0 = verts[1].second;
-            P.v1 = verts[2].second;
-            P.v2 = verts[0].second;
+            P.v0 = verts[0].second;
+            P.v1 = verts[1].second;
+            P.v2 = verts[2].second;
         }
 
         if(P.numVerts == 4) {
-            P.v0 = verts[1].second;
-            P.v1 = verts[2].second;
-            P.v2 = verts[3].second;
-            P.v3 = verts[0].second;
+            P.v0 = verts[0].second;
+            P.v1 = verts[1].second;
+            P.v2 = verts[2].second;
+            P.v3 = verts[3].second;
         }
 
         return true;
@@ -424,41 +411,11 @@ bool ClippingMesh::sortPolygonCounterClockWise(Polygon &P) {
 }
 
 
-bool ClippingMesh::sortPolygonCounterClockWise(std::vector<Vector3<float> > &V, HalfEdgeMesh * halfEdgeMesh) {
+bool ClippingMesh::sortPolygonCounterClockWise(std::vector<Vector3<float> > &V) {
 
     // If the polygon has no vertices, then return it as sorted
     if(V.size() == 0)
         return true;
-/*
-    std::cout << "FETCH EDGE ON BORDER" << std::endl;
-    unsigned int firstEdge = halfEdgeMesh->getEdge(V[0]);
-    unsigned int tmpEdge = firstEdge;
-
-    std::cout << "\nfetched vert: " << halfEdgeMesh->getVert(halfEdgeMesh->getEdge(firstEdge).vert).pos << std::endl;
-    std::cout << "this vert: " << V[0] << std::endl;
-
-    std::cout << "CLEAR VECTOR\n" << std::endl;
-    V.clear();
-    V.shrink_to_fit();
-
-    V.push_back(halfEdgeMesh->getVert(halfEdgeMesh->getEdge(firstEdge).vert).pos);
-
-    while(true) {
-        
-        tmpEdge = halfEdgeMesh->getEdge(tmpEdge).prev;
-        std::cout << "firstEdge: " << firstEdge << std::endl;
-        std::cout << "tmpEdge: " << tmpEdge << std::endl;
-        std::cout << "vertPos: " << halfEdgeMesh->getVert(halfEdgeMesh->getEdge(tmpEdge).vert).pos << std::endl;
-    
-
-        if(tmpEdge == firstEdge)
-            break;
-
-        V.push_back(halfEdgeMesh->getVert(halfEdgeMesh->getEdge(tmpEdge).vert).pos);
-    }
-    std::cout << "\n---- DONE!!! ----" << std::endl;
-    return true;
-    */
 
     Vector3<float> centerOfMass;
 
@@ -503,20 +460,13 @@ bool ClippingMesh::sortPolygonCounterClockWise(std::vector<Vector3<float> > &V, 
         if(xdiff < ydiff && xdiff < zdiff) {
             s = 1;
             t = 2;
-            //std::cout << "\nX-projection\n";
         } else if(ydiff < xdiff && ydiff < zdiff) {
             s = 0;
             t = 2;
-            //std::cout << "\nY-projection\n";
         } else {
             s = 0;
             t = 1;
-            //std::cout << "\nZ-projection\n";
         }
-
-        //std::cout << "\nx-max: " << xmax << "\ty-max: " << ymax << "\tz-max: " << zmax << std::endl;
-        //std::cout << "x-min: " << xmin << "\ty-min: " << ymin << "\tz-min: " << zmin << std::endl;
-        //std::cout << "x-diff: " << xdiff << "\ty-diff: " << ydiff << "\tz-diff: " << zdiff << std::endl;
 
         std::vector<std::pair<float, Vector3<float> > > verts;
 
@@ -551,55 +501,45 @@ bool ClippingMesh::sortPolygonCounterClockWise(std::vector<Vector3<float> > &V, 
 
 bool ClippingMesh::triangulateQuad(Polygon &P1, Polygon &P2) {
 
-    P2.v0 = P1.v3;
+    P2.v0 = P1.v0;
     P2.v1 = P1.v2;
-    P2.v2 = P1.v0;
+    P2.v2 = P1.v3;
 
     P1.numVerts = 3;
     P2.numVerts = 3;
 }
 
-
-bool ClippingMesh::triangulate(std::vector<Vector3<float> > &P, HalfEdgeMesh *hm) {
+//! Triangulates a polygon of any shape, however it need to be sorted correctly in order to draw correct.
+//  This is however not trivial to do for a non-convex polygon. So if the polygon is 100% convex, use the 
+//  function bellow instead.
+bool ClippingMesh::triangulateArbPolygon(std::vector<Vector3<float> > &P, std::vector<Vector3<float> > &clippedVerts) {
 
     std::cout << "\ntriangulating..." << std::endl;
 
     // Can't make any triangles
     if(P.size() < 3) {
-        //std::cout << "less than 3" << std::endl;
         return false;
     }
     else if(P.size() == 3) {
         // Add the polygon as it is, might not be needed.
-        //std::cout << "exactly 3" << std::endl;
+        clippedVerts.push_back(P[0]);
+        clippedVerts.push_back(P[1]);
+        clippedVerts.push_back(P[2]);
     }
 
     unsigned int vectorSize = P.size();
     unsigned int currentVectorSize = P.size();
-
-    std::vector<Vector3<float> > face;
-    face.resize(3);
 
     for(unsigned int i = 0; i < currentVectorSize;) {
         for(unsigned int j = 0; j < currentVectorSize; j++) {
 
             if(P.size() == 3) {
 
-                face.resize(3);
+                clippedVerts.push_back(P[0]);
+                clippedVerts.push_back(P[2]);
+                clippedVerts.push_back(P[1]);
 
-                face[0] = P[0];
-                face[1] = P[2];
-                face[2] = P[1];
-
-                //std::cout << "\nVert 0: " << face[0] << std::endl;
-                //std::cout << "Vert 1: " << face[1] << std::endl;
-                //std::cout << "Vert 2: " << face[2] << std::endl << std::endl;
-
-                hm->addFace(face);
-
-                face.clear();
-                //face.shrink_to_fit();
-
+                std::cout << "\ntriangulation done!" << std::endl;
                 return true;
             }
 
@@ -635,28 +575,17 @@ bool ClippingMesh::triangulate(std::vector<Vector3<float> > &P, HalfEdgeMesh *hm
 
             if(isInsidePolygon(V, P[j])) {
                 // We cant make a triangle yet, move on.
-                //std::cout << "\n\nDEN LIGGER INNANFÖR!!\n\n";
                 i++;
                 continue;
             }
             else {
 
-                if( fabs(acos((P[i1] - P[i2]) * (P[i3] - P[i2]))) < M_PI - EPSILON ) {
+                if( fabs(acos((P[i1] - P[i2]) * (P[i3] - P[i2]))) < M_PI - EPSILON_2 ) {
                     // We can add a triangle, nice.
-                    //std::cout << "\n\nDEN LIGGER INTE INNANFÖR!!" << " i:" << i << "\n";
 
-                    face.resize(3);
-
-                    face[0] = P[i1];
-                    face[1] = P[i3];
-                    face[2] = P[i2];
-
-                    //std::cout << "Vert 0: " << face[0] << std::endl;
-                    //std::cout << "Vert 1: " << face[1] << std::endl;
-                    //std::cout << "Vert 2: " << face[2] << std::endl << std::endl;
-
-                    hm->addFace(face);
-                    face.clear();
+                    clippedVerts.push_back(P[i1]);
+                    clippedVerts.push_back(P[i3]);
+                    clippedVerts.push_back(P[i2]);
 
                     P.erase(P.begin() + i);
                     currentVectorSize--;
@@ -671,6 +600,32 @@ bool ClippingMesh::triangulate(std::vector<Vector3<float> > &P, HalfEdgeMesh *hm
 
     std::cout << "\ntriangulation done!" << std::endl;
 
+    return true;
+}
+
+//! Triangulates a completely convex and sorted polygon
+bool ClippingMesh::triangulateConvexPolygon(std::vector<Vector3<float> > &P, std::vector<Vector3<float> > &clippedVerts) {
+
+    Vector3<float> centerOfMass = Vector3<float>(0.0f, 0.0f, 0.0f);
+
+    for(unsigned int i = 0; i < P.size(); i++)
+        centerOfMass += P[i];
+
+    centerOfMass /= static_cast<float>(P.size());
+
+    for(unsigned int i = 0; i < P.size(); i++) {
+        
+        if(i == P.size()-1) {
+            clippedVerts.push_back(P[0]);
+            clippedVerts.push_back(P[i]);
+            clippedVerts.push_back(centerOfMass);
+            continue;
+        }
+
+        clippedVerts.push_back(P[i+1]);
+        clippedVerts.push_back(P[i]);
+        clippedVerts.push_back(centerOfMass);
+    }
     return true;
 }
 
@@ -706,20 +661,12 @@ bool ClippingMesh::checkTriangleOrientation(Polygon &P, Vector3<float> normal) {
     if((polygonNormal[0] > normal[0] - EPSILON && polygonNormal[0] < normal[0] + EPSILON) &&
        (polygonNormal[1] > normal[1] - EPSILON && polygonNormal[1] < normal[1] + EPSILON) &&
        ((polygonNormal[2] > normal[2] - EPSILON && polygonNormal[2] < normal[2] + EPSILON))) {
-        /*std::cout << "\nSAMMA NORMAL" << std::endl;
-        std::cout << "correct normal: " << P.normal << std::endl;
-        std::cout << "this normal: " << polygonNormal << std::endl;*/
         return true;
     } else {
-        /*std::cout << "\nOLIKA NORMAL" << std::endl;
-        std::cout << "correct normal: " << P.normal << std::endl;
-        std::cout << "this normal: " << polygonNormal << std::endl;*/
-
         Vector3<float> tmp = P.v1;
         P.v1 = P.v2;
         P.v2 = tmp;
         P.normal = Cross(P.v1 - P.v0, P.v2 - P.v0).Normalize();
-        //std::cout << "fixed normal: " << P.normal << std::endl;
         return false;
     }
 }

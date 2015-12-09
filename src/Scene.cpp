@@ -156,12 +156,27 @@ void Scene::splitMesh(HalfEdgeMesh *he) {
     if(he->isCompoundComputed()) {
         //Mesh * sm = new SimpleMesh();
         //addGeometry(sm);
+        std::cout << "\nNUMBER OF VORONOI POINTS: " << he->getNumVoronoiPoints() << std::endl;
+
         ClippingMesh * cm = new ClippingMesh(he);
-        //cm->print();
-        HalfEdgeMesh * hm = cm->clipMesh();
+        
+        for(unsigned int i = 0; i < he->getNumVoronoiPoints(); i++) {
+            addGeometry(cm->clipMesh(he->getVoronoiPoint(i)));
+            mGeometries.back()->initialize(mPointLight.position);
+        }
+        
+        //HalfEdgeMesh * hm = cm->clipMesh();
+        delete mGeometries[2];
         mGeometries.erase(mGeometries.begin()+2);
-        addGeometry(hm);
-        hm->initialize(mPointLight.position);
+        delete cm;
+
+        std::cout << "\n\nGeometries left after splitting: \n";
+
+        for(std::vector<Geometry*>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
+            std::cout << "Type: " << (*it)->getType() << std::endl;
+
+        //addGeometry(hm);
+        //hm->initialize(mPointLight.position);
         //sm->initialize();
     }
 }

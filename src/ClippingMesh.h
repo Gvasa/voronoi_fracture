@@ -34,40 +34,9 @@ public:
 
     void initialize();
 
-    HalfEdgeMesh * clipMesh();
+    HalfEdgeMesh * clipMesh(Vector3<float>);
 
 private:
-
-    //clipFace(XYZ *p,XYZ n,XYZ p0);
-
-    struct ClippingVertex {
-        ClippingVertex(const Vector3<float> & p = Vector3<float>(0, 0, 0),
-                       float d = 0,
-                       int o = 0,
-                       bool v = false)
-                       : pos(p),
-                       dist(d),
-                       occurs(o),
-                       visible(v) {}
-        Vector3<float> pos;
-        float dist;
-        int occurs;
-        bool visible;
-    };
-
-    struct ClippingEdge {
-        ClippingEdge(bool v = false) : visible(v) {}
-        unsigned int vert1;
-        unsigned int vert2;
-        unsigned int face;
-        bool visible;
-    };
-
-    struct ClippingFace {
-        ClippingFace(bool v = false) : visible(v) {}
-        unsigned int edge;
-        bool visible;
-    };
 
     struct Polygon{
         Polygon() {}
@@ -81,11 +50,9 @@ private:
 
     HalfEdgeMesh * mHalfEdgeMesh = nullptr;
 
-    std::vector<ClippingVertex> mVerts;
+    std::vector<Vector3<float> > mVerts;
 
-    std::vector<ClippingEdge> mEdges;
-
-    std::vector<ClippingFace> mFaces;
+    //std::vector<Vector3<float> > mFaces;
 
     std::vector<Polygon> mClippedPolygons;
 
@@ -93,11 +60,13 @@ private:
 
     bool sortPolygonCounterClockWise(Polygon &);
 
-    bool sortPolygonCounterClockWise(std::vector<Vector3<float> > &V, HalfEdgeMesh *);
+    bool sortPolygonCounterClockWise(std::vector<Vector3<float> > &V);
 
     bool triangulateQuad(Polygon &, Polygon &);
 
-    bool triangulate(std::vector<Vector3<float> > &, HalfEdgeMesh *);
+    bool triangulateArbPolygon(std::vector<Vector3<float> > &, std::vector<Vector3<float> > &);
+
+    bool triangulateConvexPolygon(std::vector<Vector3<float> > &, std::vector<Vector3<float> > &);
 
     bool isInsidePolygon(const std::vector<Vector3<float> > &, const Vector3<float> &);
 

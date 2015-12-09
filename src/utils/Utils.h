@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <cstdlib>
+#include <ctime>
 
 #include "../math/Vector4.h"
 

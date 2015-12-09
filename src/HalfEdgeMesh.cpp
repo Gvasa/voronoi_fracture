@@ -73,28 +73,20 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
     std::cout << "\nInitializing Half-Edge mesh ...\n\n";
 
     mBoundingbox = new Boundingbox(buildVertexData());
-    std::cout << "\nbbox skapad" << std::endl;
     mBoundingbox->initialize();
-    std::cout << "\nbbox initialized" << std::endl;
     mBoundingbox->setWireFrame(true);
 
-    std::cout << "\n--------- INIT BUILD RENDERDATA ---------" << std::endl;
     buildRenderData();
-    std::cout << "\n--------- INIT BUILD RENDERDATA COMPLETE ---------" << std::endl;
 
-    std::cout << "\n--------- INIT UPDATE FACE NORMALS ---------" << std::endl;
     // Update face normals
     for(unsigned int i = 0; i < mFaces.size(); i++) {
         getFace(i).normal = calculateFaceNormal(i);
         //std::cout << getFace(i).normal << std::endl;
     }
-    std::cout << "\n--------- INIT UPDATE FACE NORMALS COMPLETE ---------" << std::endl;
 
-    std::cout << "\n--------- INIT UPDATE VERTEX NORMALS ---------" << std::endl;
     // Update vertex normals
     for(unsigned int i = 0; i < mVerts.size(); i++)
         getVert(i).normal = calculateVertNormal(i);
-    std::cout << "\n--------- INIT UPDATE VERTEX NORMALS COMPLETE ---------" << std::endl;
 
     // Update the lists that we draw
     updateRenderData();
@@ -157,7 +149,7 @@ void HalfEdgeMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
 
     // Use shader
     glUseProgram(shaderProgram);
-    glEnable( GL_BLEND );
+    glDisable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     
     glUniformMatrix4fv(MVPLoc, 1, GL_FALSE, &sceneMatrices[I_MVP](0, 0));
@@ -256,7 +248,6 @@ bool HalfEdgeMesh::addFace(const std::vector<Vector3 <float> > verts) {
 
     // Optionally, track the (outer) boundary half-edges
     // to represent non-closed surfaces
-
     if(getEdge(getEdge(innerHalfEdgeIndex1).pair).face == UNINITIALIZED ||
        getEdge(getEdge(innerHalfEdgeIndex1).pair).face == BORDER)
         MergeOuterBoundaryEdge(innerHalfEdgeIndex1);
@@ -547,7 +538,7 @@ Vector3<float> HalfEdgeMesh::calculateVertNormal(unsigned int vertIndex) const {
             normal += getFace(faces[i]).normal;
         }
     }
-
+    //std::cout << "\nvert normal: " << normal.Normalize() << std::endl;
     return normal.Normalize();
 }
 
@@ -559,7 +550,7 @@ std::vector<Vector3<float> > HalfEdgeMesh::buildVertexData() {
     for(unsigned int i = 0; i < mVerts.size(); i++) {
         vertexData.push_back(mVerts[i].pos);
     }
-    std::cout << "vertexdata: " << vertexData.size() << std::endl;
+    
     return vertexData;
 }
 
@@ -586,11 +577,33 @@ void HalfEdgeMesh::buildRenderData() {
         mOrderedVertexList.push_back(v1.pos);    
         mOrderedVertexList.push_back(v2.pos);
         mOrderedVertexList.push_back(v3.pos);
-
+        //std::cout << "\ninnan normal bestäms" << std::endl;
+        Vector3<float> faceNormal = getFace(i).normal;//Vector3<float>(0.0001f, 0.0001f, 0.0001f);
+     /*   
+        if(getEdge(v1.edge).face != BORDER && getEdge(v1.edge).face != UNINITIALIZED) {
+            //std::cout << "v1.normal" << std::endl;
+            faceNormal = getFace(getEdge(v1.edge).face).normal;
+        }
+        else if(getEdge(v2.edge).face != BORDER && getEdge(v2.edge).face != UNINITIALIZED) {
+            //std::cout << "v2.normal" << std::endl;
+            faceNormal = getFace(getEdge(v2.edge).face).normal;
+        }
+        else if(getEdge(v3.edge).face != BORDER && getEdge(v3.edge).face != UNINITIALIZED) {
+            //std::cout << "v3.normal" << std::endl;
+            faceNormal = getFace(getEdge(v3.edge).face).normal;
+        }
+        else if(getEdge(getEdge(v1.edge).pair).face != BORDER && getEdge(getEdge(v1.edge).pair).face != UNINITIALIZED)
+            faceNormal = getFace(getEdge(getEdge(v1.edge).pair).face).normal;
+        else if(getEdge(getEdge(v2.edge).pair).face != BORDER && getEdge(getEdge(v2.edge).pair).face != UNINITIALIZED)
+            faceNormal = getFace(getEdge(getEdge(v2.edge).pair).face).normal;
+        else if(getEdge(getEdge(v3.edge).pair).face != BORDER && getEdge(getEdge(v3.edge).pair).face != UNINITIALIZED)
+            faceNormal = getFace(getEdge(getEdge(v3.edge).pair).face).normal;
+        //std::cout << "efter normal bestäms" << std::endl;
+*/
         // Add normals to our drawing list
-        mOrderedNormalList.push_back(v1.normal);
-        mOrderedNormalList.push_back(v2.normal);
-        mOrderedNormalList.push_back(v3.normal);
+        mOrderedNormalList.push_back(faceNormal);
+        mOrderedNormalList.push_back(faceNormal);
+        mOrderedNormalList.push_back(faceNormal);
     }   
     std::cout << "\n--------- buildRenderData COMPLETE !!! ---------" << std::endl;
 }
@@ -604,27 +617,42 @@ void HalfEdgeMesh::updateRenderData() {
         //if(getEdge(getFace(i).edge).face == BORDER)
           //  continue;
 
-        Face &face = getFace(i);
+        Face face = getFace(i);
 
-        HalfEdge* edge = &getEdge(face.edge);
+        HalfEdge edge = getEdge(face.edge);
 
-        Vertex &v1 = getVert(edge->vert);
-        edge = &getEdge(edge->next);
+        Vertex v1 = getVert(edge.vert);
+        edge = getEdge(edge.next);
 
-        Vertex &v2 = getVert(edge->vert);
-        edge = &getEdge(edge->next);
+        Vertex v2 = getVert(edge.vert);
+        edge = getEdge(edge.next);
 
-        Vertex &v3 = getVert(edge->vert);
+        Vertex v3 = getVert(edge.vert);
         
         // Add vertices to our drawing list
-        mOrderedVertexList[vertIndex]     = v1.pos;    
+        mOrderedVertexList[vertIndex]     = v1.pos;   
         mOrderedVertexList[vertIndex + 1] = v2.pos;
         mOrderedVertexList[vertIndex + 2] = v3.pos;
 
+        //Vector3<float> faceNormal = Vector3<float>(0.0001f, 0.0001f, 0.0001f);
+        Vector3<float> faceNormal = getFace(i).normal;
+        /*if(getEdge(v1.edge).face != BORDER && getEdge(v1.edge).face != UNINITIALIZED)
+            faceNormal = getFace(getEdge(v1.edge).face).normal;
+        else if(getEdge(v2.edge).face != BORDER && getEdge(v2.edge).face != UNINITIALIZED)
+            faceNormal = getFace(getEdge(v2.edge).face).normal;
+        else if(getEdge(v3.edge).face != BORDER && getEdge(v3.edge).face != UNINITIALIZED)
+            faceNormal = getFace(getEdge(v3.edge).face).normal;
+        else if(getEdge(getEdge(v1.edge).pair).face != BORDER && getEdge(getEdge(v1.edge).pair).face != UNINITIALIZED)
+            faceNormal = getFace(getEdge(getEdge(v1.edge).pair).face).normal;
+        else if(getEdge(getEdge(v2.edge).pair).face != BORDER && getEdge(getEdge(v2.edge).pair).face != UNINITIALIZED)
+            faceNormal = getFace(getEdge(getEdge(v2.edge).pair).face).normal;
+        else if(getEdge(getEdge(v3.edge).pair).face != BORDER && getEdge(getEdge(v3.edge).pair).face != UNINITIALIZED)
+            faceNormal = getFace(getEdge(getEdge(v3.edge).pair).face).normal;
+*/
         // Add normals to our drawing list
-        mOrderedNormalList[vertIndex]     = v1.normal;
-        mOrderedNormalList[vertIndex + 1] = v2.normal;
-        mOrderedNormalList[vertIndex + 2] = v3.normal;
+        mOrderedNormalList[vertIndex]     = faceNormal;
+        mOrderedNormalList[vertIndex + 1] = faceNormal;
+        mOrderedNormalList[vertIndex + 2] = faceNormal;
 
         vertIndex += 3;
     }

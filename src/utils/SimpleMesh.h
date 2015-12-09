@@ -30,6 +30,10 @@ public:
 
     bool addFace(const std::vector<Vector3<float> >);
 
+    unsigned int getNumberOfVerts() { return mVerts.size(); }
+    
+    std::vector<Vector3<float> >& getVertexList() { return mVerts; }
+
 private:
 
     std::vector<Vector3<float> > mVerts;

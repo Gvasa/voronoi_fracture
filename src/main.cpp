@@ -40,6 +40,8 @@ double calcFPS(double, std::string);
 
 int main (int argc, char* argv[]) {
 
+    srand (static_cast<unsigned>(time(0)));
+
     scene = new Scene();
     utilHandler = new Utils();
 
@@ -69,14 +71,16 @@ int main (int argc, char* argv[]) {
     mesh->setDebugMode(true);
 
     //mesh->createMesh("lowPolySphere1.0");
-    //mesh->createMesh("Sphere1.0");
+    mesh->createMesh("Sphere1.0");
+    //mesh->createMesh("icosphere");
     //mesh->createMesh("Sphere1.0_hole");
-    mesh->createMesh("bunnySmall");
+    //mesh->createMesh("bunnySmall");
     //mesh->createMesh("cube");
     //mesh->createMesh("cube_hole");
+    //mesh->createMesh("cow");
     //mesh->translate(Vector3<float>(0.0f, 0.0f, 1.0f));
-    mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
-    mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
+    //mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
+    //mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
 
    /* mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.0f));
     mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.6f, 0.0f));

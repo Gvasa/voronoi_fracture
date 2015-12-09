@@ -271,6 +271,8 @@ public:
     unsigned int getNumFaces() const {  return mFaces.size(); }
     //Return number of Edges
     unsigned int getNumEdges() const {  return mEdges.size(); }
+    //Return vertex list
+    std::vector<Vector3<float> > getVertexList() { return mOrderedVertexList; }
 };
 
 #endif // HALFEDGEMESH_H
