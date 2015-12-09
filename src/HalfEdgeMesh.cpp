@@ -265,6 +265,8 @@ void HalfEdgeMesh::createMesh(std::string objName) {
 
     for(unsigned int i = 0; i < vertexList.size(); i++) 
         addFace(vertexList[i]);
+
+    calculateCenterOfMass();
 }
 
 // Rotate the mesh
@@ -277,6 +279,7 @@ void HalfEdgeMesh::rotate(Vector3<float> axis, float angle) {
 void HalfEdgeMesh::translate(Vector3<float> p){
 
     mTransMat = mTransMat * glm::translate(glm::mat4(1.f),  glm::vec3(p[0], p[1], p[2]));
+    updateCenterOfMass(mTransMat);
 
 }
 
@@ -284,7 +287,7 @@ void HalfEdgeMesh::translate(Vector3<float> p){
 void HalfEdgeMesh::scale(Vector3<float> s){
 
     mTransMat = mTransMat * glm::scale(glm::mat4(1.0f), glm::vec3(s[0], s[1], s[2]));
-
+    updateCenterOfMass(mTransMat);
 }
 
 
@@ -327,6 +330,24 @@ void HalfEdgeMesh::computeVoronoiPattern() {
     mCompound->initialize();
 
     mCompoundIsComputed = true;
+}
+
+void HalfEdgeMesh::calculateCenterOfMass() {
+    for (unsigned int i = 0; i < mVerts.size(); ++i)
+        mCenterOfMass += mVerts[i].pos;
+
+    mCenterOfMass /= mVerts.size();
+
+    std::cout << "COM: " << mCenterOfMass << std::endl;
+}
+
+void HalfEdgeMesh::updateCenterOfMass(glm::mat4) {
+    glm::vec4 tmpCom(mCenterOfMass[0], mCenterOfMass[1], mCenterOfMass[2], 1.0);
+
+    tmpCom = mTransMat*tmpCom;
+
+    mCenterOfMass = Vector3<float>(tmpCom.x, tmpCom.y, tmpCom.z);
+    //hstd::cout << "updaterad COM: " << mCenterOfMass << std::endl;
 }
 
 std::vector<Vector3<float> > HalfEdgeMesh::getVertexList() {

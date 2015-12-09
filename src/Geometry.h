@@ -76,6 +76,15 @@ public:
     virtual void markCurrentVoronoiPoint(unsigned int, Vector4<float>) {
         std::cout << "\nGeometry does not have markCurrentVoronoiPoint implemented!\n";
     };
+    virtual void calculateCenterOfMass() {
+        std::cout << "\nGeometry does not have calculateCenterOfMass implemented!\n";  
+    };
+    virtual void updateCenterOfMass(glm::mat4) {
+        std::cout << "\nGeometry does not have updateCenterOfMass implemented!\n";  
+    };
+    virtual Vector3<float> getCenterOfMass() { 
+        std::cout << "\nGeometry does not have getCenterOfMass implemented!\n"; 
+    };
     virtual std::vector<Vector3<float> > getVertexList() {
         std::cout << "\nGeometry does not have getVertexList implemented!\n";
     };

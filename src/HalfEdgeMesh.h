@@ -65,6 +65,12 @@ public:
 
     void markCurrentVoronoiPoint(unsigned int i, Vector4<float> c) { mDebugPoints[i]->setColor(c); }
 
+    void calculateCenterOfMass();
+
+    void updateCenterOfMass(glm::mat4);
+    
+    Vector3<float> getCenterOfMass() { return mCenterOfMass; }
+
     unsigned int getType() { return HALFEDGEMESH; }
 
     void setPrevPos(Vector3<float> v) { mPrevPos = v; }
@@ -222,6 +228,8 @@ private:
     std::vector< Vector3<float> > mVoronoiPoints;
 
     std::vector<Debugpoint *> mDebugPoints;
+
+    Vector3<float> mCenterOfMass;
 
     Vector3<float> mPrevPos;
     float mPrevRotAngle;

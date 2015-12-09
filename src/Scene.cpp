@@ -3,7 +3,7 @@
 struct cameraHandler {
     float fov = 45.0f;
     float aspectRatio = 4.0f / 3.0f;
-    float zoom = 2.0f;
+    float zoom = 4.0f;
     glm::quat orientation;
 
     glm::mat4 projectionMatrix;
@@ -72,26 +72,6 @@ void Scene::render() {
         glm::vec3(0.0f, 1.0f, 0.0f)) *          // Up-vector                            
         glm::mat4_cast(camera.orientation);     // multiplies the veiw matrix with current rotation
 
-
-    // The scene modelmatrix is nothing atm, the geometries will have their own model transforms
-/*    //glm::mat4 modelMatrix; = glm::mat4(1.0f);
-
-    // Construct MVP matrix
-    mSceneMatrices[I_MVP] = toMatrix4x4(camera.projectionMatrix * camera.viewMatrix) * modelMatrix);
-
-    // Modelview Matrix, apply camera transforms here as well
-    mSceneMatrices[I_MV] = toMatrix4x4(camera.viewMatrix * modelMatrix);
-
-    // Modelview Matrix for our light
-    mSceneMatrices[I_MV_LIGHT] = toMatrix4x4(camera.viewMatrix * modelMatrix);
-
-    // Normal Matrix, used for normals in our shading
-    mSceneMatrices[I_NM] = toMatrix4x4(glm::inverseTranspose(glm::mat4(camera.viewMatrix * modelMatrix)));
-
-    (*it)->render(mSceneMatrices);
-*/
-
-
     glm::mat4 modelMatrix;
     // render Geometries in scene
     for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it) {
@@ -122,7 +102,7 @@ void Scene::render() {
 
 void Scene::addGeometry(Geometry *G, unsigned int type) {
     mGeometries.push_back(G);
-    physicsWorld->addGeometry(G->getVertexList(), type);
+    physicsWorld->addGeometry(G->getVertexList(), G->getCenterOfMass() , type);
 
 }
 
@@ -169,7 +149,7 @@ void Scene::resetCamera() {
 }
 
 void Scene::stepSimulation() { 
-    physicsWorld->stepSimulation(); 
+     
     
     btTransform worldTrans;
     btQuaternion rotation;
@@ -182,32 +162,36 @@ void Scene::stepSimulation() {
     for(unsigned int i = 0; i < mGeometries.size(); i++) {
         if(mGeometries[i]->getType() == HALFEDGEMESH) {
                 physicsWorld->getRigidBodyAt(i)->getMotionState()->getWorldTransform(worldTrans);
-                HalfEdgeMesh* tmpHem = dynamic_cast<HalfEdgeMesh*>(mGeometries[i]);
+                HalfEdgeMesh* hem = dynamic_cast<HalfEdgeMesh*>(mGeometries[i]);
                 
-                prevPos = tmpHem->getPrevPos();
-                prevAngle = tmpHem->getPrevRot();
+                prevPos = hem->getPrevPos();
+                prevAngle = hem->getPrevRot();
 
                 rotation = worldTrans.getRotation();
                 rotAxis = rotation.getAxis();
                 rotAngle = rotation.getAngle();
 
-                if((float)rotAngle - prevAngle < -EPSILON || (float)rotAngle - prevAngle > EPSILON ) {
-                    tmpHem->translate(-prevPos);
-                    tmpHem->rotate(Vector3<float>((float)rotAxis.getX(), (float)rotAxis.getY(), (float)rotAxis.getZ() ), (float)rotAngle * M_PI / 180.0);
-                    tmpHem->translate(prevPos);
-                    tmpHem->setPrevRot((float)rotAngle);
-                }
 
-                tmpHem->translate(Vector3<float>((float)worldTrans.getOrigin().getX() - prevPos[0], (float)worldTrans.getOrigin().getY() - prevPos[1], (float)worldTrans.getOrigin().getZ() - prevPos[2]));
-                tmpHem->setPrevPos(Vector3<float>(worldTrans.getOrigin().getX(), worldTrans.getOrigin().getY(), worldTrans.getOrigin().getZ()));
-                //mpHem->setPrevRot((float)rotAngle);
+                //std::cout << "translate with: " << (float)worldTrans.getOrigin().getX() - prevPos[0] << " " <<  (float)worldTrans.getOrigin().getY() - prevPos[1] << " " << (float)worldTrans.getOrigin().getZ() - prevPos[2] << std::endl;
+                hem->translate(Vector3<float>(((float)worldTrans.getOrigin().getX() - prevPos[0]),( (float)worldTrans.getOrigin().getY() - prevPos[1]), ((float)worldTrans.getOrigin().getZ() - prevPos[2])));
+                hem->setPrevPos(Vector3<float>(worldTrans.getOrigin().getX(), worldTrans.getOrigin().getY(), worldTrans.getOrigin().getZ()));
+            
+                if((float)rotAngle - prevAngle < -EPSILON || (float)rotAngle - prevAngle > EPSILON ) {
+                    std::cout << " rotAxis: " << rotAxis.getX() << " " << rotAxis.getY() << " " << rotAxis.getZ() << "  - angle " << rotAngle << std::endl;
+                    hem->translate(-prevPos);
+                    hem->rotate(Vector3<float>((float)rotAxis.getX(), (float)rotAxis.getY(), (float)rotAxis.getZ() ), (float)rotAngle-prevAngle);
+                    hem->translate(prevPos);
+                    hem->setPrevRot((float)rotAngle);
+                }
+                /**********************************************
+                /*
+                /*  TYDLIGEN SÅ PÅVERKAS BULLET AV VAFAN MESHET HÅLLER PÅ MED! ; HEEEELT JÄVLA ORIMLIGT!
+                /*
+                /*
+                *********************************************
+
+               //hem->setPrevRot((float)rotAngle);
         }
     }
-
-   // std::cout << "sphere height:" << trans.getOrigin().getX() << " " << trans.getOrigin().getY() << " " << trans.getOrigin().getZ() << std::endl;
-    
-
-    // std::cout << "sphere heigh:" << trans.getOrigin().getX() << " " << trans.getOrigin().getY() << " " << trans.getOrigin().getZ() << std::endl;
-    
-    //mGeometries(2)->translate()
+    physicsWorld->stepSimulation(mSceneMatrices[I_MVP]);
 }

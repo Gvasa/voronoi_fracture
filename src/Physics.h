@@ -14,6 +14,7 @@
 #include "utils/Utils.h"
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision/CollisionShapes/btShapeHull.h"
+#include "BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h"
 #include "Geometry.h"
 #include "utils/GLDebugDrawer.h"
 
@@ -25,8 +26,8 @@ public:
     
     ~Physics(); 
     
-    void addGeometry(std::vector<Vector3<float> >, unsigned int);
-    void stepSimulation();
+    void addGeometry(std::vector<Vector3<float> >, Vector3<float>, unsigned int);
+    void stepSimulation(Matrix4x4<float>);
     void setWireFrame(bool w) { mWireframe = w; };
     btRigidBody* getRigidBodyAt(int i) { return mRigidBodies[i]; }
 
@@ -61,7 +62,9 @@ private:
 
     std::vector<btRigidBody* > mRigidBodies;
 
-    GLDebugDrawer debugDrawer;
+    GLDebugDrawer mDebugDrawer;
+
+    double prevTime;
 
 
 

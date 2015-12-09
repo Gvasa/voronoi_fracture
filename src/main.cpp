@@ -37,8 +37,7 @@ double calcFPS(double, std::string);
 
 int main (int argc, char* argv[]) {
 
-    scene = new Scene();
-    utilHandler = new Utils();
+  
 
     // Magic
     glewExperimental = GL_TRUE;
@@ -47,6 +46,9 @@ int main (int argc, char* argv[]) {
     if(initializeOpenGL() == -1) {
         return -1;
     }
+
+    scene = new Scene();
+    utilHandler = new Utils();
     
     // Create geometries and add them to the scene
 
@@ -65,29 +67,11 @@ int main (int argc, char* argv[]) {
     mesh = new HalfEdgeMesh();
     mesh->setDebugMode(true);
 
-    //mesh->createMesh("sphere1.0");
+    //mesh->createMesh("lowPolySphere1.0");
     mesh->createMesh("bunnySmall");
-    mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
-    mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
-   // mesh->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), M_PI/2.0);
-
-   /* mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.0f));
-    mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.6f, 0.0f));
-    mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.7f, 0.0f));
-    //mesh->addVoronoiPoint(Vector3<float>(0.2f, -0.7f, 0.5f));
-    
-   /* mesh->addVoronoiPoint(Vector3<float>(-0.5f, -0.7f, 0.5f));
-    mesh->addVoronoiPoint(Vector3<float>(0.1f, 0.6f, -0.37f));
-    mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.6f, 0.9f));
-*/
-    //mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
-
-/*
-    mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
-    mesh->addVoronoiPoint(Vector3<float>(0.9f, 0.9f, 0.997f));
-    mesh->addVoronoiPoint(Vector3<float>(0.7f, -0.8f, 0.0f));
-*/
-
+    mesh->scale(Vector3<float>(0.1f, 0.1f, 0.1f));
+    mesh->translate(-mesh->getCenterOfMass());
+   
     mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
     mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
 

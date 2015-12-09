@@ -72,9 +72,7 @@ void Boundingbox::render(Matrix4x4<float> MVP) {
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, mVerts.size() * sizeof(Vector3<float>), &mVerts[0], GL_STATIC_DRAW);
 
-    // Draw geometry
-
-    
+    // Draw geometry    
     if(mWireframe)   //Draw Wireframe
         glDrawArrays(GL_LINES, 0, mVerts.size()); // 3 indices starting at 0 -> 1 triangle
     else                //draw triangles

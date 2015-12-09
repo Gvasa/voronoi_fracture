@@ -29,6 +29,10 @@ public:
     void addNormal(Vector3<float> n) { mNormals.push_back(n); };
     void createVertices(float, float);
 
+    void calculateCenterOfMass();
+    void updateCenterOfMass(glm::mat4);
+    Vector3<float> getCenterOfMass() { return mCenterOfMass; }
+    
     void rotate(Vector3<float>, float);
     void translate(Vector3<float>);
     void scale(Vector3<float>);
@@ -65,6 +69,8 @@ private:
     GLint shinynessLoc;     // How much specularity (magnitude)
 
     glm::mat4 mTransMat;
+
+    Vector3<float> mCenterOfMass;
 
     struct Material : public Geometry::Material {   
     } mMaterial;
