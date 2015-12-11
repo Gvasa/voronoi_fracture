@@ -32,13 +32,14 @@ public:
     void calculateCenterOfMass();
     void updateCenterOfMass(glm::mat4);
     Vector3<float> getCenterOfMass() { return mCenterOfMass; }
-    
+
     void rotate(Vector3<float>, float);
     void translate(Vector3<float>);
     void scale(Vector3<float>);
 
     std::vector<Vector3<float> > getVertexList() { return mVerts; }
     glm::mat4 getTransMat() { return mTransMat; }
+    void setTransMat(glm::mat4 m) { mTransMat = m; }
 
     unsigned int getType() { return RECTANGLE; }
 

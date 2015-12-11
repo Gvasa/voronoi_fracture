@@ -91,10 +91,12 @@ public:
     virtual Vector3<float> getPrevPos(Vector3<float>) {
         std::cout << "\nGeometry does not have getPrevPos implemented!\n";
     };
-
     virtual glm::mat4 getTransMat() {
         std::cout << "\nGeometry does not have getPrevPos implemented!\n";  
-    }
+    };
+    virtual void setTransMat(glm::mat4) {
+        std::cout << "\nGeometry does not have setPrevPos implemented!\n";  
+    };
 protected:
 
     //! Compute and return the normal at face at faceIndex

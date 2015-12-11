@@ -3,7 +3,7 @@
 struct cameraHandler {
     float fov = 45.0f;
     float aspectRatio = 4.0f / 3.0f;
-    float zoom = 4.0f;
+    float zoom = 1.0f;
     glm::quat orientation;
 
     glm::mat4 projectionMatrix;
@@ -102,6 +102,7 @@ void Scene::render() {
 
 void Scene::addGeometry(Geometry *G, unsigned int type) {
     mGeometries.push_back(G);
+    
     physicsWorld->addGeometry(G->getVertexList(), G->getCenterOfMass() , type);
 
 }
@@ -116,7 +117,6 @@ Matrix4x4<float> Scene::toMatrix4x4(glm::mat4 m) {
     return Matrix4x4<float>(M);
 }
 
-
 Matrix4x4<float> Scene::toMatrix4x4(glm::mat3 m) {
     float M[4][4] = {
         {m[0][0], m[0][1], m[0][2], 0.0f},
@@ -127,6 +127,27 @@ Matrix4x4<float> Scene::toMatrix4x4(glm::mat3 m) {
     return Matrix4x4<float>(M);
 }
 
+glm::mat4 Scene::toGlmMat4(float m[]) {
+    glm::mat4 M;
+        M[0][0] = m[0];
+        M[0][1] = m[1];
+        M[0][2] = m[2];
+        M[0][3] = m[3];
+        M[1][0] = m[4];
+        M[1][1] = m[5];
+        M[1][2] = m[6];
+        M[1][3] = m[7];
+        M[2][0] = m[8];
+        M[2][1] = m[9];
+        M[2][2] = m[10];
+        M[2][3] = m[11];
+        M[3][0] = m[12];
+        M[3][1] = m[13];
+        M[3][2] = m[14];
+        M[3][3] = m[15]; 
+
+    return M;
+}
 
 void Scene::updateCameraPosition(double x, double y) {
     if(! control->dragged())
@@ -149,49 +170,68 @@ void Scene::resetCamera() {
 }
 
 void Scene::stepSimulation() { 
-     
-    
     btTransform worldTrans;
     btQuaternion rotation;
     btScalar rotAngle;
     btVector3 rotAxis;
-
+   // float trans[16];
     Vector3<float> prevPos;
     float prevAngle;
+
+    physicsWorld->stepSimulation(mSceneMatrices[I_MVP]);
 
     for(unsigned int i = 0; i < mGeometries.size(); i++) {
         if(mGeometries[i]->getType() == HALFEDGEMESH) {
                 physicsWorld->getRigidBodyAt(i)->getMotionState()->getWorldTransform(worldTrans);
-                HalfEdgeMesh* hem = dynamic_cast<HalfEdgeMesh*>(mGeometries[i]);
+                float bulletTransform[16];
+                worldTrans.getOpenGLMatrix(bulletTransform);
+
+                mGeometries[i]->setTransMat(toGlmMat4(bulletTransform));
+
+                //btRigidBody* rigidBody = physicsWorld->getRigidBodyAt(i);
+                //HalfEdgeMesh* hem = dynamic_cast<HalfEdgeMesh*>(mGeometries[i]);
                 
-                prevPos = hem->getPrevPos();
-                prevAngle = hem->getPrevRot();
+//                 prevPos = hem->getPrevPos();
+//                 prevAngle = hem->getPrevRot();
 
-                rotation = worldTrans.getRotation();
-                rotAxis = rotation.getAxis();
-                rotAngle = rotation.getAngle();
+//                /* rotation = worldTrans.getRotation();
+//                 rotAxis = rotation.getAxis();
+//                 rotAngle = rotation.getAngle();
+// */
+//                 std::cout << "prevPos: " << prevPos << std::endl;
 
+//                 btVector3 pos = rigidBody->getCenterOfMassPosition();
+//                 rotation = rigidBody->getOrientation();
+//                 rotAxis = rotation.getAxis();
+//                 rotAngle = rotation.getAngle();
+//                 //std::cout << "worldTransgetOrigin: " 
+//                 //std::cout << "translate with: " << (float)worldTrans.getOrigin().getX() - prevPos[0] << " " <<  (float)worldTrans.getOrigin().getY() - prevPos[1] << " " << (float)worldTrans.getOrigin().getZ() - prevPos[2] << std::endl;
+//                // std::cout << "translate with: " << (float)worldTrans.getOrigin().getX() - prevPos[0] << " " <<  (float)worldTrans.getOrigin().getY() - prevPos[1] << " " << (float)worldTrans.getOrigin().getZ() - prevPos[2] << std::endl;
 
-                //std::cout << "translate with: " << (float)worldTrans.getOrigin().getX() - prevPos[0] << " " <<  (float)worldTrans.getOrigin().getY() - prevPos[1] << " " << (float)worldTrans.getOrigin().getZ() - prevPos[2] << std::endl;
-                hem->translate(Vector3<float>(((float)worldTrans.getOrigin().getX() - prevPos[0]),( (float)worldTrans.getOrigin().getY() - prevPos[1]), ((float)worldTrans.getOrigin().getZ() - prevPos[2])));
-                hem->setPrevPos(Vector3<float>(worldTrans.getOrigin().getX(), worldTrans.getOrigin().getY(), worldTrans.getOrigin().getZ()));
+//                 //if((float)rotAngle - prevAngle < -EPSILON || (float)rotAngle - prevAngle > EPSILON ) {
+//                     //std::cout << " rotAxis: " << rotAxis.getX() << " " << rotAxis.getY() << " " << rotAxis.getZ() << "  - angle " << rotAngle << std::endl;
+//                     hem->translate(-prevPos);
+//                     hem->rotate(Vector3<float>((float)rotAxis.getX(), (float)rotAxis.getY(), (float)rotAxis.getZ() ), (float)rotAngle - prevAngle);
+//                     hem->translate(prevPos);
+//                     hem->setPrevRot((float)rotAngle);
+//                 //}
+                
+//                 //hem->translate(Vector3<float>(((float)worldTrans.getOrigin().getX() - prevPos[0]),( (float)worldTrans.getOrigin().getY() - prevPos[1]), ((float)worldTrans.getOrigin().getZ() - prevPos[2])));
+//                 //hem->setPrevPos(Vector3<float>(worldTrans.getOrigin().getX(), worldTrans.getOrigin().getY(), worldTrans.getOrigin().getZ()));
+                
+//                 hem->translate(Vector3<float>((float)pos.getX() - prevPos[0], (float)pos.getY() - prevPos[1], (float)pos.getZ() - prevPos[2]));
+//                 hem->setPrevPos(Vector3<float>(pos.getX(), pos.getY(), pos.getZ()));
             
-                if((float)rotAngle - prevAngle < -EPSILON || (float)rotAngle - prevAngle > EPSILON ) {
-                    std::cout << " rotAxis: " << rotAxis.getX() << " " << rotAxis.getY() << " " << rotAxis.getZ() << "  - angle " << rotAngle << std::endl;
-                    hem->translate(-prevPos);
-                    hem->rotate(Vector3<float>((float)rotAxis.getX(), (float)rotAxis.getY(), (float)rotAxis.getZ() ), (float)rotAngle-prevAngle);
-                    hem->translate(prevPos);
-                    hem->setPrevRot((float)rotAngle);
-                }
+
                 /**********************************************
                 /*
-                /*  TYDLIGEN SÅ PÅVERKAS BULLET AV VAFAN MESHET HÅLLER PÅ MED! ; HEEEELT JÄVLA ORIMLIGT!
+                /*  TYDLIGEN SÅ PÅVERKAS BULLET AV VAFAN MESHET HÅLLER PÅ MED! ; HEEEELT JÄVLA ORIMLIGT
                 /*
                 /*
-                *********************************************
+                ********************************************* */
 
                //hem->setPrevRot((float)rotAngle);
         }
     }
-    physicsWorld->stepSimulation(mSceneMatrices[I_MVP]);
+    
 }

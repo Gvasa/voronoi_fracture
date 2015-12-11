@@ -54,6 +54,7 @@ private:
 
     Matrix4x4<float> toMatrix4x4(glm::mat4);
     Matrix4x4<float> toMatrix4x4(glm::mat3);
+    glm::mat4 toGlmMat4(float []);
 
     std::vector<Geometry *>mGeometries;
     std::vector<Matrix4x4<float> >mSceneMatrices;

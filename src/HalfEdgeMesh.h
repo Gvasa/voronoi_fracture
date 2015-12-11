@@ -68,7 +68,7 @@ public:
     void calculateCenterOfMass();
 
     void updateCenterOfMass(glm::mat4);
-    
+
     Vector3<float> getCenterOfMass() { return mCenterOfMass; }
 
     unsigned int getType() { return HALFEDGEMESH; }
@@ -82,6 +82,7 @@ public:
     std::vector<Vector3<float> > getVertexList();
 
    glm::mat4 getTransMat() { return mTransMat; }
+   void setTransMat(glm::mat4 m) { mTransMat = m; }
   //  void setPrevRot(std::pair<Vector3<float>, float> p) { mPrevRot = p; }
 
     

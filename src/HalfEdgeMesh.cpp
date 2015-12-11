@@ -81,17 +81,19 @@ HalfEdgeMesh::~HalfEdgeMesh() {
 void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     std::cout << "\nInitializing Half-Edge mesh ...\n\n";
-
+    debug
     mBoundingbox = new Boundingbox(buildVertexData());
+    debug
     mBoundingbox->initialize();
+    debug
     mBoundingbox->setWireFrame(true);
-
+    debug
     /*for(unsigned int i = 0; i < mDebugPoints.size(); i++)
         mDebugPoints[i]->initialize(lightPosition);*/
     std::cout << "Volume: " << volume() << std::endl << std::endl;
 
     buildRenderData();
-
+    debug
     // Update face normals
     for(unsigned int i = 0; i < mFaces.size(); i++) {
         getFace(i).normal = calculateFaceNormal(i);
@@ -101,7 +103,7 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
     // Update face normals
     for(unsigned int i = 0; i < mVerts.size(); i++)
         getVert(i).normal = calculateVertNormal(i);
-
+    debug
     // Update the lists that we draw
     updateRenderData();
 
@@ -268,7 +270,7 @@ void HalfEdgeMesh::createMesh(std::string objName) {
 
     calculateCenterOfMass();
 }
-
+/*
 // Rotate the mesh
 void HalfEdgeMesh::rotate(Vector3<float> axis, float angle) {
 
@@ -288,6 +290,69 @@ void HalfEdgeMesh::scale(Vector3<float> s){
 
     mTransMat = mTransMat * glm::scale(glm::mat4(1.0f), glm::vec3(s[0], s[1], s[2]));
     updateCenterOfMass(mTransMat);
+}*/
+
+    // Rotate the mesh
+void HalfEdgeMesh::rotate(Vector3<float> axis, float angle) {
+   
+    //Compute the rotational matrix
+    std::cout << std::endl << "Rotating..." << std::endl;
+    mTransMat = mTransMat * glm::rotate(glm::mat4(1.f), angle, glm::vec3(axis[0], axis[1], axis[2]));
+ 
+    Matrix4x4<float>  rotationMatrix = Matrix4x4<float>::RotationXYZ(
+        axis[0] * (angle * M_PI / 180.0f),
+        axis[1] * (angle * M_PI / 180.0f),
+        axis[2] * (angle * M_PI / 180.0f)  
+    );
+ 
+    for(unsigned int i = 0; i < mVerts.size(); i++){
+        // Apply the rotation to the vertices
+        Vector4<float> v = Vector4<float>(mVerts[i].pos[0], mVerts[i].pos[1], mVerts[i].pos[2], 1.0f);
+        v = rotationMatrix * v;
+        mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
+ 
+        //Apply the rotation to the normals
+        Vector4<float> n = Vector4<float>(mVerts[i].normal[0], mVerts[i].normal[1], mVerts[i].normal[2], 1.0f);
+        n = rotationMatrix * n;
+        mVerts[i].normal = Vector3<float>(n[0], n[1], n[2]).Normalize();
+    }
+    //updateCenterOfMass(mTransMat);
+    calculateCenterOfMass();
+
+}
+ 
+// Translate the Mesh
+void HalfEdgeMesh::translate(Vector3<float> p){
+   
+    // Compute the translation matrix
+    mTransMat = mTransMat * glm::translate(glm::mat4(1.f),  glm::vec3(p[0], p[1], p[2]));
+    Matrix4x4<float> translationMatrix = Matrix4x4<float>::Translation(p[0], p[1], p[2]);
+ 
+    for(unsigned int i = 0; i < mVerts.size(); i++) {
+        // Apply the rotation to the vertices
+        Vector4<float> v = Vector4<float>(mVerts[i].pos[0], mVerts[i].pos[1], mVerts[i].pos[2], 1.0f);
+        v = translationMatrix * v;
+        mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
+    }
+    //updateCenterOfMass(mTransMat);
+    calculateCenterOfMass();
+}
+ 
+// Scale the Mesh
+void HalfEdgeMesh::scale(Vector3<float> s){
+ 
+    // Compute the scaling matrix
+    mTransMat = mTransMat * glm::scale(glm::mat4(1.0f), glm::vec3(s[0], s[1], s[2]));
+    Matrix4x4<float> scalingMatrix = Matrix4x4<float>::Scale(s[0], s[1], s[2]);
+ 
+    for(unsigned int i = 0; i < mVerts.size(); i++) {
+        // Apply the scaling matrix
+        Vector4<float> v = Vector4<float>(mVerts[i].pos[0], mVerts[i].pos[1], mVerts[i].pos[2], 1.0f);
+        v = scalingMatrix * v;
+        mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
+    }
+    //updateCenterOfMass(mTransMat);
+    calculateCenterOfMass();
 }
 
 
@@ -472,14 +537,15 @@ Vector3<float> HalfEdgeMesh::calculateVertNormal(unsigned int vertIndex) const {
 
 
 std::vector<Vector3<float> > HalfEdgeMesh::buildVertexData() {
-
+    debug
     std::vector<Vector3<float> > vertexData;
 
     for(unsigned int i = 0; i < mVerts.size(); i++) {
         vertexData.push_back(mVerts[i].pos);
     }
+    debug
     return vertexData;
-}
+}   
 
 
 void HalfEdgeMesh::buildRenderData() {

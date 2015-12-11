@@ -15,6 +15,7 @@
 GLFWwindow* window;
 Scene *scene;
 Geometry *mesh;
+Geometry *mesh2;
 Geometry *floor_rect;
 Geometry *wall_rect;
 Utils *utilHandler;
@@ -54,30 +55,41 @@ int main (int argc, char* argv[]) {
 
     // Floor
     floor_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
+    
+    floor_rect->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), 90);
+    floor_rect->scale(Vector3<float>(1.5f, 1.0f, 2.0f));
     floor_rect->translate(Vector3<float>(0.0f, -1.0f, 0.0f));
-    floor_rect->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), -90.0f * M_PI / 180.0);
-    floor_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
-
     // Wall
     wall_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
-    wall_rect->translate(Vector3<float>(0.0f, 0.0f, -1.0f));
     wall_rect->scale(Vector3<float>(1.5f, 1.0f, 0.0f));
-
+    wall_rect->translate(Vector3<float>(0.0f, 0.0f, 0.0f));
     // HalfEdge mesh
     mesh = new HalfEdgeMesh();
     mesh->setDebugMode(true);
 
-    //mesh->createMesh("lowPolySphere1.0");
-    mesh->createMesh("bunnySmall");
-    mesh->scale(Vector3<float>(0.1f, 0.1f, 0.1f));
-    mesh->translate(-mesh->getCenterOfMass());
+    mesh->createMesh("cow");
+    //mesh->createMesh("bunnySmall");
+    //mesh->scale(Vector3<float>(0.7f, 0.7f, 0.7f));
+   // mesh->translate(-mesh->getCenterOfMass());
+    mesh->translate(Vector3<float>(0.0f, 0.2f, 0.1f));
+
    
     mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
     mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
 
+    mesh2 = new HalfEdgeMesh();
+    mesh2->setDebugMode(true);
+    mesh2->createMesh("cow");
+    //mesh2->scale(Vector3<float>(0.3f, 0.3f, 0.3f));
+   // mesh2->translate(-mesh2->getCenterOfMass());
+   // mesh2->translate(Vector3<float>(0.2f, 5.0f, 0.0f));
+    //mesh->translate(-mesh->getCenterOfMass());
+
+
     scene->addGeometry(floor_rect, STATIC);
-    scene->addGeometry(wall_rect, STATIC);
+  //  scene->addGeometry(wall_rect, STATIC);
     scene->addGeometry(mesh, DYNAMIC);
+    scene->addGeometry(mesh2, DYNAMIC);
 
     initializeScene();
     
