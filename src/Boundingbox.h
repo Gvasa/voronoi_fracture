@@ -21,6 +21,8 @@ public:
     ~Boundingbox();
 
     void initialize();
+
+    void updateBoundingBox(std::vector<Vector3<float> >);
     
     void render(Matrix4x4<float>);
     

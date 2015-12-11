@@ -7,6 +7,10 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
+#define GLM_FORCE_RADIANS
+
+#define GLM_FORCE_RADIANS
+
 #define I_MVP 0
 #define I_MV 1
 #define I_MV_LIGHT 2
@@ -16,6 +20,8 @@
 #include "math/Vector4.h"
 #include "math/Matrix4x4.h"
 #include "utils/LoadObj.h"
+#include <glm/gtc/matrix_transform.hpp>
+
 
 class Geometry {
 
@@ -29,6 +35,8 @@ public:
     virtual void initialize(Vector3<float>) = 0;
     
     virtual void render(std::vector<Matrix4x4<float> >) = 0;
+
+    virtual unsigned int getType() = 0;
 
 
     /* 
@@ -67,8 +75,28 @@ public:
     };
     virtual void markCurrentVoronoiPoint(unsigned int, Vector4<float>) {
         std::cout << "\nGeometry does not have markCurrentVoronoiPoint implemented!\n";
-    }
-
+    };
+    virtual void calculateCenterOfMass() {
+        std::cout << "\nGeometry does not have calculateCenterOfMass implemented!\n";  
+    };
+    virtual void updateCenterOfMass(glm::mat4) {
+        std::cout << "\nGeometry does not have updateCenterOfMass implemented!\n";  
+    };
+    virtual Vector3<float> getCenterOfMass() { 
+        std::cout << "\nGeometry does not have getCenterOfMass implemented!\n"; 
+    };
+    virtual std::vector<Vector3<float> > getVertexList() {
+        std::cout << "\nGeometry does not have getVertexList implemented!\n";
+    };
+    virtual Vector3<float> getPrevPos(Vector3<float>) {
+        std::cout << "\nGeometry does not have getPrevPos implemented!\n";
+    };
+    virtual glm::mat4 getTransMat() {
+        std::cout << "\nGeometry does not have getPrevPos implemented!\n";  
+    };
+    virtual void setTransMat(glm::mat4) {
+        std::cout << "\nGeometry does not have setPrevPos implemented!\n";  
+    };
 protected:
 
     //! Compute and return the normal at face at faceIndex
