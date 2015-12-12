@@ -48,6 +48,15 @@ void Scene::initialize() {
 
     for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
         (*it)->initialize(mPointLight.position);
+
+    // Control the volume
+    float volume = 0;
+
+    for(std::vector<Geometry *>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it){
+        if((*it)->getType() == HALFEDGEMESH)
+            volume += (*it)->volume();
+    }
+    std::cout << "\nMesh volume: " << volume << std::endl;
 }
 
 // render all geometries
@@ -157,9 +166,9 @@ void Scene::updateCameraPosition(double x, double y) {
     control->dragUpdate(x, y);
 }
 
-void Scene::updateCameraZoom(double x, double y) { 
+void Scene::updateCameraZoom(double x, double y) {
     
-    if((3.0 + (camera.zoom - y / 5.0f)) > 0.1f)  
+    if((3.0 + (camera.zoom - y / 5.0f)) > 0.1f)
         camera.zoom -= y / 5.0f;
 }
 
@@ -190,4 +199,34 @@ void Scene::stepSimulation() {
         }
     }
     
+}
+
+void Scene::splitMesh(HalfEdgeMesh *he) {
+
+    if(he->isCompoundComputed()) {
+        //Mesh * sm = new SimpleMesh();
+        //addGeometry(sm);
+        std::cout << "\nNUMBER OF VORONOI POINTS: " << he->getNumVoronoiPoints() << std::endl;
+
+        ClippingMesh * cm = new ClippingMesh(he);
+        
+        for(unsigned int i = 0; i < he->getNumVoronoiPoints(); i++) {
+            addGeometry(cm->clipMesh(he->getVoronoiPoint(i)));
+            mGeometries.back()->initialize(mPointLight.position);
+        }
+        
+        //HalfEdgeMesh * hm = cm->clipMesh();
+        delete mGeometries[2];
+        mGeometries.erase(mGeometries.begin()+2);
+        delete cm;
+
+        std::cout << "\n\nGeometries left after splitting: \n";
+
+        for(std::vector<Geometry*>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
+            std::cout << "Type: " << (*it)->getType() << std::endl;
+
+        //addGeometry(hm);
+        //hm->initialize(mPointLight.position);
+        //sm->initialize();
+    }
 }

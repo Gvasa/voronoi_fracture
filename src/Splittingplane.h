@@ -31,8 +31,6 @@ public:
 
     void resolveIntersection(std::pair<Vector3<float>, Vector3<float> >, Vector3<float>);
 
-    std::vector<Vector3<float> > getVertexList() { return mUniqueVerts; }
-
     void setColor(Vector4<float> c) { mColor = c; }
 
     void resetSplittingPlane();
@@ -42,6 +40,12 @@ public:
     std::vector<Vector3<float> > getUniqueVerts() { return mUniqueVerts; }
 
     std::pair<Vector3<float>, Vector3<float> > getVoronoiPoints() { return mVoronoiPoints; }
+
+    Vector3<float> getNormal() { return mNormal; }
+
+    std::vector<Vector3<float> > getVertexList() { return mUniqueVerts; }
+
+    Vector3<float> getVertex(unsigned int i) { return mUniqueVerts[i]; }
 
 private:
 

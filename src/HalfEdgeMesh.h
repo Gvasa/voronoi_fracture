@@ -37,7 +37,7 @@ class HalfEdgeMesh : public Geometry {
 
 public:
 
-    HalfEdgeMesh();
+    HalfEdgeMesh(Vector4<float>);
 
     ~HalfEdgeMesh();
 
@@ -59,19 +59,27 @@ public:
 
     float volume() const;
 
+    unsigned int getType() { return HALFEDGEMESH; }
+
     void updateVoronoiPoint(Vector3<float>, unsigned int);
 
     void computeVoronoiPattern();
 
     void markCurrentVoronoiPoint(unsigned int i, Vector4<float> c) { mDebugPoints[i]->setColor(c); }
 
+    bool isCompoundComputed() { return mCompoundIsComputed; }
     void calculateCenterOfMass();
 
+    Compound* getCompound() { return mCompound; }
     void updateCenterOfMass(glm::mat4);
 
+    Vector3<float> getVoronoiPoint(unsigned int i) { return mVoronoiPoints[i]; }
     Vector3<float> getCenterOfMass() { return mCenterOfMass; }
 
+    unsigned int getNumVoronoiPoints() { return mVoronoiPoints.size(); }
     unsigned int getType() { return HALFEDGEMESH; }
+
+    void printMesh();
 
     void setPrevPos(Vector3<float> v) { mPrevPos = v; }
     Vector3<float> getPrevPos() { return mPrevPos; }
@@ -154,13 +162,6 @@ private:
 
     
     // Halfedge data
-
-    // Denotes a reference to a border, only for face pointers
-    const static unsigned int BORDER;
-    // Denotes a reference to a non-existing object
-    const static unsigned int UNINITIALIZED;
-
-
     /*
      * STRUCTS
      */
@@ -211,9 +212,9 @@ private:
     /*
      * MEMBER VARIABLES
      */
-    Boundingbox *mBoundingbox;
+    Boundingbox *mBoundingbox = nullptr;
 
-    Compound *mCompound;
+    Compound *mCompound = nullptr;
     
     // The edges of the mesh
     std::vector<HalfEdge> mEdges;
@@ -252,6 +253,9 @@ private:
     //Add a half edge pair, from vertex 1 to vertex2, to the mesh.
     bool addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsigned int &index1, unsigned int &index2);
 
+    // Merges the outer (uninitialized) edge for a newly created triangle
+    void MergeOuterBoundaryEdge(unsigned int innerEdge);
+
     //add a voronoiPoint to the mesh, if debugmode = true it will add a debugpoint
     void addVoronoiPoint(Vector3<float> v);
 
@@ -281,24 +285,26 @@ private:
     //! A utility data structure to speed up removal of redundant edges
     std::map<OrderedPair, unsigned int> mUniqueEdgePairs;
 
-     //! Return the edge at index i
+public:
+    //! Return the edge at index i
     HalfEdge& getEdge(unsigned int i) { return mEdges.at(i); }
     const HalfEdge& getEdge(unsigned int i) const { return mEdges.at(i); }
+    unsigned int getEdge(Vector3<float>);
     //! Return the face at index i
     Face& getFace(unsigned int i) { return mFaces.at(i); }
     const Face& getFace(unsigned int i) const { return mFaces.at(i); }
     //! Return the Vertex at index i
     Vertex& getVert(unsigned int i) { return mVerts.at(i); }
     const Vertex getVert(unsigned int i) const { return mVerts.at(i); }
+
     //Return number of vertices
     unsigned int getNumVerts() const {  return mVerts.size(); }
     //Return number of faces
     unsigned int getNumFaces() const {  return mFaces.size(); }
     //Return number of Edges
     unsigned int getNumEdges() const {  return mEdges.size(); }
-    
-
-
+    //Return vertex list
+    std::vector<Vector3<float> > getVertexList() { return mOrderedVertexList; }
 };
 
 #endif // HALFEDGEMESH_H

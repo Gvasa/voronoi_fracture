@@ -12,13 +12,12 @@
 //#include "LoadObj.h"
 #include "utils/Debugpoint.h"
 
-GLFWwindow* window;
-Scene *scene;
-Geometry *mesh;
-Geometry *mesh2;
-Geometry *floor_rect;
-Geometry *wall_rect;
-Utils *utilHandler;
+GLFWwindow* window = nullptr;
+Scene *scene = nullptr;
+Geometry *mesh = nullptr;
+Geometry *floor_rect = nullptr;
+Geometry *wall_rect = nullptr;
+Utils *utilHandler = nullptr;
 
 std::string windowTitle = "Voronoi Fracture";
 
@@ -38,7 +37,8 @@ double calcFPS(double, std::string);
 
 int main (int argc, char* argv[]) {
 
-  
+    srand (static_cast<unsigned>(time(0)));
+
 
     // Magic
     glewExperimental = GL_TRUE;
@@ -55,41 +55,38 @@ int main (int argc, char* argv[]) {
 
     // Floor
     floor_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
-    
-    floor_rect->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), 90);
-    floor_rect->scale(Vector3<float>(1.5f, 1.0f, 2.0f));
+    floor_rect->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), 90.0f);
     floor_rect->translate(Vector3<float>(0.0f, -1.0f, 0.0f));
+    floor_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
+
     // Wall
     wall_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
-    wall_rect->scale(Vector3<float>(1.5f, 1.0f, 0.0f));
-    wall_rect->translate(Vector3<float>(0.0f, 0.0f, 0.0f));
+    wall_rect->translate(Vector3<float>(0.0f, 0.0f, -1.0f));
+    wall_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
+
     // HalfEdge mesh
-    mesh = new HalfEdgeMesh();
+    mesh = new HalfEdgeMesh(Vector4<float>(0.2f, 0.8f, 0.2f, 0.4f));
     mesh->setDebugMode(true);
 
-    mesh->createMesh("cow");
+    //mesh->createMesh("lowPolySphere1.0");
+    mesh->createMesh("Sphere1.0");
+    //mesh->createMesh("icosphere");
+    //mesh->createMesh("Sphere1.0_hole");
     //mesh->createMesh("bunnySmall");
-    //mesh->scale(Vector3<float>(0.7f, 0.7f, 0.7f));
-   // mesh->translate(-mesh->getCenterOfMass());
-    mesh->translate(Vector3<float>(0.0f, 0.2f, 0.1f));
+    //mesh->createMesh("cube");
+    //mesh->createMesh("cube_hole");
+    //mesh->createMesh("cow");
+    //mesh->translate(Vector3<float>(0.0f, 0.0f, 1.0f));
+    //mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
+    //mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
 
    
     mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
     mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
 
-    mesh2 = new HalfEdgeMesh();
-    mesh2->setDebugMode(true);
-    mesh2->createMesh("cow");
-    //mesh2->scale(Vector3<float>(0.3f, 0.3f, 0.3f));
-   // mesh2->translate(-mesh2->getCenterOfMass());
-   // mesh2->translate(Vector3<float>(0.2f, 5.0f, 0.0f));
-    //mesh->translate(-mesh->getCenterOfMass());
-
-
-    scene->addGeometry(floor_rect, STATIC);
-  //  scene->addGeometry(wall_rect, STATIC);
-    scene->addGeometry(mesh, DYNAMIC);
-    scene->addGeometry(mesh2, DYNAMIC);
+    scene->addGeometry(floor_rect);
+    scene->addGeometry(wall_rect);
+    scene->addGeometry(mesh);
 
     initializeScene();
     
@@ -249,6 +246,7 @@ void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mo
                 if(currentNumberOfVoronoiPoints >= 2) {
                     mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
                     mesh->computeVoronoiPattern();
+                    scene->splitMesh(dynamic_cast<HalfEdgeMesh*>(mesh));
                     voronoiPatternIsComputed = true;
                 } else {
                     std::cout << "\nError!\n";

@@ -384,7 +384,7 @@ std::vector<Vector3<float> > Compound::sortVertices(std::vector<Vector3<float> >
     Vector3<float> centerPoint = Vector3<float>(0.0f, 0.0f, 0.0f);
 
     for(unsigned int i = 0; i < plane.size(); i++) {
-        centerPoint += plane[i];    
+        centerPoint += plane[i];
     }
 
     centerPoint /= plane.size();

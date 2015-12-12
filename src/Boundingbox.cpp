@@ -119,9 +119,7 @@ void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts)
     }  
 
     for(std::map<std::string, unsigned int>::iterator it = mBoundingValuesIndex.begin(); it != mBoundingValuesIndex.end(); ++it) {
-       // std::cout << (*it).first << "  " << uniqueVerts.at((*it).second) << std::endl;
         mBoundingValues.push_back(uniqueVerts[(*it).second]);
-       // std::cout << "pushat: " << uniqueVerts[(*it).second] << std::endl;
     }
 
     // xMin Plane
