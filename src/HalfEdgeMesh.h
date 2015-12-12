@@ -8,6 +8,10 @@
 #ifndef HALFEDGEMESH_H
 #define HALFEDGEMESH_H
 
+#define GLM_FORCE_RADIANS
+
+#define GLM_FORCE_RADIANS
+
 // Libs and headers
 #include <iostream>
 #include <stdio.h>
@@ -16,6 +20,7 @@
 #include <limits>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/gtx/transform.hpp>
 
 // Classes
 #include "Geometry.h"
@@ -59,6 +64,29 @@ public:
     void computeVoronoiPattern();
 
     void markCurrentVoronoiPoint(unsigned int i, Vector4<float> c) { mDebugPoints[i]->setColor(c); }
+
+    void calculateCenterOfMass();
+
+    void updateCenterOfMass(glm::mat4);
+
+    Vector3<float> getCenterOfMass() { return mCenterOfMass; }
+
+    unsigned int getType() { return HALFEDGEMESH; }
+
+    void setPrevPos(Vector3<float> v) { mPrevPos = v; }
+    Vector3<float> getPrevPos() { return mPrevPos; }
+
+    void setPrevRot(float f) { mPrevRotAngle = f;}
+    float getPrevRot() { return mPrevRotAngle; }
+
+    std::vector<Vector3<float> > getVertexList();
+
+   glm::mat4 getTransMat() { return mTransMat; }
+   void setTransMat(glm::mat4 m) { mTransMat = m; }
+  //  void setPrevRot(std::pair<Vector3<float>, float> p) { mPrevRot = p; }
+
+    
+    //std::pair<Vector3<float>,float> getPrevRot() { return mPrevRot; }
 
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
@@ -202,9 +230,17 @@ private:
 
     std::vector<Debugpoint *> mDebugPoints;
 
+    Vector3<float> mCenterOfMass;
+
+    Vector3<float> mPrevPos;
+    float mPrevRotAngle;
+    //std::pair< Vector3<float>, float > mPrevRot;
+
     bool mDebugMode = false;
 
     bool mCompoundIsComputed = false;
+
+    glm::mat4 mTransMat;
 
     /*
      * MEMBER FUNCTIONS

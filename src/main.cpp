@@ -15,6 +15,7 @@
 GLFWwindow* window;
 Scene *scene;
 Geometry *mesh;
+Geometry *mesh2;
 Geometry *floor_rect;
 Geometry *wall_rect;
 Utils *utilHandler;
@@ -27,7 +28,6 @@ unsigned int currentNumberOfVoronoiPoints = 1;
 int currentVoronoiIndex = 0;
 float stepSize = 0.05f;
 
-
 int initializeOpenGL();
 void initializeScene();
 void mouseButton(GLFWwindow* window, int button, int action, int mods);
@@ -36,12 +36,9 @@ void mouseScroll(GLFWwindow* window, double x, double y);
 void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mods);
 double calcFPS(double, std::string);
 
-
-
 int main (int argc, char* argv[]) {
 
-    scene = new Scene();
-    utilHandler = new Utils();
+  
 
     // Magic
     glewExperimental = GL_TRUE;
@@ -50,60 +47,59 @@ int main (int argc, char* argv[]) {
     if(initializeOpenGL() == -1) {
         return -1;
     }
+
+    scene = new Scene();
+    utilHandler = new Utils();
     
     // Create geometries and add them to the scene
 
     // Floor
     floor_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
-    floor_rect->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), 90.0f);
+    
+    floor_rect->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), 90);
+    floor_rect->scale(Vector3<float>(1.5f, 1.0f, 2.0f));
     floor_rect->translate(Vector3<float>(0.0f, -1.0f, 0.0f));
-    floor_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
-
     // Wall
     wall_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
-    wall_rect->translate(Vector3<float>(0.0f, 0.0f, -1.0f));
-    wall_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
-
+    wall_rect->scale(Vector3<float>(1.5f, 1.0f, 0.0f));
+    wall_rect->translate(Vector3<float>(0.0f, 0.0f, 0.0f));
     // HalfEdge mesh
     mesh = new HalfEdgeMesh();
     mesh->setDebugMode(true);
 
-    //mesh->createMesh("sphere1.0");
-    mesh->createMesh("bunnySmall");
-    mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
-    mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
+    mesh->createMesh("cow");
+    //mesh->createMesh("bunnySmall");
+    //mesh->scale(Vector3<float>(0.7f, 0.7f, 0.7f));
+   // mesh->translate(-mesh->getCenterOfMass());
+    mesh->translate(Vector3<float>(0.0f, 0.2f, 0.1f));
 
-   /* mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.0f));
-    mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.6f, 0.0f));
-    mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.7f, 0.0f));
-    //mesh->addVoronoiPoint(Vector3<float>(0.2f, -0.7f, 0.5f));
-    
-   /* mesh->addVoronoiPoint(Vector3<float>(-0.5f, -0.7f, 0.5f));
-    mesh->addVoronoiPoint(Vector3<float>(0.1f, 0.6f, -0.37f));
-    mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.6f, 0.9f));
-*/
-    //mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
-
-/*
-    mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
-    mesh->addVoronoiPoint(Vector3<float>(0.9f, 0.9f, 0.997f));
-    mesh->addVoronoiPoint(Vector3<float>(0.7f, -0.8f, 0.0f));
-*/
-
+   
     mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
     mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
 
-    scene->addGeometry(floor_rect);
-    scene->addGeometry(wall_rect);
-    scene->addGeometry(mesh);
+    mesh2 = new HalfEdgeMesh();
+    mesh2->setDebugMode(true);
+    mesh2->createMesh("cow");
+    //mesh2->scale(Vector3<float>(0.3f, 0.3f, 0.3f));
+   // mesh2->translate(-mesh2->getCenterOfMass());
+   // mesh2->translate(Vector3<float>(0.2f, 5.0f, 0.0f));
+    //mesh->translate(-mesh->getCenterOfMass());
+
+
+    scene->addGeometry(floor_rect, STATIC);
+  //  scene->addGeometry(wall_rect, STATIC);
+    scene->addGeometry(mesh, DYNAMIC);
+    scene->addGeometry(mesh2, DYNAMIC);
 
     initializeScene();
+    
 
     //Set functions to handle mouse input
     glfwSetMouseButtonCallback(window, mouseButton);
     glfwSetCursorPosCallback(window, mouseMotion);
     glfwSetScrollCallback(window, mouseScroll);
     glfwSetKeyCallback(window, keyboardInput);
+
 
     // render-loop
     do{
@@ -113,6 +109,7 @@ int main (int argc, char* argv[]) {
 
         // render all geometries
         scene->render();
+        scene->stepSimulation();
 
         // Swap buffers
         glfwSwapBuffers(window);

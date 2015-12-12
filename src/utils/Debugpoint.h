@@ -55,6 +55,8 @@ public:
 
     Vector3<float> getPosition() { return mPosition; }
 
+    unsigned int getType() { return DEBUGPOINT; }
+
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
      */ 

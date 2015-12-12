@@ -19,16 +19,18 @@
 #include <math.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "glm/gtc/matrix_inverse.hpp"
+#include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "Geometry.h"
+//#include "Geometry.h"
+#include "HalfEdgeMesh.h"
 #include "math/Matrix4x4.h"
 #include "math/Vector3.h"
 #include "Controls.h"
 #include "utils/Utils.h"
+#include "Physics.h"
 
-
+class HalfEdgeMesh;
 
 class Scene{
 
@@ -40,20 +42,26 @@ public:
     void initialize();
     void render();
 
-    void addGeometry(Geometry *);
-    void updateCameraPosition(double x, double y);
-    void updateCameraZoom(double x, double y);
+    void addGeometry(Geometry *, unsigned int);
+    void updateCameraPosition(double, double);
+    void updateCameraZoom(double, double);
     void mouseButtonClick(double x, double y) { control->dragStart(x, y); }
     void mouseButtonRelease() { control->dragEnd(); }
     void resetCamera();
+    void stepSimulation();
 
 private:
 
     Matrix4x4<float> toMatrix4x4(glm::mat4);
     Matrix4x4<float> toMatrix4x4(glm::mat3);
+    glm::mat4 toGlmMat4(float []);
 
     std::vector<Geometry *>mGeometries;
     std::vector<Matrix4x4<float> >mSceneMatrices;
+
+    Physics* physicsWorld;
+
+    std::vector<std::pair<Geometry*, btRigidBody*> > mObjects;
 
     struct LightSource {
         Vector4<float> color;

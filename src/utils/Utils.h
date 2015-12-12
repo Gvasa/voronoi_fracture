@@ -17,6 +17,12 @@
 #define YPROJECTION 1
 #define ZPROJECTION 2
 #define MAX_VORONOI_POINTS 3
+#define RECTANGLE 0
+#define HALFEDGEMESH 1
+#define DEBUGPOINT 2
+#define SIMPLEMESH 3
+#define STATIC 0
+#define DYNAMIC 1
 
 #include <iostream>
 #include <glm/gtx/string_cast.hpp>

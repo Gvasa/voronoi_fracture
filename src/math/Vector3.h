@@ -293,7 +293,6 @@ template <class Real>
 inline bool Vector3<Real>::operator == ( const Vector3<Real> &A ) const
 {
   return ( (v[0]-A[0] > -0.01 && v[0]-A[0] < 0.01) && (v[1]-A[1] > -0.01 && v[1]-A[1] < 0.01) && (v[2]-A[2] > -0.01 && v[2]-A[2] < 0.01) );
-  //return ( v[0]==A[0] && v[1]==A[1] && v[2]==A[2] );
 }
 
 
