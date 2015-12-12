@@ -187,50 +187,6 @@ void Scene::stepSimulation() {
                 worldTrans.getOpenGLMatrix(bulletTransform);
 
                 mGeometries[i]->setTransMat(toGlmMat4(bulletTransform));
-
-                //btRigidBody* rigidBody = physicsWorld->getRigidBodyAt(i);
-                //HalfEdgeMesh* hem = dynamic_cast<HalfEdgeMesh*>(mGeometries[i]);
-                
-//                 prevPos = hem->getPrevPos();
-//                 prevAngle = hem->getPrevRot();
-
-//                /* rotation = worldTrans.getRotation();
-//                 rotAxis = rotation.getAxis();
-//                 rotAngle = rotation.getAngle();
-// */
-//                 std::cout << "prevPos: " << prevPos << std::endl;
-
-//                 btVector3 pos = rigidBody->getCenterOfMassPosition();
-//                 rotation = rigidBody->getOrientation();
-//                 rotAxis = rotation.getAxis();
-//                 rotAngle = rotation.getAngle();
-//                 //std::cout << "worldTransgetOrigin: " 
-//                 //std::cout << "translate with: " << (float)worldTrans.getOrigin().getX() - prevPos[0] << " " <<  (float)worldTrans.getOrigin().getY() - prevPos[1] << " " << (float)worldTrans.getOrigin().getZ() - prevPos[2] << std::endl;
-//                // std::cout << "translate with: " << (float)worldTrans.getOrigin().getX() - prevPos[0] << " " <<  (float)worldTrans.getOrigin().getY() - prevPos[1] << " " << (float)worldTrans.getOrigin().getZ() - prevPos[2] << std::endl;
-
-//                 //if((float)rotAngle - prevAngle < -EPSILON || (float)rotAngle - prevAngle > EPSILON ) {
-//                     //std::cout << " rotAxis: " << rotAxis.getX() << " " << rotAxis.getY() << " " << rotAxis.getZ() << "  - angle " << rotAngle << std::endl;
-//                     hem->translate(-prevPos);
-//                     hem->rotate(Vector3<float>((float)rotAxis.getX(), (float)rotAxis.getY(), (float)rotAxis.getZ() ), (float)rotAngle - prevAngle);
-//                     hem->translate(prevPos);
-//                     hem->setPrevRot((float)rotAngle);
-//                 //}
-                
-//                 //hem->translate(Vector3<float>(((float)worldTrans.getOrigin().getX() - prevPos[0]),( (float)worldTrans.getOrigin().getY() - prevPos[1]), ((float)worldTrans.getOrigin().getZ() - prevPos[2])));
-//                 //hem->setPrevPos(Vector3<float>(worldTrans.getOrigin().getX(), worldTrans.getOrigin().getY(), worldTrans.getOrigin().getZ()));
-                
-//                 hem->translate(Vector3<float>((float)pos.getX() - prevPos[0], (float)pos.getY() - prevPos[1], (float)pos.getZ() - prevPos[2]));
-//                 hem->setPrevPos(Vector3<float>(pos.getX(), pos.getY(), pos.getZ()));
-            
-
-                /**********************************************
-                /*
-                /*  TYDLIGEN SÅ PÅVERKAS BULLET AV VAFAN MESHET HÅLLER PÅ MED! ; HEEEELT JÄVLA ORIMLIGT
-                /*
-                /*
-                ********************************************* */
-
-               //hem->setPrevRot((float)rotAngle);
         }
     }
     

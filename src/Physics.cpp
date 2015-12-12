@@ -59,8 +59,6 @@ void Physics::addGeometry(std::vector<Vector3<float> > vertList, Vector3<float> 
         mass = 2;
         btVector3(centerOfMass[0], centerOfMass[1], centerOfMass[2]);
         motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(centerOfMass[0], centerOfMass[1], centerOfMass[2])));
-        //motionState->setPosition(centerOfMass[0], centerOfMass[2], centerOfMass[3]);
-       // motionState->setOrientation(btTransform(btQuaternion(0, 0, 0, 1)));
         shape->calculateLocalInertia(mass, inertia);
     } else if (type == STATIC) {
         
@@ -78,8 +76,6 @@ void Physics::addGeometry(std::vector<Vector3<float> > vertList, Vector3<float> 
         shape = new btConvexHullShape((const btScalar*)hull->getVertexPointer(), hull->numVertices(), sizeof(btVector3));;// new btSphereShape(1);
 
         std::cout << "La till static!" << std::endl;
-//shape = new btStaticPlaneShape(btVector3(0, 1, 0), 1);
-        //motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, -2, 0)));
         motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(centerOfMass[0], centerOfMass[1], centerOfMass[2])));
 
     }  else {
