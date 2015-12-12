@@ -21,6 +21,8 @@
 #define HALFEDGEMESH 1
 #define DEBUGPOINT 2
 #define SIMPLEMESH 3
+#define STATIC 0
+#define DYNAMIC 1
 
 #include <iostream>
 #include <glm/gtx/string_cast.hpp>
@@ -45,8 +47,6 @@ const static unsigned int UNINITIALIZED = (std::numeric_limits<unsigned int>::ma
     //const static unsigned int BORDER;
     // Denotes a reference to a non-existing object
     //const static unsigned int UNINITIALIZED;
-
-//class LoadObj;
 
 class Utils {
 

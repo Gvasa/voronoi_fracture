@@ -39,7 +39,7 @@ Debugpoint::~Debugpoint() {
 // Add init stuff here, right now its just some random shit for the red ugly triangle
 void Debugpoint::initialize(Vector3<float> lightPosition) {
 
-    std::cout << "\nInitializing Debug point ...\n\n";
+   // std::cout << "\nInitializing Debug point ...\n\n";
 
     buildRenderData();
 
@@ -70,7 +70,7 @@ void Debugpoint::initialize(Vector3<float> lightPosition) {
         reinterpret_cast<void*>(0)  // array buffer offset
     );
 
-    std::cout << "\nDebug point initialized!\n" << std::endl;
+    //std::cout << "\nDebug point initialized!\n" << std::endl;
 }
 
 // Add draw stuff here, right now its just some random shit for the red ugly triangle

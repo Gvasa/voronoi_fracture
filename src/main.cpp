@@ -27,7 +27,6 @@ unsigned int currentNumberOfVoronoiPoints = 1;
 int currentVoronoiIndex = 0;
 float stepSize = 0.05f;
 
-
 int initializeOpenGL();
 void initializeScene();
 void mouseButton(GLFWwindow* window, int button, int action, int mods);
@@ -36,14 +35,10 @@ void mouseScroll(GLFWwindow* window, double x, double y);
 void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mods);
 double calcFPS(double, std::string);
 
-
-
 int main (int argc, char* argv[]) {
 
     srand (static_cast<unsigned>(time(0)));
 
-    scene = new Scene();
-    utilHandler = new Utils();
 
     // Magic
     glewExperimental = GL_TRUE;
@@ -52,6 +47,9 @@ int main (int argc, char* argv[]) {
     if(initializeOpenGL() == -1) {
         return -1;
     }
+
+    scene = new Scene();
+    utilHandler = new Utils();
     
     // Create geometries and add them to the scene
 
@@ -82,23 +80,7 @@ int main (int argc, char* argv[]) {
     //mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
     //mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
 
-   /* mesh->addVoronoiPoint(Vector3<float>(-0.75f, -0.7f, 0.0f));
-    mesh->addVoronoiPoint(Vector3<float>(0.5f, 0.6f, 0.0f));
-    mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.7f, 0.0f));
-    //mesh->addVoronoiPoint(Vector3<float>(0.2f, -0.7f, 0.5f));
-    */
-
-   /* mesh->addVoronoiPoint(Vector3<float>(-0.5f, -0.7f, 0.5f));
-    mesh->addVoronoiPoint(Vector3<float>(0.1f, 0.6f, -0.37f));
-    mesh->addVoronoiPoint(Vector3<float>(-0.75f, 0.6f, 0.9f));
-*/
-    //mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
-/*
-    mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
-    mesh->addVoronoiPoint(Vector3<float>(0.9f, 0.9f, 0.997f));
-    mesh->addVoronoiPoint(Vector3<float>(0.7f, -0.8f, 0.0f));
-*/
-
+   
     mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
     mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
 
@@ -107,12 +89,14 @@ int main (int argc, char* argv[]) {
     scene->addGeometry(mesh);
 
     initializeScene();
+    
 
     //Set functions to handle mouse input
     glfwSetMouseButtonCallback(window, mouseButton);
     glfwSetCursorPosCallback(window, mouseMotion);
     glfwSetScrollCallback(window, mouseScroll);
     glfwSetKeyCallback(window, keyboardInput);
+
 
     // render-loop
     do{
@@ -122,6 +106,7 @@ int main (int argc, char* argv[]) {
 
         // render all geometries
         scene->render();
+        scene->stepSimulation();
 
         // Swap buffers
         glfwSwapBuffers(window);

@@ -27,11 +27,19 @@ public:
 
     void render(std::vector<Matrix4x4<float> >);
 
+    void calculateCenterOfMass();
+    void updateCenterOfMass(glm::mat4);
+    Vector3<float> getCenterOfMass() { return mCenterOfMass; }
+
     void rotate(Vector3<float>, float);
     
     void translate(Vector3<float>);
     
     void scale(Vector3<float>);
+
+    std::vector<Vector3<float> > getVertexList() { return mVerts; }
+    glm::mat4 getTransMat() { return mTransMat; }
+    void setTransMat(glm::mat4 m) { mTransMat = m; }
 
     unsigned int getType() { return RECTANGLE; }
 
@@ -67,6 +75,10 @@ private:
     GLint lightSpeLoc;      // Specular light
     GLint specularityLoc;   // Specular constant
     GLint shinynessLoc;     // How much specularity (magnitude)
+
+    glm::mat4 mTransMat;
+
+    Vector3<float> mCenterOfMass;
 
     struct Material : public Geometry::Material {   
     } mMaterial;

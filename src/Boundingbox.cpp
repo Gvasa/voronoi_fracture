@@ -72,9 +72,7 @@ void Boundingbox::render(Matrix4x4<float> MVP) {
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, mVerts.size() * sizeof(Vector3<float>), &mVerts[0], GL_STATIC_DRAW);
 
-    // Draw geometry
-
-    
+    // Draw geometry    
     if(mWireframe)   //Draw Wireframe
         glDrawArrays(GL_LINES, 0, mVerts.size()); // 3 indices starting at 0 -> 1 triangle
     else                //draw triangles
@@ -179,6 +177,13 @@ void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts)
     mVerts.push_back(Vector3<float>(uniqueVerts.at(mBoundingValuesIndex["xMin"])[0], uniqueVerts.at(mBoundingValuesIndex["yMax"])[1], uniqueVerts.at(mBoundingValuesIndex["zMax"])[2]));
 
 }
+
+void Boundingbox::updateBoundingBox(std::vector<Vector3<float> > uniqueVerts) {
+    mVerts.clear();
+    mVerts.shrink_to_fit();
+    calculateBoundingbox(uniqueVerts);
+}
+
 
 void Boundingbox::calculateConvexHull(std::vector<Vector3<float> > points) {
 
