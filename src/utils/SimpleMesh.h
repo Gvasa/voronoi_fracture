@@ -32,7 +32,7 @@ public:
 
     unsigned int getNumberOfVerts() { return mVerts.size(); }
     
-    std::vector<Vector3<float> >& getVertexList() { return mVerts; }
+    std::vector<Vector3<float> > getVertexList() { return mVerts; }
 
 private:
 

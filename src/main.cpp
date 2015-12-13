@@ -69,13 +69,13 @@ int main (int argc, char* argv[]) {
     mesh->setDebugMode(true);
 
     //mesh->createMesh("lowPolySphere1.0");
-    mesh->createMesh("Sphere1.0");
+    //mesh->createMesh("sphere1.0");
     //mesh->createMesh("icosphere");
     //mesh->createMesh("Sphere1.0_hole");
     //mesh->createMesh("bunnySmall");
     //mesh->createMesh("cube");
-    //mesh->createMesh("cube_hole");
-    //mesh->createMesh("cow");
+    //mesh->createMesh("cube_hole");s
+    mesh->createMesh("cow");
     //mesh->translate(Vector3<float>(0.0f, 0.0f, 1.0f));
     //mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
     //mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
@@ -84,9 +84,9 @@ int main (int argc, char* argv[]) {
     mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
     mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
 
-    scene->addGeometry(floor_rect);
-    scene->addGeometry(wall_rect);
-    scene->addGeometry(mesh);
+    scene->addGeometry(floor_rect, STATIC);
+    //scene->addGeometry(wall_rect, STATIC);
+    scene->addGeometry(mesh, STATIC);
 
     initializeScene();
     

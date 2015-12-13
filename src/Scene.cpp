@@ -3,7 +3,7 @@
 struct cameraHandler {
     float fov = 45.0f;
     float aspectRatio = 4.0f / 3.0f;
-    float zoom = 1.0f;
+    float zoom = 2.0f;
     glm::quat orientation;
 
     glm::mat4 projectionMatrix;
@@ -111,8 +111,8 @@ void Scene::render() {
 
 void Scene::addGeometry(Geometry *G, unsigned int type) {
     mGeometries.push_back(G);
-    
-    physicsWorld->addGeometry(G->getVertexList(), G->getCenterOfMass() , type);
+    //G->calculateCenterOfMass();
+    physicsWorld->addGeometry(G->getUniqueVertexList(), G->getCenterOfMass() , type);
 
 }
 
@@ -198,7 +198,6 @@ void Scene::stepSimulation() {
                 mGeometries[i]->setTransMat(toGlmMat4(bulletTransform));
         }
     }
-    
 }
 
 void Scene::splitMesh(HalfEdgeMesh *he) {
@@ -210,14 +209,22 @@ void Scene::splitMesh(HalfEdgeMesh *he) {
 
         ClippingMesh * cm = new ClippingMesh(he);
         
+        int counter = 0;
         for(unsigned int i = 0; i < he->getNumVoronoiPoints(); i++) {
-            addGeometry(cm->clipMesh(he->getVoronoiPoint(i)));
+            counter++;
+            addGeometry(cm->clipMesh(he->getVoronoiPoint(i)), DYNAMIC);
             mGeometries.back()->initialize(mPointLight.position);
         }
-        
+        debug
         //HalfEdgeMesh * hm = cm->clipMesh();
-        delete mGeometries[2];
-        mGeometries.erase(mGeometries.begin()+2);
+       /* delete mGeometries[mGeometries.size() - counter];
+        mGeometries.erase(mGeometries.end()-counter);
+        physicsWorld->removeGeometry(mGeometries.size() - counter);
+        delete cm;*/
+        debug
+        delete mGeometries[1];
+        mGeometries.erase(mGeometries.begin()+1);
+        physicsWorld->removeGeometry(1);
         delete cm;
 
         std::cout << "\n\nGeometries left after splitting: \n";

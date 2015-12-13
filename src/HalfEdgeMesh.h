@@ -77,7 +77,6 @@ public:
     Vector3<float> getCenterOfMass() { return mCenterOfMass; }
 
     unsigned int getNumVoronoiPoints() { return mVoronoiPoints.size(); }
-    unsigned int getType() { return HALFEDGEMESH; }
 
     void printMesh();
 
@@ -86,8 +85,6 @@ public:
 
     void setPrevRot(float f) { mPrevRotAngle = f;}
     float getPrevRot() { return mPrevRotAngle; }
-
-    std::vector<Vector3<float> > getVertexList();
 
    glm::mat4 getTransMat() { return mTransMat; }
    void setTransMat(glm::mat4 m) { mTransMat = m; }
@@ -305,6 +302,7 @@ public:
     unsigned int getNumEdges() const {  return mEdges.size(); }
     //Return vertex list
     std::vector<Vector3<float> > getVertexList() { return mOrderedVertexList; }
+    std::vector<Vector3<float> > getUniqueVertexList();
 };
 
 #endif // HALFEDGEMESH_H

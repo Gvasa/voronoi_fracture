@@ -38,6 +38,7 @@ public:
     void scale(Vector3<float>);
 
     std::vector<Vector3<float> > getVertexList() { return mVerts; }
+    std::vector<Vector3<float> > getUniqueVertexList() { return mVerts; }
     glm::mat4 getTransMat() { return mTransMat; }
     void setTransMat(glm::mat4 m) { mTransMat = m; }
 

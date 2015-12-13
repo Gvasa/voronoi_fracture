@@ -40,7 +40,7 @@ void Physics::addGeometry(std::vector<Vector3<float> > vertList, Vector3<float> 
     btVector3 inertia(0, 0, 0);
 
     if(type == DYNAMIC) {
-        std::cout << "La till dynamic!" << std::endl;
+        std::cout << "--------- La till dynamic! -----------------" << std::endl;
 
         btConvexHullShape *bConvex = new btConvexHullShape();
         
@@ -73,9 +73,9 @@ void Physics::addGeometry(std::vector<Vector3<float> > vertList, Vector3<float> 
         btScalar margin = bConvex->getMargin();
         hull->buildHull(margin);
         
-        shape = new btConvexHullShape((const btScalar*)hull->getVertexPointer(), hull->numVertices(), sizeof(btVector3));;// new btSphereShape(1);
-
-        std::cout << "La till static!" << std::endl;
+        //shape = new btConvexHullShape((const btScalar*)hull->getVertexPointer(), hull->numVertices(), sizeof(btVector3));;// new btSphereShape(1);
+        shape = bConvex;
+        std::cout << "-------------- La till static!------------" << std::endl;
         motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(centerOfMass[0], centerOfMass[1], centerOfMass[2])));
 
     }  else {
@@ -93,6 +93,22 @@ void Physics::addGeometry(std::vector<Vector3<float> > vertList, Vector3<float> 
 
 }
 
+void Physics::removeGeometry(unsigned int index) {
+
+    btCollisionObject* obj = mDynamicsWorld->getCollisionObjectArray()[index];
+    btRigidBody* body = btRigidBody::upcast(obj);
+    if (body && body->getMotionState())
+    {
+     delete body->getMotionState();
+    }
+    mDynamicsWorld->removeCollisionObject( obj );
+    delete obj;
+
+    mRigidBodies.erase(mRigidBodies.begin()+index);
+    mRigidBodies.shrink_to_fit();
+
+}
+
 void Physics::stepSimulation(Matrix4x4<float> MVP) {
     double deltaT = glfwGetTime() - prevTime;
     //std::cout << deltaT << std::endl;
@@ -100,6 +116,7 @@ void Physics::stepSimulation(Matrix4x4<float> MVP) {
     prevTime = glfwGetTime();
 
     mDebugDrawer.setMVP(MVP);
-    //mDynamicsWorld->debugDrawWorld(); 
+   // mDynamicsWorld->debugDrawWorld(); 
    // debugDrawer.drawLine(btVector3(0.0, 0.0, 0.0), btVector3(5.0, 0.0, 0.0), btVector3(1.0, 0.0, 0.0));
 }
+

@@ -348,6 +348,7 @@ void HalfEdgeMesh::translate(Vector3<float> p){
     }
     //updateCenterOfMass(mTransMat);
     calculateCenterOfMass();
+    debug
 }
  
 // Scale the Mesh
@@ -431,7 +432,7 @@ void HalfEdgeMesh::updateCenterOfMass(glm::mat4) {
     //hstd::cout << "updaterad COM: " << mCenterOfMass << std::endl;
 }
 
-std::vector<Vector3<float> > HalfEdgeMesh::getVertexList() {
+std::vector<Vector3<float> > HalfEdgeMesh::getUniqueVertexList() {
 
     std::vector<Vector3<float> > vertexList;
 

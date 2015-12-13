@@ -165,7 +165,7 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
         Face.shrink_to_fit();
         counter++;
     }
-
+    debug
     return hm;
 }
 

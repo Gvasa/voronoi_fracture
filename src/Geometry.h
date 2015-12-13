@@ -91,6 +91,9 @@ public:
     virtual std::vector<Vector3<float> > getVertexList() {
         std::cout << "\nGeometry does not have getVertexList implemented!\n";
     };
+    virtual std::vector<Vector3<float> > getUniqueVertexList() {
+        std::cout << "\nGeometry does not have getUniqueVertexList implemented!\n";
+    };
     virtual Vector3<float> getPrevPos(Vector3<float>) {
         std::cout << "\nGeometry does not have getPrevPos implemented!\n";
     };
