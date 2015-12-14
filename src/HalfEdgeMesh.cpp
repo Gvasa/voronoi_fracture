@@ -77,15 +77,15 @@ HalfEdgeMesh::~HalfEdgeMesh() {
 void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     std::cout << "\nInitializing Half-Edge mesh ...\n\n";
-    debug
+
     mBoundingbox = new Boundingbox(buildVertexData());
-    debug
+
     mBoundingbox->initialize();
-    debug
+
     mBoundingbox->setWireFrame(true);
-    debug
+
     buildRenderData();
-    debug
+
     // Update face normals
     for(unsigned int i = 0; i < mFaces.size(); i++) {
         getFace(i).normal = calculateFaceNormal(i);
@@ -95,7 +95,7 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
     // Update vertex normals
     for(unsigned int i = 0; i < mVerts.size(); i++)
         getVert(i).normal = calculateVertNormal(i);
-    debug
+
     // Update the lists that we draw
     updateRenderData();
 
@@ -273,11 +273,11 @@ bool HalfEdgeMesh::addFace(const std::vector<Vector3 <float> > verts) {
 
 void HalfEdgeMesh::createMesh(std::string objName) {
 
-    loadVoronoiPoints(objName);
+    mObjName = objName;
 
     std::vector<std::vector<Vector3<float> > > vertexList = Geometry::mObjectLoader->getMeshVertexList(objName);
 
-    for(unsigned int i = 0; i < vertexList.size(); i++) 
+    for(unsigned int i = 0; i < vertexList.size(); i++)
         addFace(vertexList[i]);
 
     calculateCenterOfMass();
@@ -348,7 +348,7 @@ void HalfEdgeMesh::translate(Vector3<float> p){
     }
     //updateCenterOfMass(mTransMat);
     calculateCenterOfMass();
-    debug
+
 }
  
 // Scale the Mesh
@@ -579,6 +579,14 @@ void HalfEdgeMesh::addVoronoiPoint(Vector3<float> v) {
 
 }
 
+
+void HalfEdgeMesh::deleteLastVoronoiPoint() {
+
+    delete mDebugPoints.back();
+    mDebugPoints.erase(mDebugPoints.end()-1);
+    mVoronoiPoints.erase(mVoronoiPoints.end()-1);
+}
+
 //! Compute and return the normal at face at faceIndex
 Vector3<float> HalfEdgeMesh::calculateFaceNormal(unsigned int faceIndex) const {
 
@@ -617,7 +625,7 @@ Vector3<float> HalfEdgeMesh::calculateVertNormal(unsigned int vertIndex) const {
 
 
 std::vector<Vector3<float> > HalfEdgeMesh::buildVertexData() {
-    debug
+
     std::vector<Vector3<float> > vertexData;
 
     for(unsigned int i = 0; i < mVerts.size(); i++) {

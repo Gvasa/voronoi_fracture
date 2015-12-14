@@ -47,6 +47,8 @@ public:
 
     Vector3<float> getVertex(unsigned int i) { return mUniqueVerts[i]; }
 
+    unsigned int getNumVerts() { return mUniqueVerts.size(); }
+
 private:
 
     // Member functions

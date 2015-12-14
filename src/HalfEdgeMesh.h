@@ -68,26 +68,40 @@ public:
     void markCurrentVoronoiPoint(unsigned int i, Vector4<float> c) { mDebugPoints[i]->setColor(c); }
 
     bool isCompoundComputed() { return mCompoundIsComputed; }
+    
     void calculateCenterOfMass();
 
     Compound* getCompound() { return mCompound; }
+    
     void updateCenterOfMass(glm::mat4);
 
     Vector3<float> getVoronoiPoint(unsigned int i) { return mVoronoiPoints[i]; }
+    
     Vector3<float> getCenterOfMass() { return mCenterOfMass; }
 
     unsigned int getNumVoronoiPoints() { return mVoronoiPoints.size(); }
 
+    std::vector<Vector3<float> > getVoronoiPoints() { return mVoronoiPoints; }
+
     void printMesh();
 
     void setPrevPos(Vector3<float> v) { mPrevPos = v; }
+    
     Vector3<float> getPrevPos() { return mPrevPos; }
 
     void setPrevRot(float f) { mPrevRotAngle = f;}
+    
     float getPrevRot() { return mPrevRotAngle; }
 
    glm::mat4 getTransMat() { return mTransMat; }
+   
    void setTransMat(glm::mat4 m) { mTransMat = m; }
+
+   std::string getObjName() { return mObjName; }
+
+    // Delete a voronoi point when the mesh has not been clipped yet
+    void deleteLastVoronoiPoint();
+
   //  void setPrevRot(std::pair<Vector3<float>, float> p) { mPrevRot = p; }
 
     
@@ -239,6 +253,8 @@ private:
     bool mCompoundIsComputed = false;
 
     glm::mat4 mTransMat;
+
+    std::string mObjName;
 
     /*
      * MEMBER FUNCTIONS

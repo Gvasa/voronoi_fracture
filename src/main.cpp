@@ -22,7 +22,7 @@ Utils *utilHandler = nullptr;
 std::string windowTitle = "Voronoi Fracture";
 
 bool voronoiPatternIsComputed = false;
-const unsigned int maximumVoronoiPoints = 3;
+const unsigned int maximumVoronoiPoints = 6;
 unsigned int currentNumberOfVoronoiPoints = 1;
 int currentVoronoiIndex = 0;
 float stepSize = 0.05f;
@@ -50,6 +50,8 @@ int main (int argc, char* argv[]) {
 
     scene = new Scene();
     utilHandler = new Utils();
+
+    createPreDefinedVoronoiPoints();
     
     // Create geometries and add them to the scene
 
@@ -57,7 +59,7 @@ int main (int argc, char* argv[]) {
     floor_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
     floor_rect->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), 90.0f);
     floor_rect->translate(Vector3<float>(0.0f, -1.0f, 0.0f));
-    floor_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
+    floor_rect->scale(Vector3<float>(3.0f, 2.0f, 2.0f));
 
     // Wall
     wall_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
@@ -71,14 +73,9 @@ int main (int argc, char* argv[]) {
     //mesh->createMesh("lowPolySphere1.0");
     //mesh->createMesh("sphere1.0");
     //mesh->createMesh("icosphere");
-    //mesh->createMesh("Sphere1.0_hole");
-    //mesh->createMesh("bunnySmall");
+    mesh->createMesh("bunnySmall_reduced");
     //mesh->createMesh("cube");
-    //mesh->createMesh("cube_hole");s
-    mesh->createMesh("cow");
-    //mesh->translate(Vector3<float>(0.0f, 0.0f, 1.0f));
-    //mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
-    //mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
+    //mesh->createMesh("cow");
 
    
     mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
@@ -204,6 +201,8 @@ void mouseScroll(GLFWwindow* window, double x, double y) {
     
 void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
+    std::vector<Vector3<float> > voronoiPattern;
+
     if(action == GLFW_PRESS) {
         
         switch(key) {
@@ -255,39 +254,66 @@ void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mo
                 break;
 
             case GLFW_KEY_UP:
-                if(currentVoronoiIndex == maximumVoronoiPoints - 1) {
-                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
-                    currentVoronoiIndex = 0;
-                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
-                } else {
-                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
-                    currentVoronoiIndex++;
-                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+                if(!voronoiPatternIsComputed) {
+                    if(currentVoronoiIndex == maximumVoronoiPoints - 1) {
+                        mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
+                        currentVoronoiIndex = 0;
+                        mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+                    } else {
+                        mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
+                        currentVoronoiIndex++;
+                        mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+                    }
                 }
                 break;
 
             case GLFW_KEY_DOWN:
-                if(currentVoronoiIndex == 0) {
-                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
-                    currentVoronoiIndex = maximumVoronoiPoints - 1;
-                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
-                } else {
-                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
-                    currentVoronoiIndex--;
-                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+                if(!voronoiPatternIsComputed) {
+                    if(currentVoronoiIndex == 0) {
+                        mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
+                        currentVoronoiIndex = maximumVoronoiPoints - 1;
+                        mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+                    } else {
+                        mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
+                        currentVoronoiIndex--;
+                        mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+                    }
                 }
                 break;
 
             case GLFW_KEY_C:
-                    if(currentNumberOfVoronoiPoints < maximumVoronoiPoints) {
-                        currentNumberOfVoronoiPoints++;
-                        mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
-                        currentVoronoiIndex = currentNumberOfVoronoiPoints-1;
-                        mesh->markCurrentVoronoiPoint(currentVoronoiIndex-1, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
-                        mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
-                    } else {
-                        std::cout << "\nMaximum number of points already added!\n";
-                    }
+                if(currentNumberOfVoronoiPoints < maximumVoronoiPoints && !voronoiPatternIsComputed) {
+                    currentNumberOfVoronoiPoints++;
+                    mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
+                    currentVoronoiIndex = currentNumberOfVoronoiPoints-1;
+                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex-1, Vector4<float>(1.0f, 0.0f, 0.0f, 1.0f));
+                    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+                } else {
+                    std::cout << "\nMaximum number of points already added!\n";
+                }
+                break;
+
+            case GLFW_KEY_P:
+
+                voronoiPattern = getVoronoiPattern(mesh->getObjName());
+                
+                if(voronoiPattern.size() == 0) {
+                    std::cout << "No pre-defined setup for " << mesh->getObjName() << "!!!" << std::endl;
+                    break;
+                }
+
+                dynamic_cast<HalfEdgeMesh*>(mesh)->deleteLastVoronoiPoint();
+
+                for(unsigned int i = 0; i < voronoiPattern.size(); i++)
+                    mesh->addVoronoiPoint(voronoiPattern[i]);
+
+                mesh->computeVoronoiPattern();
+                scene->splitMesh(dynamic_cast<HalfEdgeMesh*>(mesh));
+                voronoiPatternIsComputed = true;
+
+                voronoiPattern.clear();
+                voronoiPattern.shrink_to_fit();
+            
                 break;
 
             default:

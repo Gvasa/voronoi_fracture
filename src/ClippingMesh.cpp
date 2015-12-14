@@ -66,15 +66,15 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
             polygon.v2 = mVerts[vertCounter + 2];
 
             Vector3<float> correctNormal = Cross(polygon.v1 - polygon.v0, polygon.v2 - polygon.v0).Normalize();
-
+            
             polygon.normal = correctNormal;
 
             // For now the polygon contains 3 vertices
             polygon.numVerts = 3;
-
+            
             // Clip the polygon and set the number of vertices
             polygon.numVerts = clipFace(polygon, normal, P, createdVertices);
-
+            
             /*************************************************************************
     
             We can now split a halfedgemesh which creates a new one and deletes the
@@ -91,7 +91,7 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
             *************************************************************************/
 
             sortPolygonCounterClockWise(polygon);
-
+            
             if(polygon.numVerts == 4) {
                 
                 Polygon P2;
@@ -116,12 +116,19 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
 
             vertCounter += 3;
         }
-        sortPolygonCounterClockWise(createdVertices);
+        
+        // No new verts created from clipping
+        if(createdVertices.size() < 3) {
+            continue;
+        }
 
+        sortPolygonCounterClockWise(createdVertices);
+        
         unsigned int i1 = createdVertices.size() / 3;
         unsigned int i2 = (2 * createdVertices.size()) / 3;
-
+        
         Vector3<float> pNormal = Cross(createdVertices[i1] - createdVertices[0], createdVertices[i2] - createdVertices[0]).Normalize();
+        
         pNormal[0] = -pNormal[0];
         pNormal[1] = -pNormal[1];
         pNormal[2] = -pNormal[2];
@@ -129,9 +136,10 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
         if(pNormal != normal ){
             std::reverse(createdVertices.begin(), createdVertices.end());
         }
-
+        
         //triangulateArbPolygon(createdVertices, clippedVerts);
         triangulateConvexPolygon(createdVertices, clippedVerts);
+        
         mVerts.clear();
         mVerts.shrink_to_fit();
         mVerts = clippedVerts;
@@ -141,15 +149,14 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
         createdVertices.clear();
         createdVertices.shrink_to_fit();
 
-        std::cout << "DONE WITH PLANE" << j << std::endl;
-
+        //std::cout << "DONE WITH PLANE" << j << std::endl;
     }
 
     std::vector<Vector3<float> > Face;
     Face.resize(3);
     unsigned int counter = 0;
 
-    std::cout << "\nclippedVerts.size(): " << mVerts.size() << std::endl;
+    //std::cout << "\nclippedVerts.size(): " << mVerts.size() << std::endl;
 
     for(unsigned int i = 0; i < mVerts.size(); i+=3){
 
@@ -165,7 +172,7 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
         Face.shrink_to_fit();
         counter++;
     }
-    debug
+    
     return hm;
 }
 

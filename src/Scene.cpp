@@ -203,9 +203,13 @@ void Scene::stepSimulation() {
 void Scene::splitMesh(HalfEdgeMesh *he) {
 
     if(he->isCompoundComputed()) {
-        //Mesh * sm = new SimpleMesh();
-        //addGeometry(sm);
+
         std::cout << "\nNUMBER OF VORONOI POINTS: " << he->getNumVoronoiPoints() << std::endl;
+
+        std::vector<Vector3<float> > VP = he->getVoronoiPoints();
+
+        for(unsigned int i = 0; i < VP.size(); i++)
+            std::cout << "\nVoronoi position: " << VP[i] << std::endl;
 
         ClippingMesh * cm = new ClippingMesh(he);
         
@@ -215,13 +219,7 @@ void Scene::splitMesh(HalfEdgeMesh *he) {
             addGeometry(cm->clipMesh(he->getVoronoiPoint(i)), DYNAMIC);
             mGeometries.back()->initialize(mPointLight.position);
         }
-        debug
-        //HalfEdgeMesh * hm = cm->clipMesh();
-       /* delete mGeometries[mGeometries.size() - counter];
-        mGeometries.erase(mGeometries.end()-counter);
-        physicsWorld->removeGeometry(mGeometries.size() - counter);
-        delete cm;*/
-        debug
+
         delete mGeometries[1];
         mGeometries.erase(mGeometries.begin()+1);
         physicsWorld->removeGeometry(1);
@@ -231,9 +229,5 @@ void Scene::splitMesh(HalfEdgeMesh *he) {
 
         for(std::vector<Geometry*>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
             std::cout << "Type: " << (*it)->getType() << std::endl;
-
-        //addGeometry(hm);
-        //hm->initialize(mPointLight.position);
-        //sm->initialize();
     }
 }

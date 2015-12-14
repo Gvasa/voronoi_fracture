@@ -79,7 +79,8 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
         voronoiMassCenter += voronoiPoints[i];
     }
 
-
+// THIS SHOULDN'T BE NEEDED SINCE WE NEVER USE IT FOR ANY COMPUTATIONS
+/*
     voronoiMassCenter /= voronoiPoints.size();
 
     std::vector<std::pair<std::pair<unsigned int, unsigned int>, std::pair<Vector3<float>, Vector3<float> > > > mPlaneIntersections;
@@ -116,7 +117,7 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
                 index = i;
             }
         }    
-        mSplittingPlanes.erase(mSplittingPlanes.begin()+index);
+        //mSplittingPlanes.erase(mSplittingPlanes.begin()+index);
     }
 
     calculateBoundingBoxPoints();
@@ -139,6 +140,7 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
         for(unsigned int j = 0; j < mUniqueConvexList[i].size(); j++)
             std::cout << "mUniqueConvexList[" << i << "][" << j << "]: " << mUniqueConvexList[i][j] << std::endl;
     }
+    */
 }
 
 void Compound::calculateConvexShape(unsigned int index1, unsigned int index2, unsigned int currentConvex) {
