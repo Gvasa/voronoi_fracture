@@ -3,7 +3,7 @@
 struct cameraHandler {
     float fov = 45.0f;
     float aspectRatio = 4.0f / 3.0f;
-    float zoom = 2.0f;
+    float zoom = 1.0f;
     glm::quat orientation;
 
     glm::mat4 projectionMatrix;
@@ -188,7 +188,7 @@ void Scene::stepSimulation() {
     float prevAngle;
 
     physicsWorld->stepSimulation(mSceneMatrices[I_MVP]);
-
+ 
     for(unsigned int i = 0; i < mGeometries.size(); i++) {
         if(mGeometries[i]->getType() == HALFEDGEMESH) {
                 physicsWorld->getRigidBodyAt(i)->getMotionState()->getWorldTransform(worldTrans);

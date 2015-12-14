@@ -29,7 +29,7 @@ float stepSize = 0.05f;
 
 int initializeOpenGL();
 void initializeScene();
-void mouseButton(GLFWwindow* window, int button, int action, int mods);
+void mouseButton(GLFWwindow* window, int button, int andction, int mods);
 void mouseMotion(GLFWwindow* window, double x, double y);
 void mouseScroll(GLFWwindow* window, double x, double y);
 void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mods);

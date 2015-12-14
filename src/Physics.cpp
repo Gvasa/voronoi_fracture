@@ -115,6 +115,31 @@ void Physics::stepSimulation(Matrix4x4<float> MVP) {
     mDynamicsWorld->stepSimulation(deltaT, 10);
     prevTime = glfwGetTime();
 
+    int numManifolds = mDynamicsWorld->getDispatcher()->getNumManifolds();
+    for (int i=0;i<numManifolds;i++)
+    {
+        btPersistentManifold* contactManifold =  mDynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+        const btCollisionObject* obA = const_cast<btCollisionObject*>(contactManifold->getBody0());
+        const btCollisionObject* obB = const_cast<btCollisionObject*>(contactManifold->getBody1());
+
+        int numContacts = contactManifold->getNumContacts();
+        for (int j=0;j<numContacts;j++)
+        {
+            btManifoldPoint& pt = contactManifold->getContactPoint(j);
+            if (pt.getDistance()<0.f)
+            {
+                const btVector3& ptA = pt.getPositionWorldOnA();
+                const btVector3& ptB = pt.getPositionWorldOnB();
+                const btVector3& normalOnB = pt.m_normalWorldOnB;
+
+                std::cout << "ptA : " << ptA.getX() << " " << ptA.getY() << " " << ptA.getZ() << " " << std::endl;
+                std::cout << "ptB : " << ptB.getX() << " " << ptB.getY() << " " << ptB.getZ() << " " << std::endl;
+                std::cout << "normalOnB : " << normalOnB.getX() << " " << normalOnB.getY() << " " << normalOnB.getZ() << " " << std::endl;
+                std::cout << "applied impulse: " << pt.getAppliedImpulse() << std::endl << std::endl;
+            }
+        }
+    }
+
     mDebugDrawer.setMVP(MVP);
    // mDynamicsWorld->debugDrawWorld(); 
    // debugDrawer.drawLine(btVector3(0.0, 0.0, 0.0), btVector3(5.0, 0.0, 0.0), btVector3(1.0, 0.0, 0.0));
