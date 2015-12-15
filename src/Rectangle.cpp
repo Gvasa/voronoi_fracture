@@ -1,4 +1,4 @@
-    #include "Rectangle.h"
+#include "Rectangle.h"
 
 Rectangle::Rectangle(float w, float h, Vector3<float> p) 
 : mPosition(p) {
@@ -14,7 +14,8 @@ Rectangle::Rectangle(float w, float h, Vector3<float> p)
     mMaterial.specularity   = 50.0f;
     mMaterial.shinyness     = 0.6f;
 
-    mTransMat = glm::mat4(1.0f);
+    mCalcMat = glm::mat4(1.0f);
+    mDrawMat = glm::mat4(1.0f);
 
     std::cout << "\nPlane created!\n";
 }
@@ -155,10 +156,10 @@ void Rectangle::calculateCenterOfMass() {
 
     std::cout << "COM: " << mCenterOfMass << std::endl;
 }
-void Rectangle::updateCenterOfMass(glm::mat4) {
+void Rectangle::updateCenterOfMass(glm::mat4 m) {
     glm::vec4 tmpCom(mCenterOfMass[0], mCenterOfMass[1], mCenterOfMass[2], 1.0);
 
-    tmpCom = mTransMat*tmpCom;
+    tmpCom = m*tmpCom;
 
     mCenterOfMass = Vector3<float>(tmpCom.x, tmpCom.y, tmpCom.z);
     std::cout << "updaterad COM: " << mCenterOfMass << std::endl;

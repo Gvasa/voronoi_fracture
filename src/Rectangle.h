@@ -39,6 +39,12 @@ public:
 
     std::vector<Vector3<float> > getVertexList() { return mVerts; }
     std::vector<Vector3<float> > getUniqueVertexList() { return mVerts; }
+    glm::mat4 getCalcMat() { return mCalcMat; }
+    void getCalcMat(glm::mat4 m) { mCalcMat = m; }
+
+    glm::mat4 getDrawMat() { return mDrawMat; }
+    void setDrawMat(glm::mat4 m) { mDrawMat = m; }
+
     glm::mat4 getTransMat() { return mTransMat; }
     void setTransMat(glm::mat4 m) { mTransMat = m; }
 
@@ -77,6 +83,8 @@ private:
     GLint specularityLoc;   // Specular constant
     GLint shinynessLoc;     // How much specularity (magnitude)
 
+    glm::mat4 mCalcMat;
+    glm::mat4 mDrawMat;
     glm::mat4 mTransMat;
 
     Vector3<float> mCenterOfMass;

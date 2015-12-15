@@ -109,18 +109,24 @@ void Physics::removeGeometry(unsigned int index) {
 
 }
 
-void Physics::stepSimulation(Matrix4x4<float> MVP) {
+std::vector<unsigned int> Physics::stepSimulation(Matrix4x4<float> MVP) {
     double deltaT = glfwGetTime() - prevTime;
     //std::cout << deltaT << std::endl;
     mDynamicsWorld->stepSimulation(deltaT, 10);
     prevTime = glfwGetTime();
 
     int numManifolds = mDynamicsWorld->getDispatcher()->getNumManifolds();
+    std::vector<unsigned int> splitIndex;
+
     for (int i=0;i<numManifolds;i++)
-    {
+    {   
+       // std::cout << "getNumManifolds: " << numManifolds << std::endl;
         btPersistentManifold* contactManifold =  mDynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
         const btCollisionObject* obA = const_cast<btCollisionObject*>(contactManifold->getBody0());
         const btCollisionObject* obB = const_cast<btCollisionObject*>(contactManifold->getBody1());
+
+        const btRigidBody* body1 = btRigidBody::upcast(obA);
+        const btRigidBody* body2 = btRigidBody::upcast(obB);
 
         int numContacts = contactManifold->getNumContacts();
         for (int j=0;j<numContacts;j++)
@@ -132,6 +138,19 @@ void Physics::stepSimulation(Matrix4x4<float> MVP) {
                 const btVector3& ptB = pt.getPositionWorldOnB();
                 const btVector3& normalOnB = pt.m_normalWorldOnB;
 
+                if(pt.getAppliedImpulse() > 1.0 ) {
+                    std::vector<btRigidBody* >::iterator it;
+                    std::vector<btRigidBody* >::iterator it2;
+
+                    it = std::find(mRigidBodies.begin(), mRigidBodies.end(), body1);
+                    it2 = std::find(mRigidBodies.begin(), mRigidBodies.end(), body2);
+
+                    splitIndex.push_back(it - mRigidBodies.begin());
+                    splitIndex.push_back(it2 - mRigidBodies.begin());
+
+
+                   // std::cout << "krock mellan : " << it - mRigidBodies.begin() << " & " << it2 - mRigidBodies.begin() << std::endl;
+                }
                 //std::cout << "ptA : " << ptA.getX() << " " << ptA.getY() << " " << ptA.getZ() << " " << std::endl;
                 //std::cout << "ptB : " << ptB.getX() << " " << ptB.getY() << " " << ptB.getZ() << " " << std::endl;
                 //std::cout << "normalOnB : " << normalOnB.getX() << " " << normalOnB.getY() << " " << normalOnB.getZ() << " " << std::endl;
@@ -140,7 +159,9 @@ void Physics::stepSimulation(Matrix4x4<float> MVP) {
         }
     }
 
-    mDebugDrawer.setMVP(MVP);
+    return splitIndex; 
+    
+    //mDebugDrawer.setMVP(MVP);
    // mDynamicsWorld->debugDrawWorld(); 
    // debugDrawer.drawLine(btVector3(0.0, 0.0, 0.0), btVector3(5.0, 0.0, 0.0), btVector3(1.0, 0.0, 0.0));
 }

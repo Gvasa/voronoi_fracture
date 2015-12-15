@@ -98,10 +98,22 @@ public:
         std::cout << "\nGeometry does not have getPrevPos implemented!\n";
     };
     virtual glm::mat4 getTransMat() {
-        std::cout << "\nGeometry does not have getPrevPos implemented!\n";  
+        std::cout << "\nGeometry does not have getTransMat implemented!\n";  
     };
     virtual void setTransMat(glm::mat4) {
-        std::cout << "\nGeometry does not have setPrevPos implemented!\n";
+        std::cout << "\nGeometry does not have setTransMat implemented!\n";
+    };
+    virtual glm::mat4 getCalcMat() {
+        std::cout << "\nGeometry does not have getCalcMat implemented!\n";  
+    };
+    virtual void setCalcMat(glm::mat4) {
+        std::cout << "\nGeometry does not have setCalcMat implemented!\n";
+    };
+    virtual glm::mat4 getDrawMat() {
+        std::cout << "\nGeometry does not have getDrawMat implemented!\n";  
+    };
+    virtual void setDrawMat(glm::mat4) {
+        std::cout << "\nGeometry does not have setDrawMat implemented!\n";
     };
     virtual std::vector<Vector3<float>> getVoronoiPoints() {
         std::cout << "\nGeometry does not have getVoronoiPoints implemented!\n";

@@ -58,7 +58,9 @@ public:
     void resetCamera();
     void stepSimulation();
 
+    void splitMesh(unsigned int);
     void splitMesh(HalfEdgeMesh *);
+
 
 private:
 
@@ -66,6 +68,8 @@ private:
     
     Matrix4x4<float> toMatrix4x4(glm::mat3);
     glm::mat4 toGlmMat4(float []);
+
+    bool mSplit = true;
 
     std::vector<Geometry *>mGeometries;
     

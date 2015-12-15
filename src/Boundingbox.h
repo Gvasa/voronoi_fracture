@@ -11,6 +11,7 @@
 #include "math/Vector4.h"
 #include "math/Matrix4x4.h"
 #include "tools/shader.hpp"
+#include "utils/Utils.h"
 
 class Boundingbox {
 
@@ -23,6 +24,8 @@ public:
     void initialize();
 
     void updateBoundingBox(std::vector<Vector3<float> >);
+
+    void updateBoundingBox(glm::mat4);
     
     void render(Matrix4x4<float>);
     

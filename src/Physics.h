@@ -19,6 +19,7 @@
 #include "Geometry.h"
 #include "utils/GLDebugDrawer.h"
 
+class scene;
 
 class Physics {
 
@@ -29,10 +30,11 @@ public:
     ~Physics(); 
     
     void addGeometry(std::vector<Vector3<float> >, Vector3<float>, unsigned int);
-    void stepSimulation(Matrix4x4<float>);
+    std::vector<unsigned int> stepSimulation(Matrix4x4<float>);
     void setWireFrame(bool w) { mWireframe = w; };
     void removeGeometry(unsigned int);
     btRigidBody* getRigidBodyAt(int i) { return mRigidBodies[i]; }
+    int getNumManifolds() { return mDynamicsWorld->getDispatcher()->getNumManifolds(); }
 
 
 private:

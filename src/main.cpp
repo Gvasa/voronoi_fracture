@@ -33,6 +33,7 @@ void mouseButton(GLFWwindow* window, int button, int andction, int mods);
 void mouseMotion(GLFWwindow* window, double x, double y);
 void mouseScroll(GLFWwindow* window, double x, double y);
 void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mods);
+void prepMesh();
 double calcFPS(double, std::string);
 
 int main (int argc, char* argv[]) {
@@ -72,20 +73,22 @@ int main (int argc, char* argv[]) {
 
     //mesh->createMesh("lowPolySphere1.0");
     //mesh->createMesh("sphere1.0");
-    //mesh->createMesh("icosphere");
-    mesh->createMesh("bunnySmall_reduced");
+    mesh->createMesh("icosphere");
+    //mesh->createMesh("bunnySmall_reduced");
     //mesh->createMesh("cube");
     //mesh->createMesh("cow");
 
-   
-    mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
-    mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
+    
+    
+    //mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
+    //mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
 
     scene->addGeometry(floor_rect, STATIC);
     //scene->addGeometry(wall_rect, STATIC);
-    scene->addGeometry(mesh, STATIC);
+    scene->addGeometry(mesh, DYNAMIC);
 
     initializeScene();
+    prepMesh();
     
 
     //Set functions to handle mouse input
@@ -320,6 +323,23 @@ void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mo
                 break;
         }
     }
+}
+
+void prepMesh() {
+
+    std::vector<Vector3<float> > voronoiPattern = getVoronoiPattern(mesh->getObjName());
+    
+   if(voronoiPattern.size() == 0) {
+        std::cout << "No pre-defined setup for " << mesh->getObjName() << "!!!" << std::endl;
+    }
+
+   // dynamic_cast<HalfEdgeMesh*>(mesh)->deleteLastVoronoiPoint();
+
+    for(unsigned int i = 0; i < voronoiPattern.size(); i++)
+        mesh->addVoronoiPoint(voronoiPattern[i]);
+
+   // mesh->computeVoronoiPattern();
+    //voronoiPatternIsComputed = true;
 }
 
 

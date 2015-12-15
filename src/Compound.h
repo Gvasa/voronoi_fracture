@@ -30,9 +30,14 @@ public:
     
     void setWireFrame(bool w) { mWireframe = w; };
 
-    Splittingplane* getSplittingPlane(unsigned int i) { return mSplittingPlanes[i]; }
+    Splittingplane* getSplittingPlane(unsigned int i) { debug
+                                                        return mSplittingPlanes[i]; }
 
     unsigned int getNumberOfSplittingPlanes() { return mSplittingPlanes.size(); }
+
+    void updateCompound(glm::mat4);
+
+    bool getVoronoiCalculated() { return mVoronoiCalculated; }
 
 
 private:
@@ -72,6 +77,7 @@ private:
     std::vector<Vector3<float> > mMassCenters;
 
     bool mWireframe = false;
+    bool mVoronoiCalculated = true;
 
     std::vector<Vector3<float> > mColorScale;
 };

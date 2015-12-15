@@ -8,6 +8,10 @@ Splittingplane::Splittingplane(
     Vector4<float> c)
     : mUniqueVerts(vertices), mBoundingValues(b), mVoronoiPoints(v), mNormal(n), mColor(c) {
 
+    std::cout << " ---------- muniqueverts splittin --------------" << vertices.size() << std::endl;
+    for(unsigned int i = 0; i < mUniqueVerts.size(); i++) 
+        std::cout << mUniqueVerts[i] << std::endl;
+
     buildRenderData();
 }
 
@@ -355,6 +359,24 @@ void Splittingplane::resetSplittingPlane() {
     }
 }
 
+void Splittingplane::updateSplittingPlane(glm::mat4 m) {
+    debug
+    glm::vec4 tmpPos;
+    
+    for(unsigned int i = 0; i < mUniqueVerts.size(); i++) {
+
+        tmpPos = glm::vec4(mUniqueVerts[i][0], mUniqueVerts[i][1], mUniqueVerts[i][2], 1.0f);
+
+        tmpPos = m*tmpPos;
+
+        mUniqueVerts[i] = Vector3<float>(tmpPos.x, tmpPos.y, tmpPos.z);
+        // Apply the rotation to the vertices
+    }
+
+    //buildRenderData();
+    
+    std::cout << "updaterar splitting " << std::endl;
+}
 
 void Splittingplane::buildRenderData() {
 

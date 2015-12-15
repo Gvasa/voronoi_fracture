@@ -33,12 +33,12 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
     unsigned int numSplittingPlanes = mHalfEdgeMesh->getCompound()->getNumberOfSplittingPlanes();
 
     unsigned int vertCounter = 0;
-
+    debug
     // Loop over all splitting planes for our mesh
     for(unsigned int j = 0; j < mHalfEdgeMesh->getCompound()->getNumberOfSplittingPlanes(); j++) {
-
+        debug
         std::pair<Vector3<float>, Vector3<float> > voronoiPair = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getVoronoiPoints();
-
+        debug
         if(refVoronoiPoint != voronoiPair.first && refVoronoiPoint != voronoiPair.second)
             continue;
 
@@ -49,12 +49,12 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
             normal = (voronoiPair.second - voronoiPair.first).Normalize();
         else
             normal = (voronoiPair.first - voronoiPair.second).Normalize();
-
+        debug
         // Arbitrary point on the splitting plane (any vertex), in this case the first vertex
         Vector3<float> P = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getVertex(0);
-
+        
         vertCounter = 0;
-
+        debug
         // Loop over all faces of our mesh
         for(unsigned int i = 0; i < (mVerts.size() / 3); i++) {
 

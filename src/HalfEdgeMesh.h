@@ -93,11 +93,19 @@ public:
     
     float getPrevRot() { return mPrevRotAngle; }
 
-   glm::mat4 getTransMat() { return mTransMat; }
+    glm::mat4 getTransMat() { return mTransMat; }
    
-   void setTransMat(glm::mat4 m) { mTransMat = m; }
+    void setTransMat(glm::mat4 );
 
-   std::string getObjName() { return mObjName; }
+    glm::mat4 getCalcMat() { return mCalcMat; }
+   
+    void setCalcMat(glm::mat4);
+
+    glm::mat4 getDrawMat() { return mDrawMat; }
+
+    void setDrawMat(glm::mat4 m) { mDrawMat = m; } 
+
+    std::string getObjName() { return mObjName; }
 
     // Delete a voronoi point when the mesh has not been clipped yet
     void deleteLastVoronoiPoint();
@@ -252,6 +260,8 @@ private:
 
     bool mCompoundIsComputed = false;
 
+    glm::mat4 mCalcMat;
+    glm::mat4 mDrawMat;
     glm::mat4 mTransMat;
 
     std::string mObjName;

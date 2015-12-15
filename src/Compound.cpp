@@ -38,7 +38,6 @@ void Compound::initialize() {
     for(unsigned int i = 0; i < mSplittingPlanes.size(); i++)
         mSplittingPlanes[i]->initialize();
 
-
     std::cout << "\nCompound Initialized!\n" << std::endl;
 }
 
@@ -78,6 +77,8 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
 
         voronoiMassCenter += voronoiPoints[i];
     }
+    mVoronoiCalculated = true;
+    std::cout << " --------------------------------- claculated voronoi patternu" << std::endl;
 
 // THIS SHOULDN'T BE NEEDED SINCE WE NEVER USE IT FOR ANY COMPUTATIONS
 /*
@@ -212,7 +213,7 @@ void Compound::calculateConvexShape(unsigned int index1, unsigned int index2, un
     }
 
     for(unsigned int i = 0; i < uniqueVerticesToAdd.size(); i++) 
-        mDebugpoints.push_back(new Debugpoint(uniqueVerticesToAdd[i]));
+      //  mDebugpoints.push_back(new Debugpoint(uniqueVerticesToAdd[i]));
 
 
     //add our newly created uniquelist and indexlist to our private vectors
@@ -264,7 +265,7 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::pair<Vecto
     }
 
     okPoints = sortVertices(okPoints, normal);
-
+    std::cout << " --------------------- " << okPoints.size() << std::endl; 
     mSplittingPlanes.push_back(new Splittingplane(okPoints, mBoundingValues, voronoiPoints, normal, getColor(mSplittingPlanes.size())));
 }
 
@@ -431,4 +432,19 @@ std::vector<Vector3<float> > Compound::sortVertices(std::vector<Vector3<float> >
     }
 
     return sortedVertices;
+}
+
+void Compound::updateCompound(glm::mat4 m) {
+    debug
+    
+    std::cout << mSplittingPlanes.size() << std::endl;
+    /*
+    for(unsigned int i = 0; i < mSplittingPlanes.size(); i++) {
+       // debug
+       // mSplittingPlanes[i]->updateSplittingPlane(m);
+    }*/
+    /*for(unsigned int i = 0; i < mSplittingPlanes.size(); i++)
+        mSplittingPlanes[i]->initialize();
+*/
+    std::cout << "updaterar compound" << std::endl;
 }

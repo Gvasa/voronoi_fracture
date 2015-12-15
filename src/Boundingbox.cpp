@@ -184,6 +184,18 @@ void Boundingbox::updateBoundingBox(std::vector<Vector3<float> > uniqueVerts) {
     calculateBoundingbox(uniqueVerts);
 }
 
+void Boundingbox::updateBoundingBox(glm::mat4 m) {
+    glm::vec4 tmpPos;
+    
+    for(unsigned int i = 0; i < mVerts.size(); i++) {
+        tmpPos = glm::vec4(mVerts[i][0], mVerts[i][1], mVerts[i][2], 1.0f);
+
+        tmpPos = m*tmpPos;
+
+        mVerts[i] = Vector3<float>(tmpPos.x, tmpPos.y, tmpPos.z);
+        // Apply the rotation to the vertices
+    }
+}
 
 void Boundingbox::calculateConvexHull(std::vector<Vector3<float> > points) {
 

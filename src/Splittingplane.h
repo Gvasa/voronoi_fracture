@@ -45,9 +45,12 @@ public:
 
     std::vector<Vector3<float> > getVertexList() { return mUniqueVerts; }
 
-    Vector3<float> getVertex(unsigned int i) { return mUniqueVerts[i]; }
+    Vector3<float> getVertex(unsigned int i) { debug
+                                                return mUniqueVerts[i]; }
 
     unsigned int getNumVerts() { return mUniqueVerts.size(); }
+
+    void updateSplittingPlane(glm::mat4);
 
 private:
 
