@@ -26,12 +26,14 @@ public:
     void updateBoundingBox(std::vector<Vector3<float> >);
 
     void updateBoundingBox(glm::mat4);
+
+    void updateRenderData();
     
     void render(Matrix4x4<float>);
     
     void setWireFrame(bool w) { mWireframe = w; };
 
-    std::map<std::string, unsigned int> getBoundingValuesIndex() { return mBoundingValuesIndex; }
+    //std::map<std::string, unsigned int> getBoundingValuesIndex() { return mBoundingValuesIndex; }
     
     std::vector<Vector3<float> > getBoundingValues() { return mBoundingValues; }
 
@@ -40,8 +42,6 @@ private:
     // Member functions
 
     void calculateBoundingbox(std::vector<Vector3<float> >);
-    
-    void calculateConvexHull(std::vector<Vector3<float> >);
 
     // Shader data
 
@@ -63,7 +63,7 @@ private:
     
     std::vector<Vector3<float> > mBoundingValues;
     
-    std::map<std::string, unsigned int> mBoundingValuesIndex;
+    //std::map<std::string, unsigned int> mBoundingValuesIndex;
 
     bool mWireframe = false;
 

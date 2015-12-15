@@ -77,8 +77,8 @@ int main (int argc, char* argv[]) {
     //mesh->createMesh("bunnySmall_reduced");
     //mesh->createMesh("cube");
     //mesh->createMesh("cow");
+    //mesh->translate(Vector3<float>(0.0f, 3.0f, 0.0f));
 
-    
     
     //mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
     //mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
@@ -338,8 +338,7 @@ void prepMesh() {
     for(unsigned int i = 0; i < voronoiPattern.size(); i++)
         mesh->addVoronoiPoint(voronoiPattern[i]);
 
-   // mesh->computeVoronoiPattern();
-    //voronoiPatternIsComputed = true;
+    mesh->updateVoronoiPoints();
 }
 
 

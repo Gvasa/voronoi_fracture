@@ -121,6 +121,9 @@ public:
     virtual std::string getObjName() {
         std::cout << "\nGeometry does not have getObjName implemented!\n";
     };
+    virtual void updateVoronoiPoints() {
+        std::cout << "\nGeometry does not have updateVoronoiPoints implemented!\n";
+    };
 protected:
 
     //! Compute and return the normal at face at faceIndex

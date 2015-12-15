@@ -137,8 +137,8 @@ std::vector<unsigned int> Physics::stepSimulation(Matrix4x4<float> MVP) {
                 const btVector3& ptA = pt.getPositionWorldOnA();
                 const btVector3& ptB = pt.getPositionWorldOnB();
                 const btVector3& normalOnB = pt.m_normalWorldOnB;
-
-                if(pt.getAppliedImpulse() > 1.0 ) {
+                //std::cout << "impulse: " << pt.getAppliedImpulse() << std::endl;
+                if(pt.getAppliedImpulse() > 0.2f ) {
                     std::vector<btRigidBody* >::iterator it;
                     std::vector<btRigidBody* >::iterator it2;
 

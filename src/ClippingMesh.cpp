@@ -38,6 +38,7 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
     for(unsigned int j = 0; j < mHalfEdgeMesh->getCompound()->getNumberOfSplittingPlanes(); j++) {
         debug
         std::pair<Vector3<float>, Vector3<float> > voronoiPair = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getVoronoiPoints();
+        std::cout << "voronoiPair: " << voronoiPair.first << " ,\t" << voronoiPair.second << std::endl;
         debug
         if(refVoronoiPoint != voronoiPair.first && refVoronoiPoint != voronoiPair.second)
             continue;
@@ -158,6 +159,8 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
 
     //std::cout << "\nclippedVerts.size(): " << mVerts.size() << std::endl;
 
+    Vector3<float> COM = Vector3<float>(0.0f, 0.0f, 0.0f);
+
     for(unsigned int i = 0; i < mVerts.size(); i+=3){
 
         Face.resize(3);
@@ -171,7 +174,15 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
         Face.clear();
         Face.shrink_to_fit();
         counter++;
+
+        COM += mVerts[i];
+        COM += mVerts[i+1];
+        COM += mVerts[i+2];
     }
+
+    COM /= static_cast<float>(mVerts.size());
+
+    std::cout << "\nCENTER OF MASS: " << COM << std::endl;
     
     return hm;
 }

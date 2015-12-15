@@ -110,6 +110,8 @@ public:
     // Delete a voronoi point when the mesh has not been clipped yet
     void deleteLastVoronoiPoint();
 
+    void updateVoronoiPoints();
+
   //  void setPrevRot(std::pair<Vector3<float>, float> p) { mPrevRot = p; }
 
     

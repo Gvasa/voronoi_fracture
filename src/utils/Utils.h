@@ -42,6 +42,8 @@
 const int WIDTH = 1024;
 const int HEIGHT = 768;
 
+enum BoundingPoints {XPYPZP, XPYPZN, XNYPZN, XNYPZP, XPYNZP, XPYNZN, XNYNZN, XNYNZP};
+
 // Set constants for flaging of edges that are not valid half-edges
 const static unsigned int BORDER = (std::numeric_limits<unsigned int>::max)();
 const static unsigned int UNINITIALIZED = (std::numeric_limits<unsigned int>::max)()-1;
