@@ -57,8 +57,7 @@ void Physics::addGeometry(std::vector<Vector3<float> > vertList, Vector3<float> 
         //shape = new btConvexHullShape((const btScalar*)hull->getVertexPointer(), hull->numVertices(), sizeof(btVector3));;// new btSphereShape(1);
         shape = bConvex;
         mass = 2;
-        btVector3(centerOfMass[0], centerOfMass[1], centerOfMass[2]);
-        motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(centerOfMass[0], centerOfMass[1], centerOfMass[2])));
+        motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(centerOfMass[0]/2.0f, centerOfMass[1]/2.0f, centerOfMass[2]/2.0f)));
         shape->calculateLocalInertia(mass, inertia);
     } else if (type == STATIC) {
         
@@ -76,7 +75,7 @@ void Physics::addGeometry(std::vector<Vector3<float> > vertList, Vector3<float> 
         //shape = new btConvexHullShape((const btScalar*)hull->getVertexPointer(), hull->numVertices(), sizeof(btVector3));;// new btSphereShape(1);
         shape = bConvex;
         std::cout << "-------------- La till static!------------" << std::endl;
-        motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(centerOfMass[0], centerOfMass[1], centerOfMass[2])));
+        motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(centerOfMass[0]/2.0f, centerOfMass[1]/2.0f, centerOfMass[2]/2.0f)));
 
     }  else {
         std::cout << "Somethign went wrong when adding physical counter part " << std::endl;
@@ -94,7 +93,7 @@ void Physics::addGeometry(std::vector<Vector3<float> > vertList, Vector3<float> 
 }
 
 void Physics::removeGeometry(unsigned int index) {
-
+/*
     btCollisionObject* obj = mDynamicsWorld->getCollisionObjectArray()[index];
     btRigidBody* body = btRigidBody::upcast(obj);
     if (body && body->getMotionState())
@@ -106,39 +105,44 @@ void Physics::removeGeometry(unsigned int index) {
 
     mRigidBodies.erase(mRigidBodies.begin()+index);
     mRigidBodies.shrink_to_fit();
-
+*/
 }
 
 std::vector<unsigned int> Physics::stepSimulation(Matrix4x4<float> MVP) {
+
     double deltaT = glfwGetTime() - prevTime;
-    //std::cout << deltaT << std::endl;
+
     mDynamicsWorld->stepSimulation(deltaT, 10);
+
     prevTime = glfwGetTime();
 
     int numManifolds = mDynamicsWorld->getDispatcher()->getNumManifolds();
+
     std::vector<unsigned int> splitIndex;
 
-    for (int i=0;i<numManifolds;i++)
-    {   
+    for (int i = 0; i < numManifolds; i++) {   
+    
        // std::cout << "getNumManifolds: " << numManifolds << std::endl;
         btPersistentManifold* contactManifold =  mDynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
         const btCollisionObject* obA = const_cast<btCollisionObject*>(contactManifold->getBody0());
         const btCollisionObject* obB = const_cast<btCollisionObject*>(contactManifold->getBody1());
-
+    
         const btRigidBody* body1 = btRigidBody::upcast(obA);
         const btRigidBody* body2 = btRigidBody::upcast(obB);
-
+    
         int numContacts = contactManifold->getNumContacts();
-        for (int j=0;j<numContacts;j++)
-        {
+        
+        for (int j = 0; j < numContacts; j++) {
+            
             btManifoldPoint& pt = contactManifold->getContactPoint(j);
-            if (pt.getDistance()<0.f)
-            {
+
+            if (pt.getDistance() < 0.f) {
+                assert( 1 < 2 );
                 const btVector3& ptA = pt.getPositionWorldOnA();
                 const btVector3& ptB = pt.getPositionWorldOnB();
                 const btVector3& normalOnB = pt.m_normalWorldOnB;
                 //std::cout << "impulse: " << pt.getAppliedImpulse() << std::endl;
-                if(pt.getAppliedImpulse() > 0.2f ) {
+                if(pt.getAppliedImpulse() > 0.2f) {
                     std::vector<btRigidBody* >::iterator it;
                     std::vector<btRigidBody* >::iterator it2;
 

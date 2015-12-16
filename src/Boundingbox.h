@@ -23,8 +23,6 @@ public:
 
     void initialize();
 
-    void updateBoundingBox(std::vector<Vector3<float> >);
-
     void updateBoundingBox(glm::mat4);
 
     void updateRenderData();

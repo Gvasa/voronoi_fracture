@@ -111,7 +111,7 @@ void Scene::render() {
 
 void Scene::addGeometry(Geometry *G, unsigned int type) {
     mGeometries.push_back(G);
-    //G->calculateCenterOfMass();
+    G->calculateCenterOfMass();
     physicsWorld->addGeometry(G->getUniqueVertexList(), G->getCenterOfMass() , type);
 
 }
@@ -142,19 +142,18 @@ glm::mat4 Scene::toGlmMat4(float m[]) {
         M[0][0] = m[0];
         M[0][1] = m[1];
         M[0][2] = m[2];
-        M[0][3] = m[3];
+
         M[1][0] = m[4];
         M[1][1] = m[5];
         M[1][2] = m[6];
-        M[1][3] = m[7];
+
         M[2][0] = m[8];
         M[2][1] = m[9];
         M[2][2] = m[10];
-        M[2][3] = m[11];
-        M[3][0] = m[12];
-        M[3][1] = m[13];
-        M[3][2] = m[14];
-        M[3][3] = m[15]; 
+
+        M[0][3] = m[12];
+        M[1][3] = m[13];
+        M[2][3] = m[14];
 
 /*
         M[0][0] = m[0];
@@ -197,27 +196,33 @@ void Scene::resetCamera() {
     camera.zoom = 2.0;
 }
 
-void Scene::stepSimulation() { 
+/*void Scene::stepSimulation() { 
     
     btTransform worldTrans;
     btQuaternion rotation;
     btScalar rotAngle;
     btVector3 rotAxis;
     Vector3<float> prevPos;
-
+    debug
     std::vector<unsigned int> splitIndex = physicsWorld->stepSimulation(mSceneMatrices[I_MVP]);
+    debug
 
     for(unsigned int i = 0; i < splitIndex.size(); i++ )
         splitMesh(i);
 
+    debug
+
+    std::cout << "\nmGeometries.size(): " << mGeometries.size() << std::endl;
     for(unsigned int i = 0; i < mGeometries.size(); i++) {
 
+        std::cout << "\nmGeometry: " << i << std::endl;
         if(mGeometries[i]->getType() == HALFEDGEMESH) {
-
+            debug
             physicsWorld->getRigidBodyAt(i)->getMotionState()->getWorldTransform(worldTrans);
             HalfEdgeMesh* hem = dynamic_cast<HalfEdgeMesh*>(mGeometries[i]);
-            
+            debug
             prevPos = hem->getPrevPos();
+            debug
 
             rotation = worldTrans.getRotation();
             rotAxis = rotation.getAxis();
@@ -229,16 +234,54 @@ void Scene::stepSimulation() {
             glm::vec3 rRotAxis(rotAxis.getX(), rotAxis.getY(), rotAxis.getZ());
             glm::vec3 tTrans(worldTrans.getOrigin().getX() - prevPos[0], worldTrans.getOrigin().getY() - prevPos[1], worldTrans.getOrigin().getZ() - prevPos[2]);
 
+            fTrans = glm::translate(fTrans, -rTrans);
             fTrans = glm::rotate(fTrans, rotAngle, rRotAxis);
+            fTrans = glm::translate(fTrans, rTrans);
+
+            std::cout << "-----------\n\nrotAngle: " << rotAngle << std::endl;
+            std::cout << "axis: " << rotAxis.getX() << ", " << rotAxis.getY() << ", " << rotAxis.getZ() << std::endl;
 
             fTrans = glm::translate(fTrans, tTrans);
-
+            debug
             float bulletTransform[16];
             worldTrans.getOpenGLMatrix(bulletTransform);
-            mGeometries[i]->setDrawMat(toGlmMat4(bulletTransform));
-
+            debug
+            mGeometries[i]->setDrawMat(fTrans);
+            debug
             hem->setCalcMat(fTrans);
+            debug
             hem->setPrevPos(Vector3<float>(worldTrans.getOrigin().getX(), worldTrans.getOrigin().getY(),worldTrans.getOrigin().getZ()));
+            debug
+        }
+    }
+    debug
+}*/
+
+void Scene::stepSimulation() { 
+    btTransform worldTrans;
+    btQuaternion rotation;
+    btScalar rotAngle;
+    btVector3 rotAxis;
+   // float trans[16];
+    Vector3<float> prevPos;
+    float prevAngle;
+
+    std::vector<unsigned int> splitIndex = physicsWorld->stepSimulation(mSceneMatrices[I_MVP]);
+
+    for(unsigned int i = 0; i < splitIndex.size(); i++ )
+        splitMesh(i);
+
+    //physicsWorld->stepSimulation(mSceneMatrices[I_MVP]);
+
+    for(unsigned int i = 0; i < mGeometries.size(); i++) {
+        if(mGeometries[i]->getType() == HALFEDGEMESH) {
+                physicsWorld->getRigidBodyAt(i)->getMotionState()->getWorldTransform(worldTrans);
+                float bulletTransform[16];
+                worldTrans.getOpenGLMatrix(bulletTransform);
+
+                //mGeometries[i]->setTransMat(toGlmMat4(bulletTransform));
+                mGeometries[i]->setCalcMat(toGlmMat4(bulletTransform));
+                mGeometries[i]->setDrawMat(toGlmMat4(bulletTransform));
         }
     }
 }

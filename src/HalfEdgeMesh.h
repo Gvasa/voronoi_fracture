@@ -73,7 +73,7 @@ public:
 
     Compound* getCompound() { return mCompound; }
     
-    void updateCenterOfMass(glm::mat4);
+    void updateCenterOfMass();
 
     Vector3<float> getVoronoiPoint(unsigned int i) { return mVoronoiPoints[i]; }
     
@@ -252,7 +252,7 @@ private:
 
     std::vector<Debugpoint *> mDebugPoints;
 
-    Vector3<float> mCenterOfMass;
+    Vector3<float> mCenterOfMass = Vector3<float>(0.0f, 0.0f, 0.0f);
 
     Vector3<float> mPrevPos;
     float mPrevRotAngle;

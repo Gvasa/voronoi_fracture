@@ -411,21 +411,24 @@ void HalfEdgeMesh::computeVoronoiPattern() {
 }
 
 void HalfEdgeMesh::calculateCenterOfMass() {
+
+    //std::cout << "\n\nmVerts.size(): " << mVerts.size() << std::endl;
+
     for (unsigned int i = 0; i < mVerts.size(); ++i)
         mCenterOfMass += mVerts[i].pos;
 
     mCenterOfMass /= mVerts.size();
 
-    std::cout << "COM: " << mCenterOfMass << std::endl;
+    //std::cout << "COM: " << mCenterOfMass << std::endl;
 }
 
-void HalfEdgeMesh::updateCenterOfMass(glm::mat4) {
-    glm::vec4 tmpCom(mCenterOfMass[0], mCenterOfMass[1], mCenterOfMass[2], 1.0);
+void HalfEdgeMesh::updateCenterOfMass() {
+    glm::vec4 tmpCom(mCenterOfMass[0], mCenterOfMass[1], mCenterOfMass[2], 1.0f);
 
-    tmpCom = mCalcMat*tmpCom;
-
-    mCenterOfMass = Vector3<float>(tmpCom.x, tmpCom.y, tmpCom.z);
-    std::cout << "updaterad COM: " << mCenterOfMass << std::endl;
+    tmpCom = mCalcMat * tmpCom;
+    //std::cout << "INNAN updaterad COM: " << mCenterOfMass << std::endl;
+    mCenterOfMass = Vector3<float>(tmpCom.x, tmpCom.y, tmpCom.z) / 2.0f;
+    //std::cout << "updaterad COM: " << mCenterOfMass << std::endl;
 }
 
 void HalfEdgeMesh::setCalcMat(glm::mat4 m) { 
@@ -442,11 +445,13 @@ void HalfEdgeMesh::setCalcMat(glm::mat4 m) {
         // Apply the rotation to the vertices
     }
 
-    //std::cout << "------:  " <<  mVerts[0].pos << std::endl;
+    std::cout << "\n--- UPDATED V[0] ---\n" <<  mVerts[0].pos << std::endl;
+    std::cout << "--- UPDATED F[0].vert ---\n" <<  getVert(getEdge(mFaces[0].edge).vert).pos << std::endl;
 
     //std::cout << "\n ---- updated voronoi ------ " << std::endl;
     updateVoronoiPoints();
     mBoundingbox->updateBoundingBox(mCalcMat);
+    updateCenterOfMass();
 
     //mBoundingbox->updateBoundingBox(m);
 /*
@@ -469,7 +474,7 @@ void HalfEdgeMesh::setTransMat(glm::mat4 m) {
 
         tmpPos = mTransMat*tmpPos;
 
-        mVerts[i].pos = Vector3<float>(tmpPos.x, tmpPos.y, tmpPos.z);
+        mVerts[i].pos = Vector3<float>(tmpPos.x, tmpPos.y, tmpPos.z) / 2.0f;
         // Apply the rotation to the vertices
     }
 
@@ -481,7 +486,7 @@ void HalfEdgeMesh::setTransMat(glm::mat4 m) {
 
         tmpPos = mTransMat*tmpPos;
 
-        mVoronoiPoints[i] = Vector3<float>(tmpPos.x, tmpPos.y, tmpPos.z);
+        mVoronoiPoints[i] = Vector3<float>(tmpPos.x, tmpPos.y, tmpPos.z) / 2.0f;
        // std::cout << "mVoronoiPoints[" << i << "]" << mVoronoiPoints[i] << std::endl;
     }
 
@@ -643,7 +648,7 @@ void HalfEdgeMesh::deleteLastVoronoiPoint() {
 void HalfEdgeMesh::updateVoronoiPoints() {
 
     glm::vec4 tmpPos;
-    //std::cout << "\n\n------------------" << std::endl;
+    //std::cout << "\n\n------- UPDATED VORONOI POINTS -------" << std::endl;
     for(unsigned int i = 0; i < mVoronoiPoints.size(); i++) {
         
         tmpPos = glm::vec4(mVoronoiPoints[i][0], mVoronoiPoints[i][1], mVoronoiPoints[i][2], 1.0f);

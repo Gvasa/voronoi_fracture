@@ -35,8 +35,8 @@ void Compound::initialize() {
     for(unsigned int i = 0; i < mDebugpoints.size(); i++)
         mDebugpoints[i]->initialize(Vector3<float>(0.0f, 0.0f, 0.0f));
 
-    for(unsigned int i = 0; i < mSplittingPlanes.size(); i++)
-        mSplittingPlanes[i]->initialize();
+    //for(unsigned int i = 0; i < mSplittingPlanes.size(); i++)
+      //  mSplittingPlanes[i]->initialize();
 
     std::cout << "\nCompound Initialized!\n" << std::endl;
 }
@@ -46,8 +46,8 @@ void Compound::render(Matrix4x4<float> MVP) {
     std::vector<Matrix4x4<float> > tmp;
     tmp.push_back(MVP);
 
-    for(unsigned int i = 0; i < mSplittingPlanes.size(); i++)
-        mSplittingPlanes[i]->render(MVP);
+//    for(unsigned int i = 0; i < mSplittingPlanes.size(); i++)
+  //      mSplittingPlanes[i]->render(MVP);
 
     for(unsigned int i = 0; i < mDebugpoints.size(); i++)
         mDebugpoints[i]->render(tmp);
@@ -146,7 +146,7 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
 
 void Compound::calculateConvexShape(unsigned int index1, unsigned int index2, unsigned int currentConvex) {
 
-    std::vector<Vector3<float> > v1 = mSplittingPlanes[index1]->getVertexList();
+    /*std::vector<Vector3<float> > v1 = mSplittingPlanes[index1]->getVertexList();
     std::vector<Vector3<float> > v2 = mSplittingPlanes[index2]->getVertexList();
     
     std::vector<Vector3<float> > uniqueVerticesToAdd; //All the uniqueVertices in a cell
@@ -218,7 +218,7 @@ void Compound::calculateConvexShape(unsigned int index1, unsigned int index2, un
 
     //add our newly created uniquelist and indexlist to our private vectors
     mUniqueConvexList.push_back(uniqueVerticesToAdd);
-    mConvexList.push_back(verticesIndex);
+    mConvexList.push_back(verticesIndex);*/
 }
 
 void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::pair<Vector3<float>, Vector3<float> > voronoiPoints, unsigned int planeIndex) {
@@ -229,14 +229,16 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::pair<Vecto
     mBoundingValues = boundingBox->getBoundingValues();
     
 
-    Vector3<float> mittPunkt = voronoiPoints.first + (voronoiPoints.second - voronoiPoints.first) / 2.0f;  
-    Vector3<float> normal = (voronoiPoints.second - voronoiPoints.first).Normalize();
+    Vector3<float> centerPoint = voronoiPoints.first + (voronoiPoints.second - voronoiPoints.first) / 2.0f;  
+    /*Vector3<float> normal = (voronoiPoints.second - voronoiPoints.first).Normalize();
     
     std::vector<Vector3<float> > xPoints;
     std::vector<Vector3<float> > yPoints;
-    std::vector<Vector3<float> > zPoints;
+    std::vector<Vector3<float> > zPoints;*/
 
-    xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*mBoundingValues[YMIN][1] + normal[1]*mittPunkt[1] - normal[2]*mBoundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[0], mBoundingValues[YMIN][1], mBoundingValues[ZMIN][2]));
+
+
+    /*xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*mBoundingValues[YMIN][1] + normal[1]*mittPunkt[1] - normal[2]*mBoundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[0], mBoundingValues[YMIN][1], mBoundingValues[ZMIN][2]));
     xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*mBoundingValues[YMIN][1] + normal[1]*mittPunkt[1] - normal[2]*mBoundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[0], mBoundingValues[YMIN][1], mBoundingValues[ZMAX][2]));
     xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*mBoundingValues[YMAX][1] + normal[1]*mittPunkt[1] - normal[2]*mBoundingValues[ZMAX][2] + normal[2]*mittPunkt[2]) / normal[0], mBoundingValues[YMAX][1], mBoundingValues[ZMAX][2]));
     xPoints.push_back(Vector3<float>((normal[0]*mittPunkt[0] - normal[1]*mBoundingValues[YMAX][1] + normal[1]*mittPunkt[1] - normal[2]*mBoundingValues[ZMIN][2] + normal[2]*mittPunkt[2]) / normal[0], mBoundingValues[YMAX][1], mBoundingValues[ZMIN][2]));   
@@ -249,9 +251,9 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::pair<Vecto
     zPoints.push_back(Vector3<float>(mBoundingValues[XMIN][0], mBoundingValues[YMIN][1], (-normal[0]*mBoundingValues[XMIN][0] + normal[0]*mittPunkt[0] - normal[1]*mBoundingValues[YMIN][1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2]));
     zPoints.push_back(Vector3<float>(mBoundingValues[XMIN][0], mBoundingValues[YMAX][1], (-normal[0]*mBoundingValues[XMIN][0] + normal[0]*mittPunkt[0] - normal[1]*mBoundingValues[YMAX][1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2]));
     zPoints.push_back(Vector3<float>(mBoundingValues[XMAX][0], mBoundingValues[YMAX][1], (-normal[0]*mBoundingValues[XMAX][0] + normal[0]*mittPunkt[0] - normal[1]*mBoundingValues[YMAX][1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2]));
-    zPoints.push_back(Vector3<float>(mBoundingValues[XMAX][0], mBoundingValues[YMIN][1], (-normal[0]*mBoundingValues[XMAX][0] + normal[0]*mittPunkt[0] - normal[1]*mBoundingValues[YMIN][1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2]));
+    zPoints.push_back(Vector3<float>(mBoundingValues[XMAX][0], mBoundingValues[YMIN][1], (-normal[0]*mBoundingValues[XMAX][0] + normal[0]*mittPunkt[0] - normal[1]*mBoundingValues[YMIN][1] + normal[1]*mittPunkt[1] + normal[2]*mittPunkt[2]) / normal[2]));*/
 
-    std::vector<Vector3<float> > okPoints;
+    /*std::vector<Vector3<float> > okPoints;
 
     for(unsigned int i = 0; i < xPoints.size(); i++) {
         if(xPoints[i][0] > mBoundingValues[XMIN][0] && xPoints[i][0] < mBoundingValues[XMAX][0])
@@ -265,8 +267,8 @@ void Compound::calculateSplittingPlane(Boundingbox* boundingBox, std::pair<Vecto
     }
 
     okPoints = sortVertices(okPoints, normal);
-    std::cout << " --------------------- " << okPoints.size() << std::endl; 
-    mSplittingPlanes.push_back(new Splittingplane(okPoints, mBoundingValues, voronoiPoints, normal, getColor(mSplittingPlanes.size())));
+    std::cout << " --------------------- " << okPoints.size() << std::endl;*/ 
+    mSplittingPlanes.push_back(new Splittingplane(centerPoint, voronoiPoints));
 }
 
 bool Compound::calculatePlaneIntersection( std::vector<Vector3<float> > plane1, std::vector<Vector3<float> > plane2, std::pair<Vector3<float> , Vector3<float> > &intersectionPair) {

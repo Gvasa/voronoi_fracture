@@ -24,7 +24,16 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
 
     HalfEdgeMesh * hm = new HalfEdgeMesh(Vector4<float>(r, g, b, 1.0f));
 
-    mVerts = mHalfEdgeMesh->getVertexList();
+
+    for(unsigned int i = 0; i < mHalfEdgeMesh->getNumFaces(); i++) {
+        if(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).face != BORDER && mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).face != UNINITIALIZED) {
+            mVerts.push_back(mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).vert).pos);
+            mVerts.push_back(mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).next).vert).pos);
+            mVerts.push_back(mHalfEdgeMesh->getVert(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getEdge(mHalfEdgeMesh->getFace(i).edge).next).next).vert).pos);
+        }
+    }
+
+    //std::cout << 
 
     std::vector<Vector3<float> > clippedVerts;
 
@@ -33,13 +42,12 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
     unsigned int numSplittingPlanes = mHalfEdgeMesh->getCompound()->getNumberOfSplittingPlanes();
 
     unsigned int vertCounter = 0;
-    debug
+
     // Loop over all splitting planes for our mesh
     for(unsigned int j = 0; j < mHalfEdgeMesh->getCompound()->getNumberOfSplittingPlanes(); j++) {
-        debug
+
         std::pair<Vector3<float>, Vector3<float> > voronoiPair = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getVoronoiPoints();
-        std::cout << "voronoiPair: " << voronoiPair.first << " ,\t" << voronoiPair.second << std::endl;
-        debug
+
         if(refVoronoiPoint != voronoiPair.first && refVoronoiPoint != voronoiPair.second)
             continue;
 
@@ -50,12 +58,15 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
             normal = (voronoiPair.second - voronoiPair.first).Normalize();
         else
             normal = (voronoiPair.first - voronoiPair.second).Normalize();
-        debug
+
         // Arbitrary point on the splitting plane (any vertex), in this case the first vertex
-        Vector3<float> P = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getVertex(0);
+
+        //std::cout << "NUMBER OF VERTS IN SPLITTING PLANE: " << mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getNumVerts() << std::endl;
+
+        Vector3<float> P = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getCenterPoint();
         
         vertCounter = 0;
-        debug
+
         // Loop over all faces of our mesh
         for(unsigned int i = 0; i < (mVerts.size() / 3); i++) {
 
@@ -183,6 +194,9 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
     COM /= static_cast<float>(mVerts.size());
 
     std::cout << "\nCENTER OF MASS: " << COM << std::endl;
+
+    mVerts.clear();
+    mVerts.shrink_to_fit();
     
     return hm;
 }

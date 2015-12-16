@@ -141,20 +141,16 @@ void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts)
     mBoundingValues[XNYNZP] = Vector3<float>(boundingValuesIndex["xMin"], boundingValuesIndex["yMin"], boundingValuesIndex["zMax"]);
 
 
-    std::cout << "\nBOUNDING BOX: " << std::endl;
+    /*std::cout << "\nBOUNDING BOX: " << std::endl;
     for(unsigned int i = 0; i < 8; i++)
-        std::cout << mBoundingValues[i] << std::endl;
+        std::cout << mBoundingValues[i] << std::endl;*/
 
     updateRenderData();
 }
 
-void Boundingbox::updateBoundingBox(std::vector<Vector3<float> > uniqueVerts) {
-    mVerts.clear();
-    mVerts.shrink_to_fit();
-    calculateBoundingbox(uniqueVerts);
-}
 
 void Boundingbox::updateBoundingBox(glm::mat4 m) {
+    
     glm::vec4 tmpPos;
     
     for(unsigned int i = 0; i < mBoundingValues.size(); i++) {
@@ -162,10 +158,13 @@ void Boundingbox::updateBoundingBox(glm::mat4 m) {
 
         tmpPos = m*tmpPos;
 
-        mBoundingValues[i] = Vector3<float>(tmpPos.x, tmpPos.y, tmpPos.z);
+        mBoundingValues[i] = Vector3<float>(tmpPos.x, tmpPos.y, tmpPos.z) / 2.0f;
         // Apply the rotation to the vertices
     }
-    updateRenderData();
+
+    /*std::cout << "\nUPDATED BOUNDING BOX: " << std::endl;
+    for(unsigned int i = 0; i < 8; i++)
+        std::cout << mBoundingValues[i] << std::endl;*/
 }
 
 
