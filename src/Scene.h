@@ -64,9 +64,17 @@ public:
 
     void setInitialVelocity(unsigned int i, Vector3<float> v) { physicsWorld->setInitialVelocity(i, v); }
 
+    void setPreComputedVoronoiPoints(std::map<std::string, std::vector<Vector3<float> > > v) { mVoronoiPoints = v; }
+
+    std::vector<Vector3<float> > getPreComputedVoronoiPoints(std::string s) { return mVoronoiPoints[s]; }
+
+    void updatePreComputedVoronoiPattern(std::string, glm::mat4);
+
 private:
 
-    Matrix4x4<float> toMatrix4x4(glm::mat4);
+    Matrix4x4<float> toMatrix4x4Row(glm::mat4);
+
+    Matrix4x4<float> toMatrix4x4Column(glm::mat4);
     
     Matrix4x4<float> toMatrix4x4(glm::mat3);
 
@@ -79,6 +87,8 @@ private:
     Physics* physicsWorld;
 
     std::vector<std::pair<Geometry*, btRigidBody*> > mObjects;
+
+    std::map<std::string, std::vector<Vector3<float> > > mVoronoiPoints;
 
     struct LightSource {
         Vector4<float> color;

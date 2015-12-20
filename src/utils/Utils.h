@@ -40,6 +40,11 @@
 
 #define debug std::cout << "vid: " << __LINE__ << " " << __FUNCTION__ << std::endl << std::endl;
 
+static std::vector<Vector3<float> > getVoronoiPattern(std::string obj);
+static void updateVoronoiPatterns(std::string, Matrix4x4<float>);
+static bool createPreDefinedVoronoiPoints();
+
+
 const int WIDTH = 1024;
 const int HEIGHT = 768;
 
@@ -117,6 +122,49 @@ static bool createPreDefinedVoronoiPoints() {
     VP.shrink_to_fit();
 }
 
+static void updateVoronoiPatterns2(std::string s) {
+    std::cout << "--------------   update2 --------------" << std::endl;
+
+    std::map<std::string, std::vector<Vector3<float> > >::iterator it;
+    
+    it = sVoronoiPoints.find("icosphere");
+
+    if(it != sVoronoiPoints.end())
+        std::cout << "DEN ÄR HITTAD" << std::endl;
+
+}
+
+static void updateVoronoiPatterns(std::string s, Matrix4x4<float> M) {
+
+    std::cout << "--------------   akdjasdaskjdakjdnas --------------" << std::endl;
+    std::cout << "s: " << s << std::endl;
+    std::cout << "sVoronoiPoints.size(): " << sVoronoiPoints.size() << std::endl;
+
+
+
+    std::vector<Vector3<float> > foo = getVoronoiPattern(s);
+    std::cout << "foo.size: " << foo.size() << std::endl;
+
+
+    std::map<std::string, std::vector<Vector3<float> > >::iterator it;
+    
+    it = sVoronoiPoints.find(s);
+
+    if(it != sVoronoiPoints.end()) {
+        std::cout << "DEN ÄR HITTAD" << std::endl;
+        std::cout << "sVoronoiPoints.size(): " << sVoronoiPoints["icosphere"].size() << std::endl;
+    }
+
+    for(std::vector<Vector3<float> >::iterator it = sVoronoiPoints[s].begin(); it != sVoronoiPoints[s].end(); ++it) {
+        
+        std::cout << "-------------- MEN I DENNA DÅ ASHMDBASJ;DBASKDJBAK --------------" << std::endl;
+        /*for(std::vector<Vector3<float> >::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2) {
+            Vector4<float> p = M * Vector4<float>((*it2)[0], (*it2)[1], (*it2)[2], 1.0f);
+            (*it2) = Vector3<float>(p[0], p[1], p[2]);
+        }*/
+    }
+}
+
 
 static std::vector<Vector3<float> > getVoronoiPattern(std::string obj) {
     
@@ -125,6 +173,7 @@ static std::vector<Vector3<float> > getVoronoiPattern(std::string obj) {
     it = sVoronoiPoints.find(obj);
     
     if(it != sVoronoiPoints.end()) {
+        std::cout << "*************svoronoipoints[obj].size: " << sVoronoiPoints[obj].size() << std::endl;
         return sVoronoiPoints[obj];   
     } else {
         std::vector<Vector3<float> > empty;

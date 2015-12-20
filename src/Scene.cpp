@@ -89,16 +89,16 @@ void Scene::render() {
         modelMatrix = (*it)->getTransMat();
 
         // Construct MVP matrix
-        mSceneMatrices[I_MVP] = toMatrix4x4(camera.projectionMatrix * camera.viewMatrix * modelMatrix);
+        mSceneMatrices[I_MVP] = toMatrix4x4Row(camera.projectionMatrix * camera.viewMatrix * modelMatrix);
 
         // Modelview Matrix, apply camera transforms here as well
-        mSceneMatrices[I_MV] = toMatrix4x4(camera.viewMatrix * modelMatrix);
+        mSceneMatrices[I_MV] = toMatrix4x4Row(camera.viewMatrix * modelMatrix);
 
         // Modelview Matrix for our light
-        mSceneMatrices[I_MV_LIGHT] = toMatrix4x4(camera.viewMatrix * modelMatrix);
+        mSceneMatrices[I_MV_LIGHT] = toMatrix4x4Row(camera.viewMatrix * modelMatrix);
 
         // Normal Matrix, used for normals in our shading
-        mSceneMatrices[I_NM] = toMatrix4x4(glm::inverseTranspose(glm::mat4(camera.viewMatrix * modelMatrix)));
+        mSceneMatrices[I_NM] = toMatrix4x4Row(glm::inverseTranspose(glm::mat4(camera.viewMatrix * modelMatrix)));
 
         (*it)->render(mSceneMatrices);
     }
@@ -110,18 +110,31 @@ void Scene::render() {
 
 
 void Scene::addGeometry(Geometry *G, unsigned int type) {
+
+    //updateVoronoiPatterns("icosphere", Matrix4x4<float>());
     mGeometries.push_back(G);
     G->calculateCenterOfMass();
     physicsWorld->addGeometry(G->getUniqueVertexList(), G->getWorldCenterOfMass() , type);
 
 }
 
-Matrix4x4<float> Scene::toMatrix4x4(glm::mat4 m) {
+Matrix4x4<float> Scene::toMatrix4x4Row(glm::mat4 m) {
     float M[4][4] = {
         {m[0][0], m[0][1], m[0][2], m[0][3]},
         {m[1][0], m[1][1], m[1][2], m[1][3]},
         {m[2][0], m[2][1], m[2][2], m[2][3]},
         {m[3][0], m[3][1], m[3][2], m[3][3]}
+    };
+    return Matrix4x4<float>(M);
+}
+
+
+Matrix4x4<float> Scene::toMatrix4x4Column(glm::mat4 m) {
+    float M[4][4] = {
+        {m[0][0], m[1][0], m[2][0], m[3][0]},
+        {m[0][1], m[1][1], m[2][1], m[3][1]},
+        {m[0][2], m[1][2], m[2][2], m[3][2]},
+        {m[0][3], m[2][3], m[2][3], m[3][3]}
     };
     return Matrix4x4<float>(M);
 }
@@ -193,11 +206,12 @@ void Scene::stepSimulation() {
  
     for(unsigned int i = 0; i < mGeometries.size(); i++) {
         if(mGeometries[i]->getType() == HALFEDGEMESH) {
-                physicsWorld->getRigidBodyAt(i)->getMotionState()->getWorldTransform(worldTrans);
-                float bulletTransform[16];
-                worldTrans.getOpenGLMatrix(bulletTransform);
+            physicsWorld->getRigidBodyAt(i)->getMotionState()->getWorldTransform(worldTrans);
+            float bulletTransform[16];
+            worldTrans.getOpenGLMatrix(bulletTransform);
 
-                mGeometries[i]->updateMesh(toGlmMat4(bulletTransform));
+            mGeometries[i]->updateMesh(toGlmMat4(bulletTransform));
+            updatePreComputedVoronoiPattern(mGeometries[i]->getObjName(), toGlmMat4(bulletTransform));
         }
     }
 }
@@ -237,5 +251,19 @@ void Scene::splitMesh(HalfEdgeMesh *he) {
         //addGeometry(hm);
         //hm->initialize(mPointLight.position);
         //sm->initialize();
+    }
+}
+
+
+void Scene::updatePreComputedVoronoiPattern(std::string s, glm::mat4 M) {
+
+    Matrix4x4<float> transformMatrix = toMatrix4x4Row(M);
+ 
+    for(std::vector<Vector3<float> >::iterator it = mVoronoiPoints[s].begin(); it != mVoronoiPoints[s].end(); ++it) {
+        
+        //std::cout << "-------------- MEN I DENNA DÅ ASHMDBASJ;DBASKDJBAK --------------" << std::endl;
+        Vector4<float> p = transformMatrix * Vector4<float>((*it)[0], (*it)[1], (*it)[2], 1.0f);
+        (*it) = Vector3<float>(p[0], p[1], p[2]);
+        std::cout << "updateVoronoi: " << (*it)[0] << " " << (*it)[1] << " " << (*it)[2] << std::endl;
     }
 }

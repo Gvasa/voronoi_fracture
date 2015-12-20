@@ -86,7 +86,7 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     buildRenderData();
 
-    calculateWorldCenterOfMass();
+    //calculateWorldCenterOfMass();
 
     mTransformedVertexList = mOrderedVertexList;
 
@@ -445,18 +445,21 @@ void HalfEdgeMesh::updateVoronoiPoints() {
         Vector4<float> v = transformMatrix * Vector4<float>(mVoronoiPoints[i][0], mVoronoiPoints[i][1], mVoronoiPoints[i][2], 1.0f);
         mVoronoiPoints[i] = Vector3<float>(v[0], v[1], v[2]);
     }
+
+ 
 }
 
-
+/*
 void HalfEdgeMesh::updateVoronoiPattern() {
-    
-}
+
+    Trans getWorldCenterOfMass() - mInitialWorldCenterOfMass;
+}*/
 
 
 void HalfEdgeMesh::computeVoronoiPattern() {
 
     if(!mCompoundIsComputed) {
-        updateVoronoiPattern();
+       // updateVoronoiPattern();
         mCompound = new Compound(mBoundingbox, mVoronoiPoints);
         mCompoundIsComputed = true;
     }
@@ -905,13 +908,17 @@ void HalfEdgeMesh::updateMesh(glm::mat4 m) {
         Vector4<float> v = transformMatrix * Vector4<float>(mOrderedVertexList[i][0], mOrderedVertexList[i][1], mOrderedVertexList[i][2], 1.0f);
         mTransformedVertexList[i] = Vector3<float>(v[0], v[1], v[2]);
     }    
+
+    /*std::cout << " asdasd ----------------" << std::endl;
+    updateVoronoiPatterns(mObjName, transformMatrix);
+    std::cout << " ---------- \n" << std::endl;*/
 }
 
-
+/*
 void HalfEdgeMesh::calculateWorldCenterOfMass() {
 
     for(unsigned int i = 0; i < mVerts.size(); i++)
         mInitialWorldCenterOfMass += mVerts[i].pos;
 
     mInitialWorldCenterOfMass /= static_cast<float>(mVerts.size());
-}
+}*/

@@ -52,13 +52,15 @@ int main (int argc, char* argv[]) {
     utilHandler = new Utils();
 
     createPreDefinedVoronoiPoints();
+
+    scene->setPreComputedVoronoiPoints(sVoronoiPoints);
     
     // Create geometries and add them to the scene
 
     // Floor
     floor_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
     floor_rect->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), 90.0f);
-    floor_rect->translate(Vector3<float>(0.0f, -1.0f, 0.0f));
+    floor_rect->translate(Vector3<float>(0.0f, -0.5f, 0.0f));
     floor_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
 
     // Wall
@@ -73,21 +75,22 @@ int main (int argc, char* argv[]) {
 
     //mesh->createMesh("lowPolySphere1.0");
     //mesh->createMesh("sphere1.0");
+    //mesh->createMesh("pillar");
     //mesh->createMesh("icosphere");
-    mesh->createMesh("icosphere");
     //mesh->createMesh("Sphere1.0_hole");
     //mesh->createMesh("bunnySmall");
     //mesh->createMesh("cube");
     //mesh->createMesh("cube_hole");s
-    //mesh->createMesh("cow");
+    mesh->createMesh("cow");
     //mesh->scale(Vector3<float>(0.5f, 0.5f, 0.5f));
     //mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
-    mesh->translate(Vector3<float>(0.0f, 3.0f, 0.0f));
+   
+    //mesh->translate(Vector3<float>(0.0f, 3.0f, 0.0f));
 
     mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
     scene->addGeometry(floor_rect, STATIC);
     //scene->addGeometry(wall_rect, STATIC);
-    scene->addGeometry(mesh, DYNAMIC);
+    scene->addGeometry(mesh, STATIC);
 
     initializeScene();
 
@@ -297,7 +300,7 @@ void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mo
 
                 if(!voronoiPatternIsComputed) {
 
-                    voronoiPattern = getVoronoiPattern(mesh->getObjName());
+                    voronoiPattern = scene->getPreComputedVoronoiPoints(mesh->getObjName());
                     
                     if(voronoiPattern.size() == 0) {
                         std::cout << "No pre-defined setup for " << mesh->getObjName() << "!!!" << std::endl;
