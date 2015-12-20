@@ -49,7 +49,7 @@ void Physics::addGeometry(std::vector<Vector3<float> > vertList, Vector3<float> 
 
         bConvex->recalcLocalAabb();
         
-        bConvex->setMargin(0.001);//padding
+        bConvex->setMargin(0.04);//padding
         btShapeHull* hull = new btShapeHull(bConvex);
         btScalar margin = bConvex->getMargin();
         hull->buildHull(margin);
@@ -68,13 +68,13 @@ void Physics::addGeometry(std::vector<Vector3<float> > vertList, Vector3<float> 
 
         bConvex->recalcLocalAabb();
         
-        bConvex->setMargin(0.1);//padding
+        bConvex->setMargin(0.04);//padding
         btShapeHull* hull = new btShapeHull(bConvex);
         btScalar margin = bConvex->getMargin();
         hull->buildHull(margin);
         
-        //shape = new btConvexHullShape((const btScalar*)hull->getVertexPointer(), hull->numVertices(), sizeof(btVector3));;// new btSphereShape(1);
-        shape = bConvex;
+        shape = new btConvexHullShape((const btScalar*)hull->getVertexPointer(), hull->numVertices(), sizeof(btVector3));;// new btSphereShape(1);
+        //shape = bConvex;
         std::cout << "-------------- La till static!------------" << std::endl;
         motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(centerOfMass[0], centerOfMass[1], centerOfMass[2])));
 
@@ -86,7 +86,8 @@ void Physics::addGeometry(std::vector<Vector3<float> > vertList, Vector3<float> 
     btRigidBody::btRigidBodyConstructionInfo shapeRigidBodyCI(mass, motionState, shape, inertia);
     btRigidBody *shapeRigidBody = new btRigidBody(shapeRigidBodyCI);
     
-    shapeRigidBody->setRestitution(0.4);   
+    shapeRigidBody->setRestitution(0.4);
+    //shapeRigidBody->setAngularVelocity(btVector3(0.0f, 0.0f, 10.0f));
 
     mDynamicsWorld->addRigidBody(shapeRigidBody);
     mRigidBodies.push_back(shapeRigidBody);
@@ -108,6 +109,19 @@ void Physics::removeGeometry(unsigned int index) {
     mRigidBodies.shrink_to_fit();
 
 }
+
+
+void Physics::setInitialVelocity(unsigned int i, Vector3<float> v) {
+
+    btCollisionObject* obj = mDynamicsWorld->getCollisionObjectArray()[i];
+    btRigidBody* body = btRigidBody::upcast(obj);
+    
+    if(body && body->getMotionState()) {
+        body->setLinearVelocity(btVector3(v[0], v[1], v[2]));
+        std::cout << "VELOCITY YOOOOOOO" << std::endl;
+    }
+}
+
 
 void Physics::stepSimulation(Matrix4x4<float> MVP) {
     double deltaT = glfwGetTime() - prevTime;
@@ -140,8 +154,8 @@ void Physics::stepSimulation(Matrix4x4<float> MVP) {
         }
     }
 
-    mDebugDrawer.setMVP(MVP);
-   // mDynamicsWorld->debugDrawWorld(); 
-   // debugDrawer.drawLine(btVector3(0.0, 0.0, 0.0), btVector3(5.0, 0.0, 0.0), btVector3(1.0, 0.0, 0.0));
+    //mDebugDrawer.setMVP(MVP);
+    //mDynamicsWorld->debugDrawWorld(); 
+    //mDebugDrawer.drawLine(btVector3(0.0, 0.0, 0.0), btVector3(5.0, 0.0, 0.0), btVector3(1.0, 0.0, 0.0));
 }
 

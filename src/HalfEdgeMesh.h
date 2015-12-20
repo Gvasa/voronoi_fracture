@@ -37,7 +37,7 @@ class HalfEdgeMesh : public Geometry {
 
 public:
 
-    HalfEdgeMesh(Vector4<float>);
+    HalfEdgeMesh(Vector4<float>, std::string s = "");
 
     ~HalfEdgeMesh();
 
@@ -63,6 +63,8 @@ public:
 
     void updateVoronoiPoint(Vector3<float>, unsigned int);
 
+    void updateVoronoiPoints();
+
     void computeVoronoiPattern();
 
     void markCurrentVoronoiPoint(unsigned int i, Vector4<float> c) { mDebugPoints[i]->setColor(c); }
@@ -74,7 +76,10 @@ public:
     void updateCenterOfMass(glm::mat4);
 
     Vector3<float> getVoronoiPoint(unsigned int i) { return mVoronoiPoints[i]; }
+    
     Vector3<float> getCenterOfMass() { return mCenterOfMass; }
+
+    Vector3<float> getWorldCenterOfMass();
 
     unsigned int getNumVoronoiPoints() { return mVoronoiPoints.size(); }
 
@@ -90,7 +95,7 @@ public:
 
    glm::mat4 getTransMat() { return mTransMat; }
    
-   void setTransMat(glm::mat4 m) { mTransMat = m; }
+   void updateMesh(glm::mat4 m);
   
    std::string getObjName() { return mObjName; }
 
@@ -227,6 +232,8 @@ private:
     // Normal list in drawing order
     std::vector< Vector3<float> > mOrderedNormalList;
 
+    std::vector< Vector3<float> > mTransformedVertexList;
+
     std::vector< Vector3<float> > mVoronoiPoints;
 
     std::vector<Debugpoint *> mDebugPoints;
@@ -244,6 +251,8 @@ private:
     glm::mat4 mTransMat;
 
     std::string mObjName;
+
+    Vector3<float> mInitialWorldCenterOfMass = Vector3<float>(0.0f, 0.0f, 0.0f);
 
     /*
      * MEMBER FUNCTIONS
@@ -277,6 +286,8 @@ private:
 
     std::vector<unsigned int> findNeighborFaces(unsigned int) const;
 
+    Matrix4x4<float> toMatrix4x4(glm::mat4);
+
     /*
      * UTILITY
      */
@@ -306,7 +317,7 @@ public:
     //Return number of Edges
     unsigned int getNumEdges() const {  return mEdges.size(); }
     //Return vertex list
-    std::vector<Vector3<float> > getVertexList() { return mOrderedVertexList; }
+    std::vector<Vector3<float> > getVertexList() { return mTransformedVertexList; }
     std::vector<Vector3<float> > getUniqueVertexList();
 };
 

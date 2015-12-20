@@ -36,6 +36,7 @@
 
 #include "../math/Vector4.h"
 #include "../math/Vector3.h"
+#include "../math/Matrix4x4.h"
 
 #define debug std::cout << "vid: " << __LINE__ << " " << __FUNCTION__ << std::endl << std::endl;
 
@@ -78,6 +79,8 @@ static Vector4<float> mColorScale[12] = {
         Vector4<float>(177.0f/255.0f, 89.0f /255.0f, 40.0f /255.0f, 0.5f)
     };
 
+static unsigned int uglyFuckCounter = 0;
+
 static Vector4<float> getColor(unsigned int i) { return mColorScale[i]; }
 
 static std::map<std::string, std::vector<Vector3<float> > > sVoronoiPoints;
@@ -113,6 +116,7 @@ static bool createPreDefinedVoronoiPoints() {
     VP.clear();
     VP.shrink_to_fit();
 }
+
 
 static std::vector<Vector3<float> > getVoronoiPattern(std::string obj) {
     

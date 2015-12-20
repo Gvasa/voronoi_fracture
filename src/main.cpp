@@ -22,7 +22,7 @@ Utils *utilHandler = nullptr;
 std::string windowTitle = "Voronoi Fracture";
 
 bool voronoiPatternIsComputed = false;
-const unsigned int maximumVoronoiPoints = 3;
+const unsigned int maximumVoronoiPoints = 7;
 unsigned int currentNumberOfVoronoiPoints = 1;
 int currentVoronoiIndex = 0;
 float stepSize = 0.05f;
@@ -68,37 +68,36 @@ int main (int argc, char* argv[]) {
 
     // HalfEdge mesh
     mesh = new HalfEdgeMesh(Vector4<float>(0.2f, 0.8f, 0.2f, 0.4f));
+    mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
     mesh->setDebugMode(true);
 
     //mesh->createMesh("lowPolySphere1.0");
     //mesh->createMesh("sphere1.0");
+    //mesh->createMesh("icosphere");
     mesh->createMesh("icosphere");
     //mesh->createMesh("Sphere1.0_hole");
     //mesh->createMesh("bunnySmall");
     //mesh->createMesh("cube");
     //mesh->createMesh("cube_hole");s
     //mesh->createMesh("cow");
-    //mesh->translate(Vector3<float>(0.0f, 0.0f, 1.0f));
-    //mesh->scale(Vector3<float>(0.2f, 0.2f, 0.2f));
+    //mesh->scale(Vector3<float>(0.5f, 0.5f, 0.5f));
     //mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
+    mesh->translate(Vector3<float>(0.0f, 3.0f, 0.0f));
 
-   
-    mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
     mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
-
     scene->addGeometry(floor_rect, STATIC);
     //scene->addGeometry(wall_rect, STATIC);
-    scene->addGeometry(mesh, STATIC);
+    scene->addGeometry(mesh, DYNAMIC);
 
     initializeScene();
-    
+
+    //scene->setInitialVelocity(1, Vector3<float>(1.0f, 5.0f, 0.0f));
 
     //Set functions to handle mouse input
     glfwSetMouseButtonCallback(window, mouseButton);
     glfwSetCursorPosCallback(window, mouseMotion);
     glfwSetScrollCallback(window, mouseScroll);
     glfwSetKeyCallback(window, keyboardInput);
-
 
     // render-loop
     do{
@@ -296,26 +295,30 @@ void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mo
 
             case GLFW_KEY_P:
 
-                voronoiPattern = getVoronoiPattern(mesh->getObjName());
-                
-                if(voronoiPattern.size() == 0) {
-                    std::cout << "No pre-defined setup for " << mesh->getObjName() << "!!!" << std::endl;
-                    break;
+                if(!voronoiPatternIsComputed) {
+
+                    voronoiPattern = getVoronoiPattern(mesh->getObjName());
+                    
+                    if(voronoiPattern.size() == 0) {
+                        std::cout << "No pre-defined setup for " << mesh->getObjName() << "!!!" << std::endl;
+                        break;
+                    }
+
+                    dynamic_cast<HalfEdgeMesh*>(mesh)->deleteLastVoronoiPoint();
+
+                    for(unsigned int i = 0; i < voronoiPattern.size(); i++)
+                        mesh->addVoronoiPoint(voronoiPattern[i]);
+
+                    mesh->updateVoronoiPoints();
+                    mesh->computeVoronoiPattern();
+                    scene->splitMesh(dynamic_cast<HalfEdgeMesh*>(mesh));
+                    voronoiPatternIsComputed = true;
+
+                    voronoiPattern.clear();
+                    voronoiPattern.shrink_to_fit();
                 }
-
-                dynamic_cast<HalfEdgeMesh*>(mesh)->deleteLastVoronoiPoint();
-
-                for(unsigned int i = 0; i < voronoiPattern.size(); i++)
-                    mesh->addVoronoiPoint(voronoiPattern[i]);
-
-                mesh->computeVoronoiPattern();
-                scene->splitMesh(dynamic_cast<HalfEdgeMesh*>(mesh));
-                voronoiPatternIsComputed = true;
-
-                voronoiPattern.clear();
-                voronoiPattern.shrink_to_fit();
             
-                 break;
+                break;
 
             default:
                 break;

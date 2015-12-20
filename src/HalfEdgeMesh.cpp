@@ -1,6 +1,7 @@
 #include "HalfEdgeMesh.h"
 
-HalfEdgeMesh::HalfEdgeMesh(Vector4<float> c) {
+HalfEdgeMesh::HalfEdgeMesh(Vector4<float> c, std::string s)
+    : mObjName(s) {
 
     mMaterial.color         = c;
     mMaterial.ambient       = Vector4<float>(0.3f, 0.3f, 0.3f, 1.0f);
@@ -76,15 +77,19 @@ HalfEdgeMesh::~HalfEdgeMesh() {
 void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     std::cout << "\nInitializing Half-Edge mesh ...\n\n";
-    debug
+
     mBoundingbox = new Boundingbox(buildVertexData());
-    debug
+
     mBoundingbox->initialize();
-    debug
+
     mBoundingbox->setWireFrame(true);
-    debug
+
     buildRenderData();
-    debug
+
+    calculateWorldCenterOfMass();
+
+    mTransformedVertexList = mOrderedVertexList;
+
     // Update face normals
     for(unsigned int i = 0; i < mFaces.size(); i++) {
         getFace(i).normal = calculateFaceNormal(i);
@@ -94,7 +99,7 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
     // Update vertex normals
     for(unsigned int i = 0; i < mVerts.size(); i++)
         getVert(i).normal = calculateVertNormal(i);
-    debug
+
     // Update the lists that we draw
     updateRenderData();
 
@@ -157,7 +162,7 @@ void HalfEdgeMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     // Use shader
     glUseProgram(shaderProgram);
     glDisable( GL_BLEND );
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );  
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     
     glUniformMatrix4fv(MVPLoc, 1, GL_FALSE, &sceneMatrices[I_MVP](0, 0));
     glUniformMatrix4fv(MVLoc, 1, GL_FALSE, &sceneMatrices[I_MV](0, 0));
@@ -342,25 +347,55 @@ void HalfEdgeMesh::translate(Vector3<float> p){
         v = translationMatrix * v;
         mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
     }
-    //updateCenterOfMass(mTransMat);
+
+    glm::vec4 tmpPos;
+
+    for(unsigned int i = 0; i < mVoronoiPoints.size(); i++) {
+        
+        tmpPos = glm::vec4(mVoronoiPoints[i][0], mVoronoiPoints[i][1], mVoronoiPoints[i][2], 1.0f);
+
+        tmpPos = mTransMat*tmpPos;
+
+        mVoronoiPoints[i] = Vector3<float>(tmpPos.x, tmpPos.y, tmpPos.z);
+        std::cout << "mVoronoiPoints[" << i << "]" << mVoronoiPoints[i] << std::endl;
+    }
+
+    if(mDebugPoints.size() > 0) {
+        for (unsigned int i = 0; i < mDebugPoints.size(); i++) {
+            mDebugPoints[i]->updatePosition(p);
+        }
+    }
+
     calculateCenterOfMass();
-    debug
+
 }
  
 // Scale the Mesh
 void HalfEdgeMesh::scale(Vector3<float> s){
  
-    // Compute the scaling matrix
-    mTransMat = mTransMat * glm::scale(glm::mat4(1.0f), glm::vec3(s[0], s[1], s[2]));
-    Matrix4x4<float> scalingMatrix = Matrix4x4<float>::Scale(s[0], s[1], s[2]);
+    // Compute the translation matrix
+    mTransMat = mTransMat * glm::scale(glm::mat4(1.f),  glm::vec3(s[0], s[1], s[2]));
+    Matrix4x4<float> translationMatrix = Matrix4x4<float>::Scale(s[0], s[1], s[2]);
  
     for(unsigned int i = 0; i < mVerts.size(); i++) {
-        // Apply the scaling matrix
+        // Apply the rotation to the vertices
         Vector4<float> v = Vector4<float>(mVerts[i].pos[0], mVerts[i].pos[1], mVerts[i].pos[2], 1.0f);
-        v = scalingMatrix * v;
+        v = translationMatrix * v;
         mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
     }
-    //updateCenterOfMass(mTransMat);
+
+    glm::vec4 tmpPos;
+
+    for(unsigned int i = 0; i < mVoronoiPoints.size(); i++) {
+        
+        tmpPos = glm::vec4(mVoronoiPoints[i][0], mVoronoiPoints[i][1], mVoronoiPoints[i][2], 1.0f);
+
+        tmpPos = mTransMat*tmpPos;
+
+        mVoronoiPoints[i] = Vector3<float>(tmpPos.x, tmpPos.y, tmpPos.z);
+        std::cout << "mVoronoiPoints[" << i << "]" << mVoronoiPoints[i] << std::endl;
+    }
+
     calculateCenterOfMass();
 }
 
@@ -401,19 +436,43 @@ void HalfEdgeMesh::updateVoronoiPoint(Vector3<float> dp, unsigned int index) {
 }
 
 
+void HalfEdgeMesh::updateVoronoiPoints() {
+
+    Matrix4x4<float> transformMatrix = toMatrix4x4(mTransMat);
+ 
+    for(unsigned int i = 0; i < mVoronoiPoints.size(); i++) {
+        // Apply the rotation to the vertices
+        Vector4<float> v = transformMatrix * Vector4<float>(mVoronoiPoints[i][0], mVoronoiPoints[i][1], mVoronoiPoints[i][2], 1.0f);
+        mVoronoiPoints[i] = Vector3<float>(v[0], v[1], v[2]);
+    }
+}
+
+
+void HalfEdgeMesh::updateVoronoiPattern() {
+    
+}
+
+
 void HalfEdgeMesh::computeVoronoiPattern() {
 
     if(!mCompoundIsComputed) {
+        updateVoronoiPattern();
         mCompound = new Compound(mBoundingbox, mVoronoiPoints);
         mCompoundIsComputed = true;
     }
 }
 
 void HalfEdgeMesh::calculateCenterOfMass() {
-    for (unsigned int i = 0; i < mVerts.size(); ++i)
-        mCenterOfMass += mVerts[i].pos;
 
-    mCenterOfMass /= mVerts.size();
+    Vector4<float>tmpCenterOfMass = Vector4<float>(0.0f, 0.0f, 0.0f, 0.0f);
+
+    for (unsigned int i = 0; i < mVerts.size(); ++i)
+        tmpCenterOfMass += Vector4<float>(mVerts[i].pos[0], mVerts[i].pos[1], mVerts[i].pos[2], 1.0f);
+
+    tmpCenterOfMass = toMatrix4x4(glm::inverse(mTransMat)) * tmpCenterOfMass;
+    tmpCenterOfMass /= mVerts.size();
+
+    mCenterOfMass = Vector3<float>(tmpCenterOfMass[0], tmpCenterOfMass[1], tmpCenterOfMass[2]);
 
     std::cout << "COM: " << mCenterOfMass << std::endl;
 }
@@ -621,7 +680,7 @@ Vector3<float> HalfEdgeMesh::calculateVertNormal(unsigned int vertIndex) const {
 
 
 std::vector<Vector3<float> > HalfEdgeMesh::buildVertexData() {
-    debug
+
     std::vector<Vector3<float> > vertexData;
 
     for(unsigned int i = 0; i < mVerts.size(); i++) {
@@ -654,6 +713,7 @@ void HalfEdgeMesh::buildRenderData() {
         mOrderedVertexList.push_back(v1.pos);    
         mOrderedVertexList.push_back(v2.pos);
         mOrderedVertexList.push_back(v3.pos);
+
         //std::cout << "\ninnan normal bestäms" << std::endl;
         Vector3<float> faceNormal = getFace(i).normal;//Vector3<float>(0.0001f, 0.0001f, 0.0001f);
      /*   
@@ -681,7 +741,7 @@ void HalfEdgeMesh::buildRenderData() {
         mOrderedNormalList.push_back(faceNormal);
         mOrderedNormalList.push_back(faceNormal);
         mOrderedNormalList.push_back(faceNormal);
-    }   
+    }
     std::cout << "\n--------- buildRenderData COMPLETE !!! ---------" << std::endl;
 }
 
@@ -806,4 +866,52 @@ unsigned int HalfEdgeMesh::getEdge(Vector3<float> vertPos) {
         if(getVert(getEdge(i).vert).pos == vertPos && getEdge(i).face == BORDER)
             return i;
     }
+}
+
+
+Matrix4x4<float> HalfEdgeMesh::toMatrix4x4(glm::mat4 m) {
+    float M[4][4] = {
+        {m[0][0], m[1][0], m[2][0], m[3][0]},
+        {m[0][1], m[1][1], m[2][1], m[3][1]},
+        {m[0][2], m[1][2], m[2][2], m[3][2]},
+        {m[0][3], m[1][3], m[2][3], m[3][3]}
+    };
+    return Matrix4x4<float>(M);
+}
+
+
+Vector3<float> HalfEdgeMesh::getWorldCenterOfMass() {
+
+    Vector4<float>WCM = toMatrix4x4(mTransMat) * Vector4<float>(mCenterOfMass[0], mCenterOfMass[1], mCenterOfMass[2], 1.0f); 
+
+    return Vector3<float>(WCM[0], WCM[1], WCM[2]);
+}
+
+
+void HalfEdgeMesh::updateMesh(glm::mat4 m) {
+
+    mTransMat = m;
+
+    Matrix4x4<float> transformMatrix = toMatrix4x4(mTransMat);
+ 
+    for(unsigned int i = 0; i < mVerts.size(); i++) {
+        // Apply the rotation to the vertices
+        Vector4<float> v = transformMatrix * Vector4<float>(mVerts[i].pos[0], mVerts[i].pos[1], mVerts[i].pos[2], 1.0f);
+        mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
+    }
+
+    for(unsigned int i = 0; i < mOrderedVertexList.size(); i++) {
+        // Apply the rotation to the vertices
+        Vector4<float> v = transformMatrix * Vector4<float>(mOrderedVertexList[i][0], mOrderedVertexList[i][1], mOrderedVertexList[i][2], 1.0f);
+        mTransformedVertexList[i] = Vector3<float>(v[0], v[1], v[2]);
+    }    
+}
+
+
+void HalfEdgeMesh::calculateWorldCenterOfMass() {
+
+    for(unsigned int i = 0; i < mVerts.size(); i++)
+        mInitialWorldCenterOfMass += mVerts[i].pos;
+
+    mInitialWorldCenterOfMass /= static_cast<float>(mVerts.size());
 }

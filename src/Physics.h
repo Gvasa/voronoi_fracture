@@ -29,10 +29,16 @@ public:
     ~Physics(); 
     
     void addGeometry(std::vector<Vector3<float> >, Vector3<float>, unsigned int);
+    
     void stepSimulation(Matrix4x4<float>);
+    
     void setWireFrame(bool w) { mWireframe = w; };
+    
     void removeGeometry(unsigned int);
+    
     btRigidBody* getRigidBodyAt(int i) { return mRigidBodies[i]; }
+
+    void setInitialVelocity(unsigned int, Vector3<float>);
 
 
 private:
@@ -58,11 +64,14 @@ private:
     bool mWireframe = false;
 
     btBroadphaseInterface* mBroadphase;
+    
     btDefaultCollisionConfiguration* mCollisionConfiguration;
+    
     btCollisionDispatcher* mDispatcher;
+    
     btSequentialImpulseConstraintSolver* mSolver;
+    
     btDiscreteDynamicsWorld* mDynamicsWorld;
-
 
     std::vector<btRigidBody* > mRigidBodies;
 

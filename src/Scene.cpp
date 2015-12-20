@@ -3,7 +3,7 @@
 struct cameraHandler {
     float fov = 45.0f;
     float aspectRatio = 4.0f / 3.0f;
-    float zoom = 1.0f;
+    float zoom = 4.0f;
     glm::quat orientation;
 
     glm::mat4 projectionMatrix;
@@ -111,8 +111,8 @@ void Scene::render() {
 
 void Scene::addGeometry(Geometry *G, unsigned int type) {
     mGeometries.push_back(G);
-    //G->calculateCenterOfMass();
-    physicsWorld->addGeometry(G->getUniqueVertexList(), G->getCenterOfMass() , type);
+    G->calculateCenterOfMass();
+    physicsWorld->addGeometry(G->getUniqueVertexList(), G->getWorldCenterOfMass() , type);
 
 }
 
@@ -137,23 +137,25 @@ Matrix4x4<float> Scene::toMatrix4x4(glm::mat3 m) {
 }
 
 glm::mat4 Scene::toGlmMat4(float m[]) {
+
     glm::mat4 M;
-        M[0][0] = m[0];
-        M[0][1] = m[1];
-        M[0][2] = m[2];
-        M[0][3] = m[3];
-        M[1][0] = m[4];
-        M[1][1] = m[5];
-        M[1][2] = m[6];
-        M[1][3] = m[7];
-        M[2][0] = m[8];
-        M[2][1] = m[9];
-        M[2][2] = m[10];
-        M[2][3] = m[11];
-        M[3][0] = m[12];
-        M[3][1] = m[13];
-        M[3][2] = m[14];
-        M[3][3] = m[15]; 
+
+    M[0][0] = m[0];
+    M[0][1] = m[1];
+    M[0][2] = m[2];
+    M[0][3] = m[3];
+    M[1][0] = m[4];
+    M[1][1] = m[5];
+    M[1][2] = m[6];
+    M[1][3] = m[7];
+    M[2][0] = m[8];
+    M[2][1] = m[9];
+    M[2][2] = m[10];
+    M[2][3] = m[11];
+    M[3][0] = m[12];
+    M[3][1] = m[13];
+    M[3][2] = m[14];
+    M[3][3] = 1.0f;
 
     return M;
 }
@@ -195,7 +197,7 @@ void Scene::stepSimulation() {
                 float bulletTransform[16];
                 worldTrans.getOpenGLMatrix(bulletTransform);
 
-                mGeometries[i]->setTransMat(toGlmMat4(bulletTransform));
+                mGeometries[i]->updateMesh(toGlmMat4(bulletTransform));
         }
     }
 }

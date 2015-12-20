@@ -148,10 +148,16 @@ void Rectangle::createVertices(float width, float height) {
 }
 
 void Rectangle::calculateCenterOfMass() {
-    for (unsigned int i = 0; i < mVerts.size(); ++i)
-        mCenterOfMass += mVerts[i];
 
-    mCenterOfMass /= mVerts.size();
+    Vector4<float>tmpCenterOfMass = Vector4<float>(0.0f, 0.0f, 0.0f, 0.0f);
+
+    for (unsigned int i = 0; i < mVerts.size(); ++i)
+        tmpCenterOfMass += Vector4<float>(mVerts[i][0], mVerts[i][1], mVerts[i][2], 1.0f);
+
+    tmpCenterOfMass = toMatrix4x4(glm::inverse(mTransMat)) * tmpCenterOfMass;
+    tmpCenterOfMass /= mVerts.size();
+
+    mCenterOfMass = Vector3<float>(tmpCenterOfMass[0], tmpCenterOfMass[1], tmpCenterOfMass[2]);
 
     std::cout << "COM: " << mCenterOfMass << std::endl;
 }
@@ -215,6 +221,7 @@ void Rectangle::rotate(Vector3<float> axis, float angle) {
 void Rectangle::translate(Vector3<float> p){
    
     // Compute the translation matrix
+    mTransMat = mTransMat * glm::translate(glm::mat4(1.f),  glm::vec3(p[0], p[1], p[2]));
     Matrix4x4<float> translationMatrix = Matrix4x4<float>::Translation(p[0], p[1], p[2]);
  
     for(unsigned int i = 0; i < mVerts.size(); i++) {
@@ -239,4 +246,22 @@ void Rectangle::scale(Vector3<float> s){
         mVerts[i] = Vector3<float>(v[0], v[1], v[2]);
     }
    // updateCenterOfMass(mTransMat);
+}
+
+Matrix4x4<float> Rectangle::toMatrix4x4(glm::mat4 m) {
+    float M[4][4] = {
+        {m[0][0], m[1][0], m[2][0], m[3][0]},
+        {m[0][1], m[1][1], m[2][1], m[3][1]},
+        {m[0][2], m[1][2], m[2][2], m[3][2]},
+        {m[0][3], m[1][3], m[2][3], m[3][3]}
+    };
+    return Matrix4x4<float>(M);
+}
+
+
+Vector3<float> Rectangle::getWorldCenterOfMass() {
+
+    Vector4<float>WCM = toMatrix4x4(mTransMat) * Vector4<float>(mCenterOfMass[0], mCenterOfMass[1], mCenterOfMass[2], 1.0f); 
+
+    return Vector3<float>(WCM[0], WCM[1], WCM[2]);
 }

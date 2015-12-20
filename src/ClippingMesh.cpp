@@ -22,7 +22,9 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
     float g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
-    HalfEdgeMesh * hm = new HalfEdgeMesh(Vector4<float>(r, g, b, 1.0f));
+    //HalfEdgeMesh * hm = new HalfEdgeMesh(Vector4<float>(r, g, b, 1.0f));
+    HalfEdgeMesh * hm = new HalfEdgeMesh(mColorScale[uglyFuckCounter], "");
+    uglyFuckCounter++;
 
     mVerts = mHalfEdgeMesh->getVertexList();
 

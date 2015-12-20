@@ -47,24 +47,29 @@ public:
     void render();
 
     void addGeometry(Geometry *, unsigned int);
+
     void updateCameraPosition(double, double);
+
     void updateCameraZoom(double, double);
-    
     
     void mouseButtonClick(double x, double y) { control->dragStart(x, y); }
     
     void mouseButtonRelease() { control->dragEnd(); }
     
     void resetCamera();
+
     void stepSimulation();
 
     void splitMesh(HalfEdgeMesh *);
+
+    void setInitialVelocity(unsigned int i, Vector3<float> v) { physicsWorld->setInitialVelocity(i, v); }
 
 private:
 
     Matrix4x4<float> toMatrix4x4(glm::mat4);
     
     Matrix4x4<float> toMatrix4x4(glm::mat3);
+
     glm::mat4 toGlmMat4(float []);
 
     std::vector<Geometry *>mGeometries;

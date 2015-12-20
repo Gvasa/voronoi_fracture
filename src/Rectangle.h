@@ -28,8 +28,12 @@ public:
     void render(std::vector<Matrix4x4<float> >);
 
     void calculateCenterOfMass();
+    
     void updateCenterOfMass(glm::mat4);
+    
     Vector3<float> getCenterOfMass() { return mCenterOfMass; }
+
+    Vector3<float> getWorldCenterOfMass();
 
     void rotate(Vector3<float>, float);
     
@@ -38,8 +42,11 @@ public:
     void scale(Vector3<float>);
 
     std::vector<Vector3<float> > getVertexList() { return mVerts; }
+    
     std::vector<Vector3<float> > getUniqueVertexList() { return mVerts; }
+    
     glm::mat4 getTransMat() { return mTransMat; }
+    
     void setTransMat(glm::mat4 m) { mTransMat = m; }
 
     unsigned int getType() { return RECTANGLE; }
@@ -57,6 +64,8 @@ private:
     void addNormal(Vector3<float> n) { mNormals.push_back(n); }
 
     void createVertices(float, float);
+
+    Matrix4x4<float> toMatrix4x4(glm::mat4 m);
 
     // Shader data
     GLuint vertexArrayID;

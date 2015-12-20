@@ -46,6 +46,28 @@ public:
   Vector4 operator-(const Vector4& vec4) const { return Vector4(v[0]-vec4.v[0],v[1]-vec4.v[1],v[2]-vec4.v[2],v[3]-vec4.v[3]); }
   Vector4 entryMult(const Vector4& vec4) const { return Vector4(v[0]*vec4.v[0],v[1]*vec4.v[1],v[2]*vec4.v[2],v[3]*vec4.v[3]); }
 
+  Vector4 & operator+=(const Vector4& vec4) {
+    v[0]+=vec4.v[0];
+    v[1]+=vec4.v[1];
+    v[2]+=vec4.v[2];
+    v[3]+=vec4.v[3];
+    return *this;
+  }
+
+  template<typename Scalar>
+  Vector4<Real>& operator*=(Scalar s) {
+    v[0]*=(Real)s;
+    v[1]*=(Real)s;
+    v[2]*=(Real)s;
+    v[3]*=(Real)s;
+    return *this;
+  }
+
+  template<typename Scalar>
+  Vector4<Real>& operator/=(Scalar s) {
+    return *this *= 1.0/s;
+  }
+
   //template<typename Real2>
   //friend std::ostream& std::operator << (std::ostream &os, const Vector4<Real2> &m);
 
