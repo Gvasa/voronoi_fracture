@@ -13,7 +13,6 @@ HalfEdgeMesh::HalfEdgeMesh(Vector4<float> c) {
     mPrevRotAngle = 0.0;
 
     mTransMat = glm::mat4(1.0f);
-    //mPrevRot = std::make_pair(Vector3<float>(0.0, 0.0, 0.0), 0.0);
 }
 
 
@@ -191,9 +190,6 @@ void HalfEdgeMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     glDisable( GL_BLEND );
 
     mBoundingbox->render(sceneMatrices[I_MVP]);
-    
-    if(mCompoundIsComputed)
-        mCompound->render(sceneMatrices[I_MVP]);
 
     if(mDebugMode) {
         for(unsigned int i = 0; i < mDebugPoints.size(); i++)
@@ -273,7 +269,7 @@ bool HalfEdgeMesh::addFace(const std::vector<Vector3 <float> > verts) {
 
 void HalfEdgeMesh::createMesh(std::string objName) {
 
-    loadVoronoiPoints(objName);
+    mObjName = objName;
 
     std::vector<std::vector<Vector3<float> > > vertexList = Geometry::mObjectLoader->getMeshVertexList(objName);
 
@@ -409,7 +405,6 @@ void HalfEdgeMesh::computeVoronoiPattern() {
 
     if(!mCompoundIsComputed) {
         mCompound = new Compound(mBoundingbox, mVoronoiPoints);
-        mCompound->initialize();
         mCompoundIsComputed = true;
     }
 }
@@ -578,6 +573,15 @@ void HalfEdgeMesh::addVoronoiPoint(Vector3<float> v) {
     mDebugPoints[mDebugPoints.size()-1]->initialize(Vector3<float>(0.0f, 0.0f, 0.0f));
 
 }
+
+
+void HalfEdgeMesh::deleteLastVoronoiPoint() {
+
+    delete mDebugPoints.back();
+    mDebugPoints.erase(mDebugPoints.end()-1);
+    mVoronoiPoints.erase(mVoronoiPoints.end()-1);
+}
+
 
 //! Compute and return the normal at face at faceIndex
 Vector3<float> HalfEdgeMesh::calculateFaceNormal(unsigned int faceIndex) const {

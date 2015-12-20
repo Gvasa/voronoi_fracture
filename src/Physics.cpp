@@ -132,10 +132,10 @@ void Physics::stepSimulation(Matrix4x4<float> MVP) {
                 const btVector3& ptB = pt.getPositionWorldOnB();
                 const btVector3& normalOnB = pt.m_normalWorldOnB;
 
-                std::cout << "ptA : " << ptA.getX() << " " << ptA.getY() << " " << ptA.getZ() << " " << std::endl;
+                /*std::cout << "ptA : " << ptA.getX() << " " << ptA.getY() << " " << ptA.getZ() << " " << std::endl;
                 std::cout << "ptB : " << ptB.getX() << " " << ptB.getY() << " " << ptB.getZ() << " " << std::endl;
                 std::cout << "normalOnB : " << normalOnB.getX() << " " << normalOnB.getY() << " " << normalOnB.getZ() << " " << std::endl;
-                std::cout << "applied impulse: " << pt.getAppliedImpulse() << std::endl << std::endl;
+                std::cout << "applied impulse: " << pt.getAppliedImpulse() << std::endl << std::endl;*/
             }
         }
     }

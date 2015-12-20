@@ -11,7 +11,7 @@ UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
 	FRAMEWORKS = -lGLEW -lglfw3 -lGL -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath -lX11 -lXi -lXrandr -lXxf86vm -lXinerama -lXcursor -lrt -lm -pthread -ldl -std=c++11
 else
-	FRAMEWORKS = -lglew -lglfw3 -framework Opengl -framework Cocoa -framework IOKit -framework CoreVideo -std=c++11	
+	FRAMEWORKS = -lglew -lglfw3 -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath -framework Opengl -framework Cocoa -framework IOKit -framework CoreVideo -std=c++11	
 endif
 
 

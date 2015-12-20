@@ -81,17 +81,20 @@ public:
     void printMesh();
 
     void setPrevPos(Vector3<float> v) { mPrevPos = v; }
+    
     Vector3<float> getPrevPos() { return mPrevPos; }
 
     void setPrevRot(float f) { mPrevRotAngle = f;}
+    
     float getPrevRot() { return mPrevRotAngle; }
 
    glm::mat4 getTransMat() { return mTransMat; }
+   
    void setTransMat(glm::mat4 m) { mTransMat = m; }
-  //  void setPrevRot(std::pair<Vector3<float>, float> p) { mPrevRot = p; }
+  
+   std::string getObjName() { return mObjName; }
 
-    
-    //std::pair<Vector3<float>,float> getPrevRot() { return mPrevRot; }
+   void deleteLastVoronoiPoint();
 
     /*
      * CLASS EDGEITERATOR, HELPS OUT WITH HANDLING EDGES!
@@ -231,14 +234,16 @@ private:
     Vector3<float> mCenterOfMass;
 
     Vector3<float> mPrevPos;
+
     float mPrevRotAngle;
-    //std::pair< Vector3<float>, float > mPrevRot;
 
     bool mDebugMode = false;
 
     bool mCompoundIsComputed = false;
 
     glm::mat4 mTransMat;
+
+    std::string mObjName;
 
     /*
      * MEMBER FUNCTIONS

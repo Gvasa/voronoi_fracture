@@ -51,7 +51,7 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
             normal = (voronoiPair.first - voronoiPair.second).Normalize();
 
         // Arbitrary point on the splitting plane (any vertex), in this case the first vertex
-        Vector3<float> P = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getVertex(0);
+        Vector3<float> P = mHalfEdgeMesh->getCompound()->getSplittingPlane(j)->getCenterPoint();
 
         vertCounter = 0;
 
@@ -116,6 +116,12 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
 
             vertCounter += 3;
         }
+
+        // No new verts created from clipping
+        if(createdVertices.size() < 3) {
+            continue;
+        }
+
         sortPolygonCounterClockWise(createdVertices);
 
         unsigned int i1 = createdVertices.size() / 3;
@@ -165,7 +171,7 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
         Face.shrink_to_fit();
         counter++;
     }
-    debug
+
     return hm;
 }
 

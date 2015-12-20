@@ -31,8 +31,11 @@
 #include <math.h>
 #include <cstdlib>
 #include <ctime>
+#include <map>
+#include <vector>
 
 #include "../math/Vector4.h"
+#include "../math/Vector3.h"
 
 #define debug std::cout << "vid: " << __LINE__ << " " << __FUNCTION__ << std::endl << std::endl;
 
@@ -77,16 +80,51 @@ static Vector4<float> mColorScale[12] = {
 
 static Vector4<float> getColor(unsigned int i) { return mColorScale[i]; }
 
-static void loadVoronoiPoints(std::string objName) {
+static std::map<std::string, std::vector<Vector3<float> > > sVoronoiPoints;
 
-    if(objName == "sphere1.0") {
-        std::cout << "\n---- sphere1.0 ----\n";
-    } else if(objName == "cow") {
-        std::cout << "\n---- cow ----\n";
-    } else if(objName == "bunnySmall") {
-        std::cout << "\n---- bunnySmall ----\n";
+static bool createPreDefinedVoronoiPoints() {
+
+    std::vector<Vector3<float> > VP;
+
+    VP.push_back(Vector3<float>(-0.35f, 0.15f, 0.0f));
+    VP.push_back(Vector3<float>(-0.8f, 0.65f, 0.05f));
+    VP.push_back(Vector3<float>(-0.5f, 1.05f, -0.2f));
+    VP.push_back(Vector3<float>(-0.95f, 1.0f, -0.5f));
+    sVoronoiPoints["bunnySmall_reduced"] = VP;
+
+    VP.clear();
+    VP.shrink_to_fit();
+
+    VP.push_back(Vector3<float>(-0.6f, 0.41f, 0.1f));
+    VP.push_back(Vector3<float>(0.15f, 0.5f, 0.55f));
+    VP.push_back(Vector3<float>(0.7f, 0.45f, -0.3f));
+    VP.push_back(Vector3<float>(-0.35f, -0.65f, 0.35f));
+    sVoronoiPoints["icosphere"] = VP;
+
+    VP.clear();
+    VP.shrink_to_fit();
+
+    VP.push_back(Vector3<float>(0.4f, 0.2f, 0.0f));
+    VP.push_back(Vector3<float>(0.25f, 0.1f, 0.0f));
+    VP.push_back(Vector3<float>(0.15f, 0.05f, 0.0f));
+    VP.push_back(Vector3<float>(-0.45f, 0.05f, 0.0f));
+    sVoronoiPoints["cow"] = VP;
+
+    VP.clear();
+    VP.shrink_to_fit();
+}
+
+static std::vector<Vector3<float> > getVoronoiPattern(std::string obj) {
+    
+    std::map<std::string, std::vector<Vector3<float> > >::iterator it;
+    
+    it = sVoronoiPoints.find(obj);
+    
+    if(it != sVoronoiPoints.end()) {
+        return sVoronoiPoints[obj];   
     } else {
-        std::cout << "\n---- load standard setup ----\n";
+        std::vector<Vector3<float> > empty;
+        return empty;
     }
 }
 

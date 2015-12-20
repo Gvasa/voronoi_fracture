@@ -101,7 +101,10 @@ public:
         std::cout << "\nGeometry does not have getPrevPos implemented!\n";  
     };
     virtual void setTransMat(glm::mat4) {
-        std::cout << "\nGeometry does not have setPrevPos implemented!\n";  
+        std::cout << "\nGeometry does not have setPrevPos implemented!\n";
+    };
+    virtual std::string getObjName() {
+        std::cout << "\nGeometry does not have getObjName implemented!\n";
     };
 protected:
 
