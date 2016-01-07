@@ -59,7 +59,7 @@ int main (int argc, char* argv[]) {
     floor_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
     floor_rect->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), 90.0f);
     floor_rect->scale(Vector3<float>(2.5f, 1.0f, 2.0f));
-    floor_rect->translate(Vector3<float>(0.0f, -0.5f, 0.0f));
+    floor_rect->translate(Vector3<float>(0.0f, -0.35f, 0.0f));
 
     // HalfEdge mesh
     mesh = new HalfEdgeMesh(Vector4<float>(0.2f, 0.8f, 0.2f, 0.4f));
@@ -69,10 +69,10 @@ int main (int argc, char* argv[]) {
     // The following meshes has pre-defined voronoi patterns
     
     //mesh->createMesh("pillar");
-    mesh->createMesh("icosphere");
+    //mesh->createMesh("icosphere");
     //mesh->createMesh("bunnySmall_reduced");
     //mesh->createMesh("cube");
-    //mesh->createMesh("cow_2");
+    mesh->createMesh("cow_2");
 
     mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
     scene->addGeometry(floor_rect, STATIC);
