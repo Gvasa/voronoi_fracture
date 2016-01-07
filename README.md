@@ -10,16 +10,27 @@ Demo: https://vimeo.com/150522450
 ## User controlls
 
 ``W`` Move centroid forwards
+
 ``S`` Move centroid backwards
+
 ``A`` Move centroid left
+
 ``D`` Move centroid right
+
 ``E`` Move centroid up
+
 ``Q`` Move centroid down
+
 ``Up arrow`` Choose next centroid
+
 ``Down arrow`` Choose previous centroid
+
 ``C`` Add new voronoi centroid
+
 ``Enter`` Apply user defined voronoi pattern
+
 ``P`` Apply pre-defined voronoi pattern
+
 ``O`` Apply physics
 
 ## Compiling and running
