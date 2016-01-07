@@ -1,17 +1,5 @@
 #include "Scene.h"
 
-struct cameraHandler {
-    float fov = 45.0f;
-    float aspectRatio = 4.0f / 3.0f;
-    float zoom = 4.0f;
-    glm::quat orientation;
-
-    glm::mat4 projectionMatrix;
-    glm::mat4 viewMatrix;
-};
-
-cameraHandler camera;
-
 Scene::Scene() {
 
     control = new Controls(300.f);
@@ -69,17 +57,17 @@ void Scene::render() {
     glEnable(GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    camera.projectionMatrix = glm::perspective(
-        camera.fov,          // field of view, 45.0
-        camera.aspectRatio,  // 4/3 atm
+    mCamera.projectionMatrix = glm::perspective(
+        mCamera.fov,          // field of view, 45.0
+        mCamera.aspectRatio,  // 4/3 atm
         0.1f,                // Near clipping plane
         100.0f);             // far clipping plane
 
-    camera.viewMatrix = glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 3.0f+camera.zoom),            // Camera / eye position
+    mCamera.viewMatrix = glm::lookAt(
+        glm::vec3(0.0f, 0.0f, 3.0f+mCamera.zoom),            // Camera / eye position
         glm::vec3(0.0f, 0.0f, 0.0f),            // Target, what to look at
         glm::vec3(0.0f, 1.0f, 0.0f)) *          // Up-vector                            
-        glm::mat4_cast(camera.orientation);     // multiplies the veiw matrix with current rotation
+        glm::mat4_cast(mCamera.orientation);     // multiplies the veiw matrix with current rotation
 
     glm::mat4 modelMatrix;
     // render Geometries in scene
@@ -89,16 +77,16 @@ void Scene::render() {
         modelMatrix = (*it)->getTransMat();
 
         // Construct MVP matrix
-        mSceneMatrices[I_MVP] = toMatrix4x4Row(camera.projectionMatrix * camera.viewMatrix * modelMatrix);
+        mSceneMatrices[I_MVP] = toMatrix4x4Row(mCamera.projectionMatrix * mCamera.viewMatrix * modelMatrix);
 
         // Modelview Matrix, apply camera transforms here as well
-        mSceneMatrices[I_MV] = toMatrix4x4Row(camera.viewMatrix * modelMatrix);
+        mSceneMatrices[I_MV] = toMatrix4x4Row(mCamera.viewMatrix * modelMatrix);
 
         // Modelview Matrix for our light
-        mSceneMatrices[I_MV_LIGHT] = toMatrix4x4Row(camera.viewMatrix * modelMatrix);
+        mSceneMatrices[I_MV_LIGHT] = toMatrix4x4Row(mCamera.viewMatrix * modelMatrix);
 
         // Normal Matrix, used for normals in our shading
-        mSceneMatrices[I_NM] = toMatrix4x4Row(glm::inverseTranspose(glm::mat4(camera.viewMatrix * modelMatrix)));
+        mSceneMatrices[I_NM] = toMatrix4x4Row(glm::inverseTranspose(glm::mat4(mCamera.viewMatrix * modelMatrix)));
 
         (*it)->render(mSceneMatrices);
     }
@@ -114,7 +102,7 @@ void Scene::addGeometry(Geometry *G, unsigned int type) {
     //updateVoronoiPatterns("icosphere", Matrix4x4<float>());
     mGeometries.push_back(G);
     G->calculateCenterOfMass();
-    physicsWorld->addGeometry(G->getUniqueVertexList(), G->getWorldCenterOfMass() , type);
+    physicsWorld->addGeometry(G->getUniqueVertexList(), G->getWorldCenterOfMass() , type, G->volume());
 
 }
 
@@ -177,41 +165,44 @@ void Scene::updateCameraPosition(double x, double y) {
     if(! control->dragged())
         return;
 
-    control->rotate(camera.orientation, x, y);
+    control->rotate(mCamera.orientation, x, y);
     control->dragUpdate(x, y);
 }
 
 void Scene::updateCameraZoom(double x, double y) {
     
-    if((3.0 + (camera.zoom - y / 5.0f)) > 0.1f)
-        camera.zoom -= y / 5.0f;
+    if((3.0 + (mCamera.zoom - y / 5.0f)) > 0.1f)
+        mCamera.zoom -= y / 5.0f;
 }
 
 void Scene::resetCamera() {
     glm::quat identityQuat;
-    camera.orientation = identityQuat;
-    camera.zoom = 2.0;
+    mCamera.orientation = identityQuat;
+    mCamera.zoom = 2.0;
 }
 
 void Scene::stepSimulation() { 
-    btTransform worldTrans;
-    btQuaternion rotation;
-    btScalar rotAngle;
-    btVector3 rotAxis;
-   // float trans[16];
-    Vector3<float> prevPos;
-    float prevAngle;
+    
+    if(playPhysics) {
+        btTransform worldTrans;
+        btQuaternion rotation;
+        btScalar rotAngle;
+        btVector3 rotAxis;
+       // float trans[16];
+        Vector3<float> prevPos;
+        float prevAngle;
 
-    physicsWorld->stepSimulation(mSceneMatrices[I_MVP]);
- 
-    for(unsigned int i = 0; i < mGeometries.size(); i++) {
-        if(mGeometries[i]->getType() == HALFEDGEMESH) {
-            physicsWorld->getRigidBodyAt(i)->getMotionState()->getWorldTransform(worldTrans);
-            float bulletTransform[16];
-            worldTrans.getOpenGLMatrix(bulletTransform);
+        physicsWorld->stepSimulation(mSceneMatrices[I_MVP]);
+     
+        for(unsigned int i = 0; i < mGeometries.size(); i++) {
+            if(mGeometries[i]->getType() == HALFEDGEMESH) {
+                physicsWorld->getRigidBodyAt(i)->getMotionState()->getWorldTransform(worldTrans);
+                float bulletTransform[16];
+                worldTrans.getOpenGLMatrix(bulletTransform);
 
-            mGeometries[i]->updateMesh(toGlmMat4(bulletTransform));
-            updatePreComputedVoronoiPattern(mGeometries[i]->getObjName(), toGlmMat4(bulletTransform));
+                mGeometries[i]->updateMesh(toGlmMat4(bulletTransform));
+                updatePreComputedVoronoiPattern(mGeometries[i]->getObjName(), toGlmMat4(bulletTransform));
+            }
         }
     }
 }
@@ -219,9 +210,6 @@ void Scene::stepSimulation() {
 void Scene::splitMesh(HalfEdgeMesh *he) {
 
     if(he->isCompoundComputed()) {
-        //Mesh * sm = new SimpleMesh();
-        //addGeometry(sm);
-        std::cout << "\nNUMBER OF VORONOI POINTS: " << he->getNumVoronoiPoints() << std::endl;
 
         ClippingMesh * cm = new ClippingMesh(he);
         
@@ -231,26 +219,11 @@ void Scene::splitMesh(HalfEdgeMesh *he) {
             addGeometry(cm->clipMesh(he->getVoronoiPoint(i)), DYNAMIC);
             mGeometries.back()->initialize(mPointLight.position);
         }
-        debug
-        //HalfEdgeMesh * hm = cm->clipMesh();
-       /* delete mGeometries[mGeometries.size() - counter];
-        mGeometries.erase(mGeometries.end()-counter);
-        physicsWorld->removeGeometry(mGeometries.size() - counter);
-        delete cm;*/
-        debug
+        
         delete mGeometries[1];
         mGeometries.erase(mGeometries.begin()+1);
         physicsWorld->removeGeometry(1);
         delete cm;
-
-        std::cout << "\n\nGeometries left after splitting: \n";
-
-        for(std::vector<Geometry*>::iterator it = mGeometries.begin(); it != mGeometries.end(); ++it)
-            std::cout << "Type: " << (*it)->getType() << std::endl;
-
-        //addGeometry(hm);
-        //hm->initialize(mPointLight.position);
-        //sm->initialize();
     }
 }
 
@@ -260,10 +233,7 @@ void Scene::updatePreComputedVoronoiPattern(std::string s, glm::mat4 M) {
     Matrix4x4<float> transformMatrix = toMatrix4x4Row(M);
  
     for(std::vector<Vector3<float> >::iterator it = mVoronoiPoints[s].begin(); it != mVoronoiPoints[s].end(); ++it) {
-        
-        //std::cout << "-------------- MEN I DENNA DÅ ASHMDBASJ;DBASKDJBAK --------------" << std::endl;
         Vector4<float> p = transformMatrix * Vector4<float>((*it)[0], (*it)[1], (*it)[2], 1.0f);
         (*it) = Vector3<float>(p[0], p[1], p[2]);
-        std::cout << "updateVoronoi: " << (*it)[0] << " " << (*it)[1] << " " << (*it)[2] << std::endl;
     }
 }

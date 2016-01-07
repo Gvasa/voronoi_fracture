@@ -1,7 +1,7 @@
 /******************************************************************************
  *
- * A class for handling a Half-Edge mesh
- * A Half-Edge mesh inherits form Geometry
+ * A class for rendering of debug points
+ * A Debugpoint inherits form Geometry
  *
  *****************************************************************************/
 
@@ -37,8 +37,7 @@ public:
     void initialize(Vector3<float>);
 
     void render(std::vector<Matrix4x4<float> >);
-
-    //Adds a triangle (face) to the mesh    
+    
     bool addFace(std::vector<Vector3 <float> >);
 
     void createMesh(std::string);
@@ -108,14 +107,16 @@ private:
     GLuint shaderProgram;
 
     // Shader indices for Matrices
-    GLint MVPLoc;           // MVP matrix
+    GLint MVPLoc;
     
     GLint ColorLoc;
     
+    // Lists
     Vector4<float> mColor;
     
     Vector3<float> mPosition;
 
+    // Pointer objects
     LoadObj *objLoader;
 
     // Denotes a reference to a border, only for face pointers
@@ -210,7 +211,7 @@ private:
      * UTILITY
      */
 
-    // Unique vertices, this might not be needed, idk
+    // Unique vertices
     std::map<Vector3<float>, unsigned int> mUniqueVerts;
 
     //! A utility data structure to speed up removal of redundant edges

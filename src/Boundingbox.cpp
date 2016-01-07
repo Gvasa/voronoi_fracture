@@ -73,9 +73,9 @@ void Boundingbox::render(Matrix4x4<float> MVP) {
     glBufferData(GL_ARRAY_BUFFER, mVerts.size() * sizeof(Vector3<float>), &mVerts[0], GL_STATIC_DRAW);
 
     // Draw geometry    
-    if(mWireframe)   //Draw Wireframe
-        glDrawArrays(GL_LINES, 0, mVerts.size()); // 3 indices starting at 0 -> 1 triangle
-    else                //draw triangles
+    if(mWireframe)  //Draw wireframe
+        glDrawArrays(GL_LINES, 0, mVerts.size());
+    else            // Draw triangles
         glDrawArrays(GL_TRIANGLES, 0, mVerts.size());
 
     
@@ -91,9 +91,6 @@ void Boundingbox::render(Matrix4x4<float> MVP) {
 
 void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts) {
 
-    //std::map<std::string, unsigned int> mBoundingValuesIndex;
-
-
     for(unsigned int i = 0; i < uniqueVerts.size(); i++) {
 
         if(uniqueVerts.at(i)[0] < uniqueVerts.at(mBoundingValuesIndex["xMin"])[0]){
@@ -102,14 +99,12 @@ void Boundingbox::calculateBoundingbox(std::vector<Vector3<float> > uniqueVerts)
         if(uniqueVerts.at(i)[0] > uniqueVerts.at(mBoundingValuesIndex["xMax"])[0]){
             mBoundingValuesIndex["xMax"] = i;
         }
-        
         if(uniqueVerts.at(i)[1] < uniqueVerts.at(mBoundingValuesIndex["yMin"])[1]){
             mBoundingValuesIndex["yMin"] = i;
         }
         if(uniqueVerts.at(i)[1] > uniqueVerts.at(mBoundingValuesIndex["yMax"])[1]){
             mBoundingValuesIndex["yMax"] = i;
         }
-        
         if(uniqueVerts.at(i)[2] < uniqueVerts.at(mBoundingValuesIndex["zMin"])[2]){
             mBoundingValuesIndex["zMin"] = i;
         }
@@ -182,12 +177,4 @@ void Boundingbox::updateBoundingBox(std::vector<Vector3<float> > uniqueVerts) {
     mVerts.clear();
     mVerts.shrink_to_fit();
     calculateBoundingbox(uniqueVerts);
-}
-
-
-void Boundingbox::calculateConvexHull(std::vector<Vector3<float> > points) {
-
-
-
-
 }

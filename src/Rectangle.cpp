@@ -7,7 +7,7 @@ Rectangle::Rectangle(float w, float h, Vector3<float> p)
 
     createVertices(w, h);
 
-    mMaterial.color         = Vector4<float>(0.5f, 0.5f, 0.5f, 1.0f);
+    mMaterial.color         = Vector4<float>(0.7f, 0.7f, 0.7f, 1.0f);
     mMaterial.ambient       = Vector4<float>(0.3f, 0.3f, 0.3f, 1.0f);
     mMaterial.diffuse       = Vector4<float>(0.8f, 0.8f, 0.8f, 1.0f);
     mMaterial.specular      = Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f);
@@ -22,8 +22,8 @@ Rectangle::Rectangle(float w, float h, Vector3<float> p)
 
 Rectangle::~Rectangle() {
 
-    mVerts.clear();             // Clear content
-    mVerts.shrink_to_fit();     // Free memory
+    mVerts.clear();
+    mVerts.shrink_to_fit();
 
     mNormals.clear();
     mNormals.shrink_to_fit();
@@ -114,7 +114,7 @@ void Rectangle::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     glBufferData(GL_ARRAY_BUFFER, mNormals.size() * sizeof(Vector3<float>), &mNormals[0], GL_STATIC_DRAW);
 
     // Draw geometry
-    glDrawArrays(GL_TRIANGLES, 0, mVerts.size()); // 3 indices starting at 0 -> 1 triangle
+    glDrawArrays(GL_TRIANGLES, 0, mVerts.size());
     
     // Unbind
     glBindVertexArray(0);
@@ -158,41 +158,17 @@ void Rectangle::calculateCenterOfMass() {
     tmpCenterOfMass /= mVerts.size();
 
     mCenterOfMass = Vector3<float>(tmpCenterOfMass[0], tmpCenterOfMass[1], tmpCenterOfMass[2]);
-
-    std::cout << "COM: " << mCenterOfMass << std::endl;
 }
+
 void Rectangle::updateCenterOfMass(glm::mat4) {
+
     glm::vec4 tmpCom(mCenterOfMass[0], mCenterOfMass[1], mCenterOfMass[2], 1.0);
 
     tmpCom = mTransMat*tmpCom;
 
     mCenterOfMass = Vector3<float>(tmpCom.x, tmpCom.y, tmpCom.z);
-    std::cout << "updaterad COM: " << mCenterOfMass << std::endl;
-}
-/*
-void Rectangle::rotate(Vector3<float> axis, float angle) {
-
-    // Compute rotation matrix
-    mTransMat = mTransMat * glm::rotate(glm::mat4(1.f), angle, glm::vec3(axis[0], axis[1], axis[2]));
 }
 
-
-void Rectangle::translate(Vector3<float> p) {
-    
-    // Compute translation matrix
-    mTransMat = mTransMat * glm::translate(glm::mat4(1.f), glm::vec3(p[0], p[1], p[2]));
-    updateCenterOfMass(mTransMat);
-}
-
-
-void Rectangle::scale(Vector3<float> s) {
-
-    // Compute scaling matrix
-    mTransMat = mTransMat * glm::scale(glm::mat4(1.0f), glm::vec3(s[0], s[1], s[2]));
-    updateCenterOfMass(mTransMat);
-}
-
-*/
 void Rectangle::rotate(Vector3<float> axis, float angle) {
 
     // Compute rotation matrix
@@ -213,8 +189,6 @@ void Rectangle::rotate(Vector3<float> axis, float angle) {
         n = rotationMatrix * n;
         mNormals[i] = Vector3<float>(n[0], n[1], n[2]).Normalize();
     }
-
-    //updateCenterOfMass(mTransMat);
 }
  
 // Translate the Mesh
@@ -230,7 +204,6 @@ void Rectangle::translate(Vector3<float> p){
         v = translationMatrix * v;
         mVerts[i] = Vector3<float>(v[0], v[1], v[2]);
     }
-   // updateCenterOfMass(mTransMat);
 }
  
 // Scale the Mesh
@@ -245,10 +218,10 @@ void Rectangle::scale(Vector3<float> s){
         v = scalingMatrix * v;
         mVerts[i] = Vector3<float>(v[0], v[1], v[2]);
     }
-   // updateCenterOfMass(mTransMat);
 }
 
 Matrix4x4<float> Rectangle::toMatrix4x4(glm::mat4 m) {
+    
     float M[4][4] = {
         {m[0][0], m[1][0], m[2][0], m[3][0]},
         {m[0][1], m[1][1], m[2][1], m[3][1]},

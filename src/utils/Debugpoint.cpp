@@ -36,10 +36,8 @@ Debugpoint::~Debugpoint() {
     mOrderedVertexList.shrink_to_fit();
 }
 
-// Add init stuff here, right now its just some random shit for the red ugly triangle
-void Debugpoint::initialize(Vector3<float> lightPosition) {
 
-   // std::cout << "\nInitializing Debug point ...\n\n";
+void Debugpoint::initialize(Vector3<float> lightPosition) {
 
     buildRenderData();
 
@@ -69,11 +67,8 @@ void Debugpoint::initialize(Vector3<float> lightPosition) {
         0,                          // stride
         reinterpret_cast<void*>(0)  // array buffer offset
     );
-
-    //std::cout << "\nDebug point initialized!\n" << std::endl;
 }
 
-// Add draw stuff here, right now its just some random shit for the red ugly triangle
 void Debugpoint::render(std::vector<Matrix4x4<float> > sceneMatrices) {
 
     // Use shader
@@ -90,8 +85,7 @@ void Debugpoint::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, mOrderedVertexList.size() * sizeof(Vector3<float>), &mOrderedVertexList[0], GL_STATIC_DRAW);
 
-    // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0, mOrderedVertexList.size()); // 3 indices starting at 0 -> 1 triangle
+    glDrawArrays(GL_TRIANGLES, 0, mOrderedVertexList.size());
     
     // Unbind
     glBindVertexArray(0);
@@ -102,7 +96,6 @@ void Debugpoint::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     glDisable( GL_BLEND );
 }
 
-// This is where we add a face to the half-edge structure
 bool Debugpoint::addFace(const std::vector<Vector3 <float> > verts) {
 
     //add the vertices of the face triangle
@@ -135,7 +128,7 @@ bool Debugpoint::addFace(const std::vector<Vector3 <float> > verts) {
     getEdge(innerHalfEdgeIndex3).next = innerHalfEdgeIndex1;
     getEdge(outerHalfEdgeIndex3).prev = innerHalfEdgeIndex2;
 
-    // Create the face, don't forget to set the normal! (which should be normalized ofcourse)
+    // Create the face
     Face face;
     mFaces.push_back(face);
     mFaces.back().edge = innerHalfEdgeIndex1;
@@ -160,7 +153,7 @@ void Debugpoint::createMesh(std::string objName) {
 // Rotate the mesh
 void Debugpoint::rotate(Vector3<float> axis, float angle){
     
-    //Compute the rotational matrix
+    //Compute the rotation matrix
     std::cout << std::endl << "Rotating..." << std::endl;
 
     Matrix4x4<float>  rotationMatrix = Matrix4x4<float>::RotationXYZ(
@@ -175,7 +168,7 @@ void Debugpoint::rotate(Vector3<float> axis, float angle){
         v = rotationMatrix * v;
         mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
 
-        //Apply the rotation to the normals
+        //Apply the rotation matrix
         Vector4<float> n = Vector4<float>(mVerts[i].normal[0], mVerts[i].normal[1], mVerts[i].normal[2], 1.0f);
         n = rotationMatrix * n;
         mVerts[i].normal = Vector3<float>(n[0], n[1], n[2]).Normalize();
@@ -183,21 +176,21 @@ void Debugpoint::rotate(Vector3<float> axis, float angle){
 
 }
 
-// Translate the Mesh
+// Translate the mesh
 void Debugpoint::translate(Vector3<float> p){
     
     // Compute the translation matrix
     Matrix4x4<float> translationMatrix = Matrix4x4<float>::Translation(p[0], p[1], p[2]);
 
     for(unsigned int i = 0; i < mVerts.size(); i++) {
-        // Apply the rotation to the vertices
+        // Apply the translation matrix
         Vector4<float> v = Vector4<float>(mVerts[i].pos[0], mVerts[i].pos[1], mVerts[i].pos[2], 1.0f);
         v = translationMatrix * v;
         mVerts[i].pos = Vector3<float>(v[0], v[1], v[2]);
     }
 }
 
-// Scale the Mesh 
+// Scale the mesh 
 void Debugpoint::scale(Vector3<float> s){
 
     // Compute the scaling matrix
@@ -242,19 +235,16 @@ bool Debugpoint::addVertex(const Vector3<float> &v, unsigned int &index) {
     return true;
 }
 
-//inserts a half edge pair between Debugpoint point to by vert1 and vert2 
-// the first Debugpoint::HalfEdge (vert1 -> vert2) is the inner one
-// the second (vert2->vert1) is the outer one
 bool Debugpoint::addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsigned int &index1, unsigned int &index2) {
 
-    //check if the pair to be added already exists
+    // check if the pair to be added already exists
     std::map<OrderedPair, unsigned int>::iterator it = mUniqueEdgePairs.find(OrderedPair(vert1, vert2));
 
-    //it it exists
+    // if it exists
     if(it != mUniqueEdgePairs.end()) {
 
-        index1 = it->second;                //assign the first index to the place where its found in mUniqueEdgePairs
-        index2 = getEdge(it->second).pair;  //assign the pair of the first edge to the second index
+        index1 = it->second;                // assign the first index to the place where its found in mUniqueEdgePairs
+        index2 = getEdge(it->second).pair;  // assign the pair of the first edge to the second index
         
         if(vert1 != getEdge(index1).vert ) {    // check that both index got assigned correctly
             std::swap(index1, index2);          // otherwise swap
@@ -263,7 +253,7 @@ bool Debugpoint::addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsigne
         return false;
     }
 
-    //if not found, calculate the indices 
+    // if not found, calculate the indices 
     index1 = mEdges.size();
     index2 = index1+1;
 

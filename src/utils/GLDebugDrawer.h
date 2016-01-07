@@ -29,10 +29,7 @@ public:
   
     virtual void   drawContactPoint(const btVector3& PointOnB,const btVector3& normalOnB,btScalar distance,int lifeTime,const btVector3& color);
     
-    //virtual void   drawTriangle(const btVector3& v0,const btVector3& v1,const btVector3& v2,const btVector3& /*n0*/,const btVector3& /*n1*/,const btVector3& /*n2*/,const btVector3& color, btScalar alpha);
-    
     virtual void   drawTriangle(const btVector3& v0,const btVector3& v1,const btVector3& v2,const btVector3& color, btScalar /*alpha*/);
-       
   
     virtual void   reportErrorWarning(const char* warningString);
   
@@ -43,12 +40,14 @@ public:
     virtual int    getDebugMode() const { return m_debugMode;}
 
     void initialize();
+
     void render(const btVector3&, const btVector3&);
 
     void setMVP(Matrix4x4<float> m) { mMVP = m; }
 
 private:
-	 // Shader data
+
+	// Shader data
 
     GLuint vertexArrayID;
     
@@ -56,11 +55,17 @@ private:
     
     GLuint shaderProgram;
 
-    GLint MVPLoc; // MVP Matrix
+    // Shader indices
+
+    GLint MVPLoc;
     
     GLint ColorLoc;
 
+    // Lists
+
     std::vector<Vector3<float> > mVerts;
+
+    // Instance variables
 
     Vector4<float> mColor;
 

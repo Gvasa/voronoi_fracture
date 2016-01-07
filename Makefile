@@ -28,7 +28,7 @@ FILES = $(wildcard src/*.cpp) $(wildcard src/tools/*.cpp) $(wildcard src/utils/*
 BINFOLD = bin/
 
 # Binary name:
-BINNAME = voronoifracture
+BINNAME = voronoi_fracturing
 
 
 all: compile
@@ -41,6 +41,22 @@ compile: $(FILES)
 run:
 	./$(BINFOLD)$(BINNAME)
 .PHONY: run
+
+bunny:
+	./$(BINFOLD)bunny
+.PHONY: bunny
+
+cow:
+	./$(BINFOLD)cow
+.PHONY: cow
+
+pillar:
+	./$(BINFOLD)pillar
+.PHONY: pillar
+
+icosphere:
+	./$(BINFOLD)icosphere
+.PHONY: icosphere
 
 clean:
 	rm -f $(BINFOLD)*

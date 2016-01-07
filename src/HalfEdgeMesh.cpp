@@ -64,10 +64,10 @@ HalfEdgeMesh::~HalfEdgeMesh() {
     mDebugPoints.clear();
     mDebugPoints.shrink_to_fit();
 
-    if(mBoundingbox != NULL)
+    if(mBoundingbox)
         delete mBoundingbox;
 
-    if(mCompound != NULL)
+    if(mCompound)
         delete mCompound;
 
     std::cout << "\nHalfEdgeMesh deleted\n";
@@ -86,14 +86,11 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     buildRenderData();
 
-    //calculateWorldCenterOfMass();
-
     mTransformedVertexList = mOrderedVertexList;
 
     // Update face normals
     for(unsigned int i = 0; i < mFaces.size(); i++) {
         getFace(i).normal = calculateFaceNormal(i);
-        //std::cout << getFace(i).normal << std::endl;
     }
 
     // Update vertex normals
@@ -102,6 +99,8 @@ void HalfEdgeMesh::initialize(Vector3<float> lightPosition) {
 
     // Update the lists that we draw
     updateRenderData();
+
+    std::cout << "\t --- \t Volume: " << volume() << "\t --- \t" << std::endl;
 
     glGenVertexArrays(1, &vertexArrayID);
     glBindVertexArray(vertexArrayID);
@@ -200,9 +199,6 @@ void HalfEdgeMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
         for(unsigned int i = 0; i < mDebugPoints.size(); i++)
             mDebugPoints[i]->render(sceneMatrices);
     }
-
-    //mTransMat = Matrix4x4<float>();
-
 }
 
 // This is where we add a face to the half-edge structure
@@ -214,14 +210,6 @@ bool HalfEdgeMesh::addFace(const std::vector<Vector3 <float> > verts) {
     addVertex(verts.at(0), vertIndex1);
     addVertex(verts.at(1), vertIndex2);
     addVertex(verts.at(2), vertIndex3);
-
-    /*std::cout << "--- Face ---" << std::endl;
-
-    std::cout << "vert 0: " << verts[0] << std::endl;
-    std::cout << "vert 1: " << verts[1] << std::endl;
-    std::cout << "vert 2: " << verts[2] << std::endl;
-
-    std::cout << "------------\n\n";*/
 
    // add all half-edge pairs
    unsigned int innerHalfEdgeIndex1 = 0,
@@ -283,33 +271,11 @@ void HalfEdgeMesh::createMesh(std::string objName) {
 
     calculateCenterOfMass();
 }
-/*
+
 // Rotate the mesh
-void HalfEdgeMesh::rotate(Vector3<float> axis, float angle) {
-
-    mTransMat = mTransMat * glm::rotate(glm::mat4(1.f), angle, glm::vec3(axis[0], axis[1], axis[2]));
-}
-
-// Translate the Mesh
-void HalfEdgeMesh::translate(Vector3<float> p){
-
-    mTransMat = mTransMat * glm::translate(glm::mat4(1.f),  glm::vec3(p[0], p[1], p[2]));
-    updateCenterOfMass(mTransMat);
-
-}
-
-// Scale the Mesh 
-void HalfEdgeMesh::scale(Vector3<float> s){
-
-    mTransMat = mTransMat * glm::scale(glm::mat4(1.0f), glm::vec3(s[0], s[1], s[2]));
-    updateCenterOfMass(mTransMat);
-}*/
-
-    // Rotate the mesh
 void HalfEdgeMesh::rotate(Vector3<float> axis, float angle) {
    
     //Compute the rotational matrix
-    std::cout << std::endl << "Rotating..." << std::endl;
     mTransMat = mTransMat * glm::rotate(glm::mat4(1.f), angle, glm::vec3(axis[0], axis[1], axis[2]));
  
     Matrix4x4<float>  rotationMatrix = Matrix4x4<float>::RotationXYZ(
@@ -331,7 +297,6 @@ void HalfEdgeMesh::rotate(Vector3<float> axis, float angle) {
     }
     //updateCenterOfMass(mTransMat);
     calculateCenterOfMass();
-
 }
  
 // Translate the Mesh
@@ -357,7 +322,6 @@ void HalfEdgeMesh::translate(Vector3<float> p){
         tmpPos = mTransMat*tmpPos;
 
         mVoronoiPoints[i] = Vector3<float>(tmpPos.x, tmpPos.y, tmpPos.z);
-        std::cout << "mVoronoiPoints[" << i << "]" << mVoronoiPoints[i] << std::endl;
     }
 
     if(mDebugPoints.size() > 0) {
@@ -367,7 +331,6 @@ void HalfEdgeMesh::translate(Vector3<float> p){
     }
 
     calculateCenterOfMass();
-
 }
  
 // Scale the Mesh
@@ -393,7 +356,6 @@ void HalfEdgeMesh::scale(Vector3<float> s){
         tmpPos = mTransMat*tmpPos;
 
         mVoronoiPoints[i] = Vector3<float>(tmpPos.x, tmpPos.y, tmpPos.z);
-        std::cout << "mVoronoiPoints[" << i << "]" << mVoronoiPoints[i] << std::endl;
     }
 
     calculateCenterOfMass();
@@ -409,9 +371,6 @@ float HalfEdgeMesh::volume() const {
     unsigned int edgeIndex;
 
     for(unsigned int i = 0; i < mFaces.size(); i++) {
-        
-        //if(getEdge(getFace(i).edge).face == BORDER)
-          //  continue;
 
         edgeIndex = getFace(i).edge;
         v1 = getVert(getEdge(edgeIndex).vert).pos;
@@ -435,7 +394,6 @@ void HalfEdgeMesh::updateVoronoiPoint(Vector3<float> dp, unsigned int index) {
     mDebugPoints[index]->updatePosition(dp);
 }
 
-
 void HalfEdgeMesh::updateVoronoiPoints() {
 
     Matrix4x4<float> transformMatrix = toMatrix4x4(mTransMat);
@@ -449,17 +407,9 @@ void HalfEdgeMesh::updateVoronoiPoints() {
  
 }
 
-/*
-void HalfEdgeMesh::updateVoronoiPattern() {
-
-    Trans getWorldCenterOfMass() - mInitialWorldCenterOfMass;
-}*/
-
-
 void HalfEdgeMesh::computeVoronoiPattern() {
 
     if(!mCompoundIsComputed) {
-       // updateVoronoiPattern();
         mCompound = new Compound(mBoundingbox, mVoronoiPoints);
         mCompoundIsComputed = true;
     }
@@ -476,8 +426,6 @@ void HalfEdgeMesh::calculateCenterOfMass() {
     tmpCenterOfMass /= mVerts.size();
 
     mCenterOfMass = Vector3<float>(tmpCenterOfMass[0], tmpCenterOfMass[1], tmpCenterOfMass[2]);
-
-    std::cout << "COM: " << mCenterOfMass << std::endl;
 }
 
 void HalfEdgeMesh::updateCenterOfMass(glm::mat4) {
@@ -486,7 +434,6 @@ void HalfEdgeMesh::updateCenterOfMass(glm::mat4) {
     tmpCom = mTransMat*tmpCom;
 
     mCenterOfMass = Vector3<float>(tmpCom.x, tmpCom.y, tmpCom.z);
-    //hstd::cout << "updaterad COM: " << mCenterOfMass << std::endl;
 }
 
 std::vector<Vector3<float> > HalfEdgeMesh::getUniqueVertexList() {
@@ -499,7 +446,6 @@ std::vector<Vector3<float> > HalfEdgeMesh::getUniqueVertexList() {
 
     return vertexList;
 }
-
 
 // This is where we add a vertex to the half-edge structure
 bool HalfEdgeMesh::addVertex(const Vector3<float> &v, unsigned int &index) {
@@ -522,7 +468,7 @@ bool HalfEdgeMesh::addVertex(const Vector3<float> &v, unsigned int &index) {
     return true;
 }
 
-//inserts a half edge pair between halfedgemesh point to by vert1 and vert2 
+// inserts a half edge pair between halfedgemesh point to by vert1 and vert2 
 // the first HalfEdgeMesh::HalfEdge (vert1 -> vert2) is the inner one
 // the second (vert2->vert1) is the outer one
 bool HalfEdgeMesh::addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsigned int &index1, unsigned int &index2) {
@@ -570,15 +516,8 @@ bool HalfEdgeMesh::addHalfEdgePair(unsigned int vert1, unsigned int vert2, unsig
     return true;
 }
 
-
+// Handles BORDER cases
 void HalfEdgeMesh::MergeOuterBoundaryEdge(unsigned int innerEdge) {
-    
-    // 1. Merge first loop (around innerEdge->vert)
-    // 2. Find leftmost edge, last edge counter clock-wise
-    // 3. Test if there's anything to merge
-    // 3a. If so merge the gap
-    // 3b. And set border flags
-    // 4. Merge second loop (around innerEdge->pair->vert)
     
     unsigned int tmpEdge = innerEdge;
     unsigned int tmpPrev;
@@ -622,10 +561,7 @@ void HalfEdgeMesh::MergeOuterBoundaryEdge(unsigned int innerEdge) {
         getEdge(getEdge(innerEdge).pair).face = BORDER;
         getEdge(tmpEdge).face = BORDER;
     }
-
-
 }
-
 
 void HalfEdgeMesh::addVoronoiPoint(Vector3<float> v) {
 
@@ -636,7 +572,6 @@ void HalfEdgeMesh::addVoronoiPoint(Vector3<float> v) {
 
 }
 
-
 void HalfEdgeMesh::deleteLastVoronoiPoint() {
 
     delete mDebugPoints.back();
@@ -644,8 +579,7 @@ void HalfEdgeMesh::deleteLastVoronoiPoint() {
     mVoronoiPoints.erase(mVoronoiPoints.end()-1);
 }
 
-
-//! Compute and return the normal at face at faceIndex
+// Compute and return the normal at face at faceIndex
 Vector3<float> HalfEdgeMesh::calculateFaceNormal(unsigned int faceIndex) const {
 
     if(getEdge(getFace(faceIndex).edge).face == BORDER) {
@@ -665,7 +599,6 @@ Vector3<float> HalfEdgeMesh::calculateFaceNormal(unsigned int faceIndex) const {
     return Cross(edge1, edge2).Normalize();
 }
 
-
 Vector3<float> HalfEdgeMesh::calculateVertNormal(unsigned int vertIndex) const {
 
     Vector3<float> normal(0.0f, 0.0f, 0.0f);
@@ -677,10 +610,8 @@ Vector3<float> HalfEdgeMesh::calculateVertNormal(unsigned int vertIndex) const {
             normal += getFace(faces[i]).normal;
         }
     }
-    //std::cout << "\nvert normal: " << normal.Normalize() << std::endl;
     return normal.Normalize();
 }
-
 
 std::vector<Vector3<float> > HalfEdgeMesh::buildVertexData() {
 
@@ -693,10 +624,7 @@ std::vector<Vector3<float> > HalfEdgeMesh::buildVertexData() {
     return vertexData;
 }
 
-
 void HalfEdgeMesh::buildRenderData() {
-
-    std::cout << "\n--------- buildRenderData ---------" << std::endl;
 
     for(int i = 0; i < mFaces.size(); i++ ){
         
@@ -717,45 +645,20 @@ void HalfEdgeMesh::buildRenderData() {
         mOrderedVertexList.push_back(v2.pos);
         mOrderedVertexList.push_back(v3.pos);
 
-        //std::cout << "\ninnan normal bestäms" << std::endl;
-        Vector3<float> faceNormal = getFace(i).normal;//Vector3<float>(0.0001f, 0.0001f, 0.0001f);
-     /*   
-        if(getEdge(v1.edge).face != BORDER && getEdge(v1.edge).face != UNINITIALIZED) {
-            //std::cout << "v1.normal" << std::endl;
-            faceNormal = getFace(getEdge(v1.edge).face).normal;
-        }
-        else if(getEdge(v2.edge).face != BORDER && getEdge(v2.edge).face != UNINITIALIZED) {
-            //std::cout << "v2.normal" << std::endl;
-            faceNormal = getFace(getEdge(v2.edge).face).normal;
-        }
-        else if(getEdge(v3.edge).face != BORDER && getEdge(v3.edge).face != UNINITIALIZED) {
-            //std::cout << "v3.normal" << std::endl;
-            faceNormal = getFace(getEdge(v3.edge).face).normal;
-        }
-        else if(getEdge(getEdge(v1.edge).pair).face != BORDER && getEdge(getEdge(v1.edge).pair).face != UNINITIALIZED)
-            faceNormal = getFace(getEdge(getEdge(v1.edge).pair).face).normal;
-        else if(getEdge(getEdge(v2.edge).pair).face != BORDER && getEdge(getEdge(v2.edge).pair).face != UNINITIALIZED)
-            faceNormal = getFace(getEdge(getEdge(v2.edge).pair).face).normal;
-        else if(getEdge(getEdge(v3.edge).pair).face != BORDER && getEdge(getEdge(v3.edge).pair).face != UNINITIALIZED)
-            faceNormal = getFace(getEdge(getEdge(v3.edge).pair).face).normal;
-        //std::cout << "efter normal bestäms" << std::endl;
-*/
+        Vector3<float> faceNormal = getFace(i).normal;
+
         // Add normals to our drawing list
         mOrderedNormalList.push_back(faceNormal);
         mOrderedNormalList.push_back(faceNormal);
         mOrderedNormalList.push_back(faceNormal);
     }
-    std::cout << "\n--------- buildRenderData COMPLETE !!! ---------" << std::endl;
 }
-
 
 void HalfEdgeMesh::updateRenderData() {
 
     unsigned int vertIndex = 0;
-    for(int i = 0; i < mFaces.size(); i++ ){
 
-        //if(getEdge(getFace(i).edge).face == BORDER)
-          //  continue;
+    for(int i = 0; i < mFaces.size(); i++ ){
 
         Face face = getFace(i);
 
@@ -774,21 +677,8 @@ void HalfEdgeMesh::updateRenderData() {
         mOrderedVertexList[vertIndex + 1] = v2.pos;
         mOrderedVertexList[vertIndex + 2] = v3.pos;
 
-        //Vector3<float> faceNormal = Vector3<float>(0.0001f, 0.0001f, 0.0001f);
         Vector3<float> faceNormal = getFace(i).normal;
-        /*if(getEdge(v1.edge).face != BORDER && getEdge(v1.edge).face != UNINITIALIZED)
-            faceNormal = getFace(getEdge(v1.edge).face).normal;
-        else if(getEdge(v2.edge).face != BORDER && getEdge(v2.edge).face != UNINITIALIZED)
-            faceNormal = getFace(getEdge(v2.edge).face).normal;
-        else if(getEdge(v3.edge).face != BORDER && getEdge(v3.edge).face != UNINITIALIZED)
-            faceNormal = getFace(getEdge(v3.edge).face).normal;
-        else if(getEdge(getEdge(v1.edge).pair).face != BORDER && getEdge(getEdge(v1.edge).pair).face != UNINITIALIZED)
-            faceNormal = getFace(getEdge(getEdge(v1.edge).pair).face).normal;
-        else if(getEdge(getEdge(v2.edge).pair).face != BORDER && getEdge(getEdge(v2.edge).pair).face != UNINITIALIZED)
-            faceNormal = getFace(getEdge(getEdge(v2.edge).pair).face).normal;
-        else if(getEdge(getEdge(v3.edge).pair).face != BORDER && getEdge(getEdge(v3.edge).pair).face != UNINITIALIZED)
-            faceNormal = getFace(getEdge(getEdge(v3.edge).pair).face).normal;
-*/
+
         // Add normals to our drawing list
         mOrderedNormalList[vertIndex]     = faceNormal;
         mOrderedNormalList[vertIndex + 1] = faceNormal;
@@ -798,9 +688,7 @@ void HalfEdgeMesh::updateRenderData() {
     }
 
     mBoundingbox->updateBoundingBox(buildVertexData());
-
 }
-
 
 std::vector<unsigned int> HalfEdgeMesh::findNeighborVertices(unsigned int vertIndex) const {
 
@@ -822,7 +710,6 @@ std::vector<unsigned int> HalfEdgeMesh::findNeighborVertices(unsigned int vertIn
     }
     return oneRing;
 }
-
 
 std::vector<unsigned int> HalfEdgeMesh::findNeighborFaces(unsigned int vertIndex) const {
 
@@ -851,7 +738,6 @@ std::vector<unsigned int> HalfEdgeMesh::findNeighborFaces(unsigned int vertIndex
     return foundFaces;
 }
 
-
 void HalfEdgeMesh::printMesh() {
 
     for(unsigned int i = 0; i < mFaces.size(); i++) {
@@ -862,7 +748,6 @@ void HalfEdgeMesh::printMesh() {
     }
 }
 
-
 unsigned int HalfEdgeMesh::getEdge(Vector3<float> vertPos) {
 
     for(unsigned int i = 0; i < mEdges.size(); i++) {
@@ -870,7 +755,6 @@ unsigned int HalfEdgeMesh::getEdge(Vector3<float> vertPos) {
             return i;
     }
 }
-
 
 Matrix4x4<float> HalfEdgeMesh::toMatrix4x4(glm::mat4 m) {
     float M[4][4] = {
@@ -882,14 +766,12 @@ Matrix4x4<float> HalfEdgeMesh::toMatrix4x4(glm::mat4 m) {
     return Matrix4x4<float>(M);
 }
 
-
 Vector3<float> HalfEdgeMesh::getWorldCenterOfMass() {
 
     Vector4<float>WCM = toMatrix4x4(mTransMat) * Vector4<float>(mCenterOfMass[0], mCenterOfMass[1], mCenterOfMass[2], 1.0f); 
 
     return Vector3<float>(WCM[0], WCM[1], WCM[2]);
 }
-
 
 void HalfEdgeMesh::updateMesh(glm::mat4 m) {
 
@@ -908,17 +790,4 @@ void HalfEdgeMesh::updateMesh(glm::mat4 m) {
         Vector4<float> v = transformMatrix * Vector4<float>(mOrderedVertexList[i][0], mOrderedVertexList[i][1], mOrderedVertexList[i][2], 1.0f);
         mTransformedVertexList[i] = Vector3<float>(v[0], v[1], v[2]);
     }    
-
-    /*std::cout << " asdasd ----------------" << std::endl;
-    updateVoronoiPatterns(mObjName, transformMatrix);
-    std::cout << " ---------- \n" << std::endl;*/
 }
-
-/*
-void HalfEdgeMesh::calculateWorldCenterOfMass() {
-
-    for(unsigned int i = 0; i < mVerts.size(); i++)
-        mInitialWorldCenterOfMass += mVerts[i].pos;
-
-    mInitialWorldCenterOfMass /= static_cast<float>(mVerts.size());
-}*/

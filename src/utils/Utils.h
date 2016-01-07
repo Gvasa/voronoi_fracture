@@ -44,18 +44,12 @@ static std::vector<Vector3<float> > getVoronoiPattern(std::string obj);
 static void updateVoronoiPatterns(std::string, Matrix4x4<float>);
 static bool createPreDefinedVoronoiPoints();
 
-
 const int WIDTH = 1024;
 const int HEIGHT = 768;
 
 // Set constants for flaging of edges that are not valid half-edges
 const static unsigned int BORDER = (std::numeric_limits<unsigned int>::max)();
 const static unsigned int UNINITIALIZED = (std::numeric_limits<unsigned int>::max)()-1;
-
-// Denotes a reference to a border, only for face pointers
-    //const static unsigned int BORDER;
-    // Denotes a reference to a non-existing object
-    //const static unsigned int UNINITIALIZED;
 
 class Utils {
 
@@ -84,7 +78,7 @@ static Vector4<float> mColorScale[12] = {
         Vector4<float>(177.0f/255.0f, 89.0f /255.0f, 40.0f /255.0f, 0.5f)
     };
 
-static unsigned int uglyFuckCounter = 0;
+static unsigned int mColorScaleCounter = 0;
 
 static Vector4<float> getColor(unsigned int i) { return mColorScale[i]; }
 
@@ -112,73 +106,25 @@ static bool createPreDefinedVoronoiPoints() {
     VP.clear();
     VP.shrink_to_fit();
 
-    VP.push_back(Vector3<float>(0.4f, 0.2f, 0.0f));
-    VP.push_back(Vector3<float>(0.25f, 0.1f, 0.0f));
-    VP.push_back(Vector3<float>(0.15f, 0.05f, 0.0f));
-    VP.push_back(Vector3<float>(-0.45f, 0.05f, 0.0f));
-    sVoronoiPoints["cow"] = VP;
+    VP.push_back(Vector3<float>(-0.7f, 0.15f, 0.0f));
+    VP.push_back(Vector3<float>(-0.25f, 0.45f, 0.0f));
+    VP.push_back(Vector3<float>(0.15f, 0.15f, 0.0f));
+    VP.push_back(Vector3<float>(0.6f, 0.35f, 0.0f));
+    VP.push_back(Vector3<float>(0.7f, 0.4f, 0.0f));
+    sVoronoiPoints["cow_2"] = VP;
 
     VP.clear();
     VP.shrink_to_fit();
-}
 
-static void updateVoronoiPatterns2(std::string s) {
-    std::cout << "--------------   update2 --------------" << std::endl;
+    VP.push_back(Vector3<float>(0.0f, -0.05f, 0.0f));
+    VP.push_back(Vector3<float>(-0.1f, 0.2f, -0.05f));
+    VP.push_back(Vector3<float>(0.1f, 0.2f, 0.05f));
+    VP.push_back(Vector3<float>(0.0f, 0.35f, 0.0f));
+    VP.push_back(Vector3<float>(0.0f, 0.6f, 0.0f));
+    sVoronoiPoints["pillar"] = VP;
 
-    std::map<std::string, std::vector<Vector3<float> > >::iterator it;
-    
-    it = sVoronoiPoints.find("icosphere");
-
-    if(it != sVoronoiPoints.end())
-        std::cout << "DEN ÄR HITTAD" << std::endl;
-
-}
-
-static void updateVoronoiPatterns(std::string s, Matrix4x4<float> M) {
-
-    std::cout << "--------------   akdjasdaskjdakjdnas --------------" << std::endl;
-    std::cout << "s: " << s << std::endl;
-    std::cout << "sVoronoiPoints.size(): " << sVoronoiPoints.size() << std::endl;
-
-
-
-    std::vector<Vector3<float> > foo = getVoronoiPattern(s);
-    std::cout << "foo.size: " << foo.size() << std::endl;
-
-
-    std::map<std::string, std::vector<Vector3<float> > >::iterator it;
-    
-    it = sVoronoiPoints.find(s);
-
-    if(it != sVoronoiPoints.end()) {
-        std::cout << "DEN ÄR HITTAD" << std::endl;
-        std::cout << "sVoronoiPoints.size(): " << sVoronoiPoints["icosphere"].size() << std::endl;
-    }
-
-    for(std::vector<Vector3<float> >::iterator it = sVoronoiPoints[s].begin(); it != sVoronoiPoints[s].end(); ++it) {
-        
-        std::cout << "-------------- MEN I DENNA DÅ ASHMDBASJ;DBASKDJBAK --------------" << std::endl;
-        /*for(std::vector<Vector3<float> >::iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2) {
-            Vector4<float> p = M * Vector4<float>((*it2)[0], (*it2)[1], (*it2)[2], 1.0f);
-            (*it2) = Vector3<float>(p[0], p[1], p[2]);
-        }*/
-    }
-}
-
-
-static std::vector<Vector3<float> > getVoronoiPattern(std::string obj) {
-    
-    std::map<std::string, std::vector<Vector3<float> > >::iterator it;
-    
-    it = sVoronoiPoints.find(obj);
-    
-    if(it != sVoronoiPoints.end()) {
-        std::cout << "*************svoronoipoints[obj].size: " << sVoronoiPoints[obj].size() << std::endl;
-        return sVoronoiPoints[obj];   
-    } else {
-        std::vector<Vector3<float> > empty;
-        return empty;
-    }
+    VP.clear();
+    VP.shrink_to_fit();
 }
 
 #endif // UTILS_H

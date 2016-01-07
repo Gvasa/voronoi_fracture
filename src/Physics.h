@@ -12,7 +12,6 @@
 #include "math/Matrix4x4.h"
 #include "tools/shader.hpp"
 #include "utils/Utils.h"
-//#include "OpenGLMotionState.h"
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision/CollisionShapes/btShapeHull.h"
 #include "BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h"
@@ -28,7 +27,7 @@ public:
     
     ~Physics(); 
     
-    void addGeometry(std::vector<Vector3<float> >, Vector3<float>, unsigned int);
+    void addGeometry(std::vector<Vector3<float> >, Vector3<float>, unsigned int, float);
     
     void stepSimulation(Matrix4x4<float>);
     
@@ -50,9 +49,13 @@ private:
     // Shader data
 
     GLuint vertexArrayID;
+    
     GLuint vertexBuffer;
+    
     GLuint shaderProgram;
-    GLint MVPLoc; // MVP Matrix
+    
+    GLint MVPLoc;
+    
     GLint ColorLoc;
     
     // Member variables
@@ -78,9 +81,6 @@ private:
     GLDebugDrawer mDebugDrawer;
 
     double prevTime;
-
-
-
 };
 
 #endif // PHYSICS_H

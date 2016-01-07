@@ -128,32 +128,20 @@ protected:
 
 public:
 
-    //! Minimal requirements for all meshes, inherited
+    // Minimal requirements for all meshes
     struct Face{
-        Face(const Vector3<float> & n = Vector3<float>(0,0,0),
-            const Vector3<float> & c = Vector3<float>(0.5,0.1,0.7),
-            float u = 0) 
-            : normal(n), 
-            color(c), 
-            curvature(u) {}
+        Face(const Vector3<float> & n = Vector3<float>(0,0,0)) 
+            : normal(n) {}
         Vector3<float> normal;
-        Vector3<float> color;
-        float curvature;
     };
-    //! Minimal requirements for all meshes, inherited
+    // Minimal requirements for all meshes
     struct Vertex{
         Vertex(const Vector3<float> & p = Vector3<float>(0,0,0),
-            const Vector3<float> & n = Vector3<float>(0,0,0),
-            const Vector3<float> & c = Vector3<float>(0.5,0.1,0.7),
-            float u = 0)
+            const Vector3<float> & n = Vector3<float>(0,0,0))
             : pos(p),
-            normal(n),
-            color(c),
-            curvature(u) {}
+            normal(n) {}
         Vector3<float> pos;
         Vector3<float> normal;
-        Vector3<float> color;
-        float curvature;
   };
 
   struct Material {
@@ -164,7 +152,6 @@ public:
         float specularity;
         float shinyness;
     };
-
 };
 
 #endif // GEOMETRY_H

@@ -7,24 +7,14 @@ ClippingMesh::~ClippingMesh() {
     mVerts.shrink_to_fit();
 }
 
-
-void ClippingMesh::initialize() {
-
-    std::cout << "\ninitializing ClippingMesh... ";
-
-    std::cout << "Done!\n";
-}
-
-
 HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
 
     float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     float g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
-    //HalfEdgeMesh * hm = new HalfEdgeMesh(Vector4<float>(r, g, b, 1.0f));
-    HalfEdgeMesh * hm = new HalfEdgeMesh(mColorScale[uglyFuckCounter], "");
-    uglyFuckCounter++;
+    HalfEdgeMesh * hm = new HalfEdgeMesh(mColorScale[mColorScaleCounter], "");
+    mColorScaleCounter++;
 
     mVerts = mHalfEdgeMesh->getVertexList();
 
@@ -44,8 +34,7 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
         if(refVoronoiPoint != voronoiPair.first && refVoronoiPoint != voronoiPair.second)
             continue;
 
-        // Normal of the splitting plane, we can get it from SplittingPlane object,
-        // but then it might point in the wrong direction so computing it should be faster
+        // Normal of the splitting plane
         Vector3<float> normal;
         if(voronoiPair.first == refVoronoiPoint)
             normal = (voronoiPair.second - voronoiPair.first).Normalize();
@@ -76,21 +65,6 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
 
             // Clip the polygon and set the number of vertices
             polygon.numVerts = clipFace(polygon, normal, P, createdVertices);
-
-            /*************************************************************************
-    
-            We can now split a halfedgemesh which creates a new one and deletes the
-            old one. We now need to make a big fucking loop that creates parts for the
-            entier object and then deletes the original. Also make the maesh clip against
-            every splitting plane that contains the voronoi point corresponding to the
-            current cell.
-
-            1. Loop over all cells outside this class, i.e. in the scene.
-            2. Determine which planes that are created by this point.
-            3. Cut the mesh against every plane.
-            4. return a new half-edge mesh.
-
-            *************************************************************************/
 
             sortPolygonCounterClockWise(polygon);
 
@@ -138,7 +112,6 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
             std::reverse(createdVertices.begin(), createdVertices.end());
         }
 
-        //triangulateArbPolygon(createdVertices, clippedVerts);
         triangulateConvexPolygon(createdVertices, clippedVerts);
         mVerts.clear();
         mVerts.shrink_to_fit();
@@ -148,16 +121,11 @@ HalfEdgeMesh * ClippingMesh::clipMesh(Vector3<float> refVoronoiPoint) {
 
         createdVertices.clear();
         createdVertices.shrink_to_fit();
-
-        std::cout << "DONE WITH PLANE" << j << std::endl;
-
     }
 
     std::vector<Vector3<float> > Face;
     Face.resize(3);
     unsigned int counter = 0;
-
-    std::cout << "\nclippedVerts.size(): " << mVerts.size() << std::endl;
 
     for(unsigned int i = 0; i < mVerts.size(); i+=3){
 
@@ -517,12 +485,10 @@ bool ClippingMesh::triangulateQuad(Polygon &P1, Polygon &P2) {
     P2.numVerts = 3;
 }
 
-//! Triangulates a polygon of any shape, however it need to be sorted correctly in order to draw correct.
+//  Triangulates a polygon of any shape, however it needs to be sorted correctly in order to draw correct.
 //  This is however not trivial to do for a non-convex polygon. So if the polygon is 100% convex, use the 
 //  function bellow instead.
 bool ClippingMesh::triangulateArbPolygon(std::vector<Vector3<float> > &P, std::vector<Vector3<float> > &clippedVerts) {
-
-    std::cout << "\ntriangulating..." << std::endl;
 
     // Can't make any triangles
     if(P.size() < 3) {
@@ -547,7 +513,6 @@ bool ClippingMesh::triangulateArbPolygon(std::vector<Vector3<float> > &P, std::v
                 clippedVerts.push_back(P[2]);
                 clippedVerts.push_back(P[1]);
 
-                std::cout << "\ntriangulation done!" << std::endl;
                 return true;
             }
 
@@ -606,12 +571,10 @@ bool ClippingMesh::triangulateArbPolygon(std::vector<Vector3<float> > &P, std::v
         }
     }
 
-    std::cout << "\ntriangulation done!" << std::endl;
-
     return true;
 }
 
-//! Triangulates a completely convex and sorted polygon
+// Triangulates a completely convex and sorted polygon
 bool ClippingMesh::triangulateConvexPolygon(std::vector<Vector3<float> > &P, std::vector<Vector3<float> > &clippedVerts) {
 
     Vector3<float> centerOfMass = Vector3<float>(0.0f, 0.0f, 0.0f);
@@ -691,4 +654,3 @@ bool ClippingMesh::findVertex(std::vector<Vector3<float> > &V, Vector3<float> v)
     else
         return false;
 }
-

@@ -1,26 +1,23 @@
 #include "Controls.h"
 
-
-Controls::~Controls() {
-
- 
-}
-
 void Controls::dragStart(double x, double y) {
+
     mDragged = true;
     dragUpdate(x, y);
 }
 
-//update the mouse current position
+// update the mouse current position
 void Controls::dragUpdate(double x, double y) {
+    
     if(mDragged) {
         mDragStartPosition.x = x - mCenterPosition.x;
         mDragStartPosition.y = y - mCenterPosition.y;
     }
 }
 
-//notify that the mouse is not moving
+// notify that the mouse is not moving
 void Controls::dragEnd() {
+    
     if(mDragged) {
         dragUpdate(0.0f, 0.0f);
         mDragged = false;
@@ -29,9 +26,11 @@ void Controls::dragEnd() {
 
 //returns the direction of the movement done
 glm::vec2 Controls::direction(double x, double y) {
+    
     glm::vec2 dragEndPosition(x - mCenterPosition.x, y - mCenterPosition.y);
     glm::vec2 v(dragEndPosition.x - mDragStartPosition.x, dragEndPosition.y - mDragStartPosition.y);
     v.y = -v.y;
+
     return glm::normalize(v);
 }
 
@@ -61,7 +60,7 @@ glm::vec3 Controls::map_to_sphere(const glm::vec2 &point) {
 
     p.y = -p.y;
 
-    float safeRadius = mRadius - 1.0f;       // safe radius is       
+    float safeRadius = mRadius - 1.0f; // safe radius is       
 
     if(glm::length(p) > safeRadius) {
         float theta = atan2(p.y, p.x);

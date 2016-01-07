@@ -70,8 +70,7 @@ void SimpleMesh::render(std::vector<Matrix4x4<float> > sceneMatrices) {
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, mVerts.size() * sizeof(Vector3<float>), &mVerts[0], GL_STATIC_DRAW);
 
-    // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0, mVerts.size()); // 3 indices starting at 0 -> 1 triangle
+    glDrawArrays(GL_TRIANGLES, 0, mVerts.size());
     
     // Unbind
     glBindVertexArray(0);

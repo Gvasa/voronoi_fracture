@@ -19,13 +19,14 @@
 #include <unistd.h>
 #include <map>
 
-
 // Classes
 #include "../math/Vector3.h"
 
 
-class LoadObj{
+class LoadObj {
+
 public:
+
 	LoadObj() {}
 
 	bool loadObject(std::string fileName); //false return on error
@@ -37,10 +38,10 @@ protected:
     std::map<std::string, std::vector<std::vector<Vector3<float> > > > mObjects;  
 
 	bool readHeader(std::istream &is);
+
 	bool readData(std::istream &is);
 
 	Vector3<unsigned int> readTri(std::istream &is);
-
 
 	struct LoadData{
 		std::vector<Vector3 <float> > verts;

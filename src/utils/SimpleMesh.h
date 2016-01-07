@@ -1,3 +1,11 @@
+/******************************************************************************
+ *
+ * A utility class for simple drawing of meshes.
+ * No neighborhood information is stored in this crude data structure, hence
+ * it is only sufficient for rendering.
+ *
+ *****************************************************************************/
+
 #ifndef SIMPLEMESH_H
 #define SIMPLEMESH_H
 
@@ -32,7 +40,7 @@ public:
 
     unsigned int getNumberOfVerts() { return mVerts.size(); }
     
-    std::vector<Vector3<float>  >getVertexList() { return mVerts; }
+    std::vector<Vector3<float> > getVertexList() { return mVerts; }
 
 private:
 

@@ -21,9 +21,9 @@ class Controls{
 public:
 
     Controls(float radius, float x = WIDTH, float y = HEIGHT) 
-            : mRadius(radius), mCenterPosition(glm::vec2(x/2.0, y/2.0)) {}
+            : mRadius(radius), mCenterPosition(glm::vec2(x / 2.0, y / 2.0)) { }
 
-    ~Controls();
+    ~Controls() { };
 
     void dragStart(double x, double y);
     
@@ -41,16 +41,18 @@ public:
         mCenterPosition.x = x;
         mCenterPosition.y = y;
     }
-    
 
 private:
+
     glm::vec2 mCenterPosition;
+    
     glm::vec2 mDragStartPosition;
+    
     float mRadius;
+    
     bool mDragged;
 
     glm::vec3 map_to_sphere(const glm::vec2 &point);
-
 };
 
 #endif // CONTROLS_H

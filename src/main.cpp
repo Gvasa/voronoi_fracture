@@ -16,7 +16,6 @@ GLFWwindow* window = nullptr;
 Scene *scene = nullptr;
 Geometry *mesh = nullptr;
 Geometry *floor_rect = nullptr;
-Geometry *wall_rect = nullptr;
 Utils *utilHandler = nullptr;
 
 std::string windowTitle = "Voronoi Fracture";
@@ -39,7 +38,6 @@ int main (int argc, char* argv[]) {
 
     srand (static_cast<unsigned>(time(0)));
 
-
     // Magic
     glewExperimental = GL_TRUE;
     
@@ -60,41 +58,27 @@ int main (int argc, char* argv[]) {
     // Floor
     floor_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
     floor_rect->rotate(Vector3<float>(1.0f, 0.0f, 0.0f), 90.0f);
+    floor_rect->scale(Vector3<float>(2.5f, 1.0f, 2.0f));
     floor_rect->translate(Vector3<float>(0.0f, -0.5f, 0.0f));
-    floor_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
-
-    // Wall
-    wall_rect = new Rectangle(1.0f, 1.0f, Vector3<float>(0.0f, 0.0f, 0.0f));
-    wall_rect->translate(Vector3<float>(0.0f, 0.0f, -1.0f));
-    wall_rect->scale(Vector3<float>(1.5f, 1.0f, 1.0f));
 
     // HalfEdge mesh
     mesh = new HalfEdgeMesh(Vector4<float>(0.2f, 0.8f, 0.2f, 0.4f));
     mesh->addVoronoiPoint(Vector3<float>(0.0f, 0.0f, 0.0f));
     mesh->setDebugMode(true);
 
-    //mesh->createMesh("lowPolySphere1.0");
-    //mesh->createMesh("sphere1.0");
+    // The following meshes has pre-defined voronoi patterns
+    
     //mesh->createMesh("pillar");
-    //mesh->createMesh("icosphere");
-    //mesh->createMesh("Sphere1.0_hole");
-    //mesh->createMesh("bunnySmall");
+    mesh->createMesh("icosphere");
+    //mesh->createMesh("bunnySmall_reduced");
     //mesh->createMesh("cube");
-    //mesh->createMesh("cube_hole");s
-    mesh->createMesh("cow");
-    //mesh->scale(Vector3<float>(0.5f, 0.5f, 0.5f));
-    //mesh->translate(Vector3<float>(0.5f, -0.5f, 0.0f));
-   
-    //mesh->translate(Vector3<float>(0.0f, 3.0f, 0.0f));
+    //mesh->createMesh("cow_2");
 
     mesh->markCurrentVoronoiPoint(currentVoronoiIndex, Vector4<float>(1.0f, 1.0f, 1.0f, 1.0f));
     scene->addGeometry(floor_rect, STATIC);
-    //scene->addGeometry(wall_rect, STATIC);
     scene->addGeometry(mesh, STATIC);
 
     initializeScene();
-
-    //scene->setInitialVelocity(1, Vector3<float>(1.0f, 5.0f, 0.0f));
 
     //Set functions to handle mouse input
     glfwSetMouseButtonCallback(window, mouseButton);
@@ -103,7 +87,7 @@ int main (int argc, char* argv[]) {
     glfwSetKeyCallback(window, keyboardInput);
 
     // render-loop
-    do{
+    do {
         calcFPS(1.0, windowTitle);
         // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -117,11 +101,10 @@ int main (int argc, char* argv[]) {
         glfwPollEvents();
 
     } // Check if the ESC key was pressed or the window was closed
-    while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
+    while ( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
            glfwWindowShouldClose(window) == 0 );
 
     // Clean-up
-    //delete floor_rect;
     delete scene;
 
     // Close OpenGL window and terminate GLFW
@@ -309,8 +292,9 @@ void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mo
 
                     dynamic_cast<HalfEdgeMesh*>(mesh)->deleteLastVoronoiPoint();
 
-                    for(unsigned int i = 0; i < voronoiPattern.size(); i++)
+                    for(unsigned int i = 0; i < voronoiPattern.size(); i++) {
                         mesh->addVoronoiPoint(voronoiPattern[i]);
+                    }
 
                     mesh->updateVoronoiPoints();
                     mesh->computeVoronoiPattern();
@@ -321,6 +305,11 @@ void keyboardInput(GLFWwindow* window, int key, int scancode, int action, int mo
                     voronoiPattern.shrink_to_fit();
                 }
             
+                break;
+
+            case GLFW_KEY_O:
+                scene->togglePhysics();
+
                 break;
 
             default:

@@ -70,6 +70,8 @@ public:
 
     void updatePreComputedVoronoiPattern(std::string, glm::mat4);
 
+    void togglePhysics() { playPhysics = !playPhysics; }
+
 private:
 
     Matrix4x4<float> toMatrix4x4Row(glm::mat4);
@@ -90,12 +92,24 @@ private:
 
     std::map<std::string, std::vector<Vector3<float> > > mVoronoiPoints;
 
+    bool playPhysics = false;
+
+    Controls *control = nullptr;
+
     struct LightSource {
         Vector4<float> color;
         Vector3<float> position;
     } mPointLight;
 
-    Controls *control;
+    struct cameraHandler {
+    
+        float fov = 45.0f;
+        float aspectRatio = 4.0f / 3.0f;
+        float zoom = 4.0f;
+        glm::quat orientation;
+        glm::mat4 projectionMatrix;
+        glm::mat4 viewMatrix;
+    } mCamera;
 };
 
 #endif // SCENE_H

@@ -8,7 +8,7 @@
 //Classes
 #include "LoadObj.h"
 
-bool LoadObj::loadObject(std::string objName){
+bool LoadObj::loadObject(std::string objName) {
 
     std::string fileName = "assets/" + objName + ".obj";
     
@@ -31,36 +31,34 @@ bool LoadObj::loadObject(std::string objName){
     } else
         return false;
     
-	// Build Mesh
-	const unsigned int numTriangles = loadData.triangles.size();
-	for(unsigned int t = 0; t < numTriangles; t++){
-		Vector3<unsigned int> & triangle = loadData.triangles[t];
-		std::vector<Vector3 <float> > verts;
+    // Build Mesh
+    const unsigned int numTriangles = loadData.triangles.size();
+    for(unsigned int t = 0; t < numTriangles; t++){
+        Vector3<unsigned int> & triangle = loadData.triangles[t];
+        std::vector<Vector3 <float> > verts;
 
-		verts.push_back(loadData.verts[triangle[0]]);
-		verts.push_back(loadData.verts[triangle[1]]);
-		verts.push_back(loadData.verts[triangle[2]]);
+        verts.push_back(loadData.verts[triangle[0]]);
+        verts.push_back(loadData.verts[triangle[1]]);
+        verts.push_back(loadData.verts[triangle[2]]);
         
         mObjects[objName].push_back(verts);
-		//mesh->addFace(verts);
-	}
+    }
 
     std::cout << "\n" << fileName.substr(fileName.find("/")+1) << " successfully loaded!\n";
 
-	return true;
+    return true;
 }
 
 bool LoadObj::readHeader(std::istream &is){
-	std::string buf;
-	//read only to the first line starting with "v"
-	while(!is.eof() && is.peek() != 'v'){
-		getline(is, buf);
-		//std::cerr << "\"" << buf << "\"\n";
-	}
-	if (is.good())
-		return true;
-	else
-		return false;
+    std::string buf;
+    //read only to the first line starting with "v"
+    while(!is.eof() && is.peek() != 'v'){
+        getline(is, buf);
+    }
+    if (is.good())
+        return true;
+    else
+        return false;
 }
 
 bool LoadObj::readData(std::istream & is){
@@ -140,6 +138,4 @@ std::vector<std::vector<Vector3<float> > > LoadObj::getMeshVertexList(std::strin
     }
 
     return it->second;
-
 }
-

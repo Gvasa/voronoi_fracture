@@ -8,7 +8,7 @@ uniform mat4 MVP;
 
 out vec4 outColor;
 
-void main(){
+void main() {
 
     vec4 pos;
     pos.xyz = vertPos;

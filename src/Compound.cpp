@@ -8,6 +8,18 @@ Compound::Compound(Boundingbox* boundingBox, std::vector<Vector3 <float> > voron
 
 Compound::~Compound() {
 
+    for(std::vector<Splittingplane *>::iterator it = mSplittingPlanes.begin(); it != mSplittingPlanes.end();) {
+        delete *it;
+        it = mSplittingPlanes.erase(it);
+    }
+
+    mSplittingPlanes.clear();
+    mSplittingPlanes.shrink_to_fit();
+
+    mVoronoiPoints.clear();
+    mVoronoiPoints.shrink_to_fit();
+
+    std::cout << "\ndelete compound!" << std::endl;
 }
 
 
@@ -16,7 +28,7 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
     mVoronoiPoints = voronoiPoints;
     Vector3<float> voronoiMassCenter = Vector3<float>(0.0f, 0.0f, 0.0f);
 
-    //from our voronoipoints create splitting planes and store them in mSplittingplanes
+    // from our voronoipoints create splitting planes and store them in mSplittingplanes
     for(unsigned int i = 0; i < voronoiPoints.size(); i++) {
         
         std::pair<Vector3<float>, Vector3<float> > voronoiPair;
@@ -27,7 +39,6 @@ void Compound::calculateVoronoiPattern(Boundingbox* boundingBox, std::vector<Vec
             std::cout << std::endl << voronoiPoints[i] << std::endl;
             std::cout << voronoiPoints[j] << std::endl;
             calculateSplittingPlane(boundingBox, voronoiPair);
-            std::cout << "\ncompute splitting plane!\n";
         }
 
         voronoiMassCenter += voronoiPoints[i];

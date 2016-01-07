@@ -32,8 +32,6 @@ public:
 
     void print() { std::cout << "\n---- Create ClippingMesh! ----\n"; }
 
-    void initialize();
-
     HalfEdgeMesh * clipMesh(Vector3<float>);
 
 private:
@@ -51,10 +49,6 @@ private:
     HalfEdgeMesh * mHalfEdgeMesh = nullptr;
 
     std::vector<Vector3<float> > mVerts;
-
-    //std::vector<Vector3<float> > mFaces;
-
-    std::vector<Polygon> mClippedPolygons;
 
     int clipFace(Polygon &, Vector3<float>, Vector3<float>, std::vector<Vector3<float> > &);
 

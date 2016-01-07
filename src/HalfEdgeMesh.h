@@ -70,9 +70,11 @@ public:
     void markCurrentVoronoiPoint(unsigned int i, Vector4<float> c) { mDebugPoints[i]->setColor(c); }
 
     bool isCompoundComputed() { return mCompoundIsComputed; }
+
     void calculateCenterOfMass();
 
     Compound* getCompound() { return mCompound; }
+    
     void updateCenterOfMass(glm::mat4);
 
     Vector3<float> getVoronoiPoint(unsigned int i) { return mVoronoiPoints[i]; }

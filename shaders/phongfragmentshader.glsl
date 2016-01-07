@@ -14,7 +14,9 @@ in vec3 light_direction;
 
 out vec4 frag_color;
 
+
 vec4 calcShading( vec3 N, vec3 L ) {
+    
     //Ambient contribution
     vec4 Iamb = ambientColor;
 
@@ -55,5 +57,4 @@ void main() {
     frag_color.rgb += calcSpecularShading(
         normalize(vec3(NM * vec4(normal, 1.0))),
         light_direction).rgb * shinyness;
-
 }

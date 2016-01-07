@@ -37,8 +37,6 @@ private:
     // Member functions
 
     void calculateBoundingbox(std::vector<Vector3<float> >);
-    
-    void calculateConvexHull(std::vector<Vector3<float> >);
 
     // Shader data
 
@@ -48,7 +46,7 @@ private:
     
     GLuint shaderProgram;
 
-    GLint MVPLoc; // MVP Matrix
+    GLint MVPLoc;
     
     GLint ColorLoc;
     
@@ -63,8 +61,6 @@ private:
     std::map<std::string, unsigned int> mBoundingValuesIndex;
 
     bool mWireframe = false;
-
-
 };
 
 #endif // BOUNDINGBOX_H
